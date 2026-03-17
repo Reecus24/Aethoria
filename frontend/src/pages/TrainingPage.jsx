@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import axios from '../utils/axios';
 import { motion } from 'framer-motion';
-import { Dumbbell, Clock } from 'lucide-react';
+import { Dumbbell, Clock, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -65,6 +66,20 @@ export default function TrainingPage() {
           Trainiere deine Stats, um mächtiger zu werden • Kosten: 100 Energie • Dauer: 12 Stunden
         </p>
       </div>
+
+      {/* Warning Alert */}
+      {!activeTraining && (
+        <Alert className="mb-6" style={{ 
+          backgroundColor: 'rgba(255, 152, 0, 0.1)', 
+          borderColor: '#FF9800',
+          borderWidth: '1px'
+        }}>
+          <AlertTriangle className="h-5 w-5" style={{ color: '#FF9800' }} />
+          <AlertDescription style={{ color: 'var(--aeth-parchment)', fontFamily: "'IBM Plex Sans', sans-serif" }}>
+            <span className="font-semibold">Achtung:</span> Während des Trainings kannst du <strong>keine anderen Aktionen</strong> durchführen (Kampf, Verbrechen, Quests, Reisen, Jagd, Taverne). Wähle den richtigen Zeitpunkt!
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Active Training */}
       {activeTraining && (
