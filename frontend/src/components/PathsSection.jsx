@@ -22,6 +22,7 @@ export const PathsSection = ({ paths = [] }) => {
 
   return (
     <section
+      id="paths"
       data-testid="paths-section"
       className="aeth-section"
       style={{ backgroundColor: 'var(--aeth-stone-1)' }}

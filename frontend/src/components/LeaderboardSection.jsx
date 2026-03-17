@@ -1,16 +1,17 @@
 import { motion } from 'framer-motion';
-import { Trophy, TrendingUp } from 'lucide-react';
+import { TrendingUp, Trophy } from 'lucide-react';
 
 const getRankStyle = (rank) => {
-  if (rank === 1) return { color: 'var(--aeth-gold)', label: '👑' };
-  if (rank === 2) return { color: '#A0A0A0', label: '⚔' };
-  if (rank === 3) return { color: 'var(--aeth-amber)', label: '🛡' };
-  return { color: 'var(--aeth-parchment-dim)', label: `#${rank}` };
+  if (rank === 1) return { color: 'var(--aeth-gold)', symbol: '👑', glow: 'rgba(214,162,77,0.15)' };
+  if (rank === 2) return { color: '#C0C0C0', symbol: '⚔', glow: 'rgba(192,192,192,0.1)' };
+  if (rank === 3) return { color: 'var(--aeth-amber)', symbol: '🛡', glow: 'rgba(201,131,46,0.12)' };
+  return { color: 'var(--aeth-parchment-dim)', symbol: `#${rank}`, glow: null };
 };
 
 export const LeaderboardSection = ({ leaderboard = [] }) => {
   return (
     <section
+      id="leaderboard"
       data-testid="leaderboard-section"
       className="aeth-section"
       style={{ backgroundColor: 'var(--aeth-stone-1)' }}
@@ -24,7 +25,7 @@ export const LeaderboardSection = ({ leaderboard = [] }) => {
           className="text-center mb-12"
         >
           <div className="aeth-divider mb-8">
-            <span style={{ color: 'var(--aeth-gold)', fontSize: '1.2rem' }}>🏆</span>
+            <Trophy size={18} style={{ color: 'var(--aeth-gold)' }} />
           </div>
           <h2
             className="font-cinzel mb-3"
@@ -60,14 +61,14 @@ export const LeaderboardSection = ({ leaderboard = [] }) => {
                     borderBottom: '1px solid var(--aeth-iron)',
                   }}
                 >
-                  {['Rank', 'Adventurer', 'Title', 'Age', 'Level', 'Growth'].map((h) => (
+                  {['Rank', 'Adventurer', 'Title', 'Days', 'Level', 'Growth'].map((h) => (
                     <th
                       key={h}
-                      className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
+                      className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider"
                       style={{
                         color: 'var(--aeth-parchment-dim)',
                         fontFamily: "'Cinzel', serif",
-                        letterSpacing: '0.06em',
+                        letterSpacing: '0.07em',
                       }}
                     >
                       {h}
@@ -81,34 +82,43 @@ export const LeaderboardSection = ({ leaderboard = [] }) => {
                   return (
                     <tr
                       key={entry.rank}
-                      className="border-b"
+                      className="border-b group"
                       style={{
                         borderColor: 'var(--aeth-iron)',
-                        backgroundColor: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.015)',
+                        backgroundColor:
+                          entry.rank === 1
+                            ? 'rgba(214,162,77,0.04)'
+                            : i % 2 === 0
+                            ? 'transparent'
+                            : 'rgba(255,255,255,0.012)',
                         transition: 'background-color 0.15s ease',
+                        boxShadow: rankInfo.glow ? `inset 3px 0 0 ${rankInfo.color}55` : undefined,
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = 'rgba(214,162,77,0.05)';
-                        e.currentTarget.style.borderLeftColor = 'var(--aeth-gold)';
+                        e.currentTarget.style.backgroundColor = 'rgba(214,162,77,0.06)';
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundColor =
-                          i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.015)';
+                          entry.rank === 1
+                            ? 'rgba(214,162,77,0.04)'
+                            : i % 2 === 0
+                            ? 'transparent'
+                            : 'rgba(255,255,255,0.012)';
                       }}
                     >
-                      <td className="px-4 py-3">
+                      <td className="px-5 py-3.5">
                         <span
-                          className="text-sm font-bold"
                           style={{
                             color: rankInfo.color,
                             fontFamily: "'Cinzel', serif",
-                            fontSize: entry.rank <= 3 ? '1rem' : '0.85rem',
+                            fontSize: entry.rank <= 3 ? '1.05rem' : '0.85rem',
+                            fontWeight: 700,
                           }}
                         >
-                          {rankInfo.label}
+                          {rankInfo.symbol}
                         </span>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-5 py-3.5">
                         <span
                           className="font-semibold text-sm"
                           style={{ color: 'var(--aeth-parchment)', fontFamily: "'IBM Plex Sans', sans-serif" }}
@@ -116,28 +126,28 @@ export const LeaderboardSection = ({ leaderboard = [] }) => {
                           {entry.username}
                         </span>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-5 py-3.5">
                         <span
                           className="text-xs px-2 py-0.5 rounded-full"
                           style={{
-                            backgroundColor: 'rgba(214,162,77,0.12)',
+                            backgroundColor: 'rgba(214,162,77,0.10)',
                             color: 'var(--aeth-gold)',
-                            border: '1px solid rgba(214,162,77,0.25)',
+                            border: '1px solid rgba(214,162,77,0.22)',
                             fontFamily: "'IBM Plex Sans', sans-serif",
                           }}
                         >
                           {entry.title}
                         </span>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-5 py-3.5">
                         <span
-                          className="text-sm font-mono-az"
+                          className="text-sm"
                           style={{ color: 'var(--aeth-parchment-dim)', fontFamily: "'Azeret Mono', monospace" }}
                         >
                           {entry.age}d
                         </span>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-5 py-3.5">
                         <span
                           className="text-sm font-semibold"
                           style={{ color: 'var(--aeth-parchment)', fontFamily: "'IBM Plex Sans', sans-serif" }}
@@ -145,14 +155,14 @@ export const LeaderboardSection = ({ leaderboard = [] }) => {
                           {entry.level}
                         </span>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-5 py-3.5">
                         <div className="flex items-center gap-1">
-                          <TrendingUp size={12} style={{ color: 'var(--aeth-gold)' }} />
+                          <TrendingUp size={11} style={{ color: 'var(--aeth-gold)' }} />
                           <span
                             className="text-sm"
                             style={{ color: 'var(--aeth-gold)', fontFamily: "'Azeret Mono', monospace" }}
                           >
-                            {entry.improvement}%
+                            +{entry.improvement}%
                           </span>
                         </div>
                       </td>
@@ -163,6 +173,14 @@ export const LeaderboardSection = ({ leaderboard = [] }) => {
             </table>
           </div>
         </motion.div>
+
+        {/* Note */}
+        <p
+          className="text-center text-xs mt-4"
+          style={{ color: 'var(--aeth-iron)', fontFamily: "'Azeret Mono', monospace" }}
+        >
+          * Rankings updated every hour &middot; Growth % based on past 30 days
+        </p>
       </div>
     </section>
   );

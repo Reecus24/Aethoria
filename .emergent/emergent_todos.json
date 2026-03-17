@@ -1,30 +1,46 @@
 [
   {
-    "content": "Phase 1: Backend skeleton + MongoDB seed + /api/landing endpoint",
+    "content": "Phase 3: Skeleton loaders for all data sections",
     "status": "completed"
   },
   {
-    "content": "Phase 1: Python POC test script to verify data flow",
+    "content": "Phase 3: Mobile navbar hamburger menu",
     "status": "completed"
   },
   {
-    "content": "Phase 2: Get design guidelines from design_agent",
+    "content": "Phase 3: Animated stat counters in online widget",
     "status": "completed"
   },
   {
-    "content": "Phase 2: Build full backend (all endpoints, auth, seeded data)",
+    "content": "Phase 3: Hero particle/ember atmosphere + deeper visuals",
     "status": "completed"
   },
   {
-    "content": "Phase 2: Build full frontend (all landing page sections)",
+    "content": "Phase 3: Live ticker auto-refresh + event categories badge",
     "status": "completed"
   },
   {
-    "content": "Phase 2: All user stories covered - ticker, features, leaderboard, paths, reviews, news, modals",
+    "content": "Phase 3: Improved feature cards with rune hover glow",
     "status": "completed"
   },
   {
-    "content": "Phase 2: E2E Testing with testing_agent_v3 - 100% backend, 95% frontend passed",
+    "content": "Phase 3: About section enhancement - stats, oaths, quote",
     "status": "completed"
+  },
+  {
+    "content": "Phase 3: Toast + modal success feedback improvement",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 3: Keyboard nav + reduced-motion + a11y pass",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 3: Anchor nav links + sticky navbar scroll behavior",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 3: E2E Testing with testing_agent_v3",
+    "status": "in_progress"
   }
 ]

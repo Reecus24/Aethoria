@@ -351,3 +351,87 @@ body {
     0% { background-position: 200% 0; }
     100% { background-position: -200% 0; }
 }
+
+
+/* ─── Scroll anchor offsets (sticky nav + ticker) ─────── */
+#features, #leaderboard, #paths, #chronicles, #about, #hero {
+    scroll-margin-top: 96px;
+}
+
+/* ─── Focus Ring Override ────────────────────────────── */
+:focus-visible {
+    outline: 2px solid var(--aeth-gold);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* ─── Selection Color ────────────────────────────────── */
+::selection {
+    background: rgba(214,162,77,0.3);
+    color: var(--aeth-parchment);
+}
+
+/* ─── Smooth image loading ───────────────────────────── */
+img {
+    transition: opacity 0.3s ease;
+}
+
+/* ─── Reduced motion overrides ───────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    .marquee-track {
+        animation: none !important;
+    }
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ─── Table responsive scroll hint ──────────────────── */
+.table-scroll-hint {
+    position: relative;
+}
+.table-scroll-hint::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 40px;
+    height: 100%;
+    background: linear-gradient(to right, transparent, var(--aeth-stone-2));
+    pointer-events: none;
+}
+@media (min-width: 768px) {
+    .table-scroll-hint::after {
+        display: none;
+    }
+}
+
+/* ─── Path card glow per type ────────────────────────── */
+.path-knight-glow { box-shadow: 0 0 30px rgba(192,57,43,0.12); }
+.path-shadow-glow { box-shadow: 0 0 30px rgba(142,68,173,0.12); }
+.path-noble-glow  { box-shadow: 0 0 30px rgba(212,172,13,0.12); }
+
+/* ─── Sonner toast custom ────────────────────────────── */
+[data-sonner-toast] {
+    font-family: 'IBM Plex Sans', sans-serif !important;
+}
+[data-sonner-toast] [data-title] {
+    font-family: 'Cinzel', serif !important;
+    letter-spacing: 0.03em;
+}
+
+/* ─── Link hover transition ──────────────────────────── */
+a {
+    transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+/* ─── Card hover border-glow animation ───────────────── */
+@keyframes border-glow-pulse {
+    0%, 100% { border-color: rgba(214,162,77,0.35); }
+    50% { border-color: rgba(214,162,77,0.60); }
+}
+.aeth-card:hover {
+    animation: border-glow-pulse 2s ease-in-out infinite;
+}

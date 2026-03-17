@@ -7,6 +7,7 @@ export const NewsSection = ({ news = [] }) => {
 
   return (
     <section
+      id="chronicles"
       data-testid="news-section"
       className="aeth-section"
       style={{ backgroundColor: 'var(--aeth-stone-0)' }}

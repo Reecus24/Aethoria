@@ -1,8 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import '@/App.css';
 import axios from 'axios';
-import { Toaster } from '@/components/ui/sonner';
-import { toast } from 'sonner';
+import { Toaster, toast } from 'sonner';
 
 import { NavBar } from './components/NavBar';
 import { EventTicker } from './components/EventTicker';
@@ -16,6 +15,12 @@ import { PathsSection } from './components/PathsSection';
 import { NewsSection } from './components/NewsSection';
 import { SiteFooter } from './components/SiteFooter';
 import { LoginModal, RegisterModal } from './components/AuthModals';
+import {
+  FeaturesSkeletonSection,
+  LeaderboardSkeleton,
+  ReviewsSkeleton,
+  NewsSkeleton,
+} from './components/SkeletonLoaders';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -32,6 +37,13 @@ export default function App() {
       setLandingData(res.data);
     } catch (err) {
       console.error('Failed to load landing data:', err);
+      toast.error('Could not connect to the Realm. Please try again.', {
+        style: {
+          backgroundColor: 'rgba(142,29,44,0.9)',
+          border: '1px solid rgba(142,29,44,0.6)',
+          color: '#fff',
+        },
+      });
     } finally {
       setLoading(false);
     }
@@ -43,12 +55,18 @@ export default function App() {
 
   const handleLoginSuccess = (data) => {
     setUser(data);
-    toast.success(`⚔️ ${data.message}`);
+    toast.success(data.message, {
+      duration: 5000,
+      icon: '⚔️',
+    });
   };
 
   const handleRegisterSuccess = (data) => {
     setUser(data);
-    toast.success(`🏰 ${data.message}`);
+    toast.success(data.message, {
+      duration: 6000,
+      icon: '🏰',
+    });
   };
 
   const handleOpenLogin = () => {
@@ -65,15 +83,18 @@ export default function App() {
     <div className="App" style={{ backgroundColor: 'var(--aeth-stone-0)', minHeight: '100vh' }}>
       {/* Toast notifications */}
       <Toaster
-        position="top-right"
+        position="top-center"
         toastOptions={{
           style: {
             backgroundColor: 'var(--aeth-stone-2)',
             border: '1px solid var(--aeth-gold)',
             color: 'var(--aeth-parchment)',
             fontFamily: "'IBM Plex Sans', sans-serif",
+            boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
+            zIndex: 9999,
           },
         }}
+        richColors
       />
 
       {/* Authenticated user banner */}
@@ -86,16 +107,32 @@ export default function App() {
             color: 'var(--aeth-gold)',
             fontFamily: "'Cinzel', serif",
             letterSpacing: '0.04em',
+            position: 'relative',
+            zIndex: 60,
           }}
         >
-          ⚔️ Welcome, {user.username} — Level {user.level} {user.title} — Your legend continues
+          ⚔️ Welcome, <strong>{user.username}</strong> — Level {user.level} {user.title} — Your legend continues
+          <button
+            onClick={() => setUser(null)}
+            className="ml-4 text-xs opacity-60 hover:opacity-100"
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: 'var(--aeth-gold)',
+              fontFamily: "'IBM Plex Sans', sans-serif",
+              transition: 'opacity 0.2s ease',
+            }}
+          >
+            (Logout)
+          </button>
         </div>
       )}
 
       {/* Event Ticker */}
       <EventTicker events={landingData?.ticker || []} />
 
-      {/* Navigation */}
+      {/* Navigation - sticky */}
       <NavBar onLogin={handleOpenLogin} onJoin={handleOpenRegister} />
 
       {/* Hero */}
@@ -108,19 +145,35 @@ export default function App() {
       <AboutSection />
 
       {/* Features */}
-      <FeaturesSection features={landingData?.features || []} />
+      {loading ? (
+        <FeaturesSkeletonSection />
+      ) : (
+        <FeaturesSection features={landingData?.features || []} />
+      )}
 
       {/* Leaderboard */}
-      <LeaderboardSection leaderboard={landingData?.leaderboard || []} />
+      {loading ? (
+        <LeaderboardSkeleton />
+      ) : (
+        <LeaderboardSection leaderboard={landingData?.leaderboard || []} />
+      )}
 
       {/* Reviews */}
-      <ReviewsSection reviews={landingData?.reviews || []} />
+      {loading ? (
+        <ReviewsSkeleton />
+      ) : (
+        <ReviewsSection reviews={landingData?.reviews || []} />
+      )}
 
       {/* Paths */}
       <PathsSection paths={landingData?.paths || []} />
 
       {/* News */}
-      <NewsSection news={landingData?.news || []} />
+      {loading ? (
+        <NewsSkeleton />
+      ) : (
+        <NewsSection news={landingData?.news || []} />
+      )}
 
       {/* Footer */}
       <SiteFooter onLogin={handleOpenLogin} onJoin={handleOpenRegister} />
