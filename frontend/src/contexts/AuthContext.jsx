@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
       const res = await axios.get(`${API}/me`, {
         headers: { Authorization: `Bearer ${storedToken}` },
       });
-      setUser(res.data.user);
+      setUser(res.data);  // Backend returns user object directly, not {user: {...}}
       setToken(storedToken);
     } catch (err) {
       // Only clear on explicit 401 auth failure — preserve token on network errors
