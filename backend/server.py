@@ -3225,27 +3225,44 @@ async def run_bot_tests(current_user: dict = Depends(get_current_user)):
     """Run automated bot tests"""
     import subprocess
     import json
+    import os
     
     try:
-        # Run bot testing script
-        subprocess.run(
+        # Delete old report if exists
+        report_path = '/app/bot_test_report.json'
+        if os.path.exists(report_path):
+            os.remove(report_path)
+        
+        # Run bot testing script with extended timeout
+        process = subprocess.run(
             ['python3', '/app/game_bot_tester.py'],
             capture_output=True,
             text=True,
-            timeout=60
+            timeout=120,  # 2 minutes
+            cwd='/app'
         )
         
+        logger.info(f"Bot script stdout: {process.stdout[-500:]}")
+        logger.info(f"Bot script stderr: {process.stderr[-500:]}")
+        
+        # Check if report was created
+        if not os.path.exists(report_path):
+            raise HTTPException(status_code=500, detail=f"Bot-Test Report wurde nicht erstellt. Exit code: {process.returncode}")
+        
         # Load report
-        with open('/app/bot_test_report.json', 'r') as f:
+        with open(report_path, 'r') as f:
             report = json.load(f)
         
         return report
         
     except subprocess.TimeoutExpired:
-        raise HTTPException(status_code=408, detail="Bot-Tests haben zu lange gedauert")
-    except FileNotFoundError:
-        raise HTTPException(status_code=500, detail="Bot-Test Report nicht gefunden")
+        raise HTTPException(status_code=408, detail="Bot-Tests haben zu lange gedauert (>2 Min)")
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=500, detail=f"Datei nicht gefunden: {str(e)}")
+    except json.JSONDecodeError as e:
+        raise HTTPException(status_code=500, detail=f"Report konnte nicht gelesen werden: {str(e)}")
     except Exception as e:
+        logger.error(f"Bot test error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Bot-Tests fehlgeschlagen: {str(e)}")
 
 @app.post("/api/reviews")

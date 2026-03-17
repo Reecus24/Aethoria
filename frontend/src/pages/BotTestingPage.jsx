@@ -11,15 +11,15 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 export default function BotTestingPage() {
   const [testing, setTesting] = useState(false);
   const [report, setReport] = useState(null);
-  const [copyText, setCopyText] = useState('');
+  const [manualMode, setManualMode] = useState(false);
 
   const runBotTests = async () => {
     setTesting(true);
     setReport(null);
-    toast.info('Starte Bot-Tests... Dies dauert ~30 Sekunden', { duration: 3000 });
+    toast.info('Starte Bot-Tests... Dies dauert ~30-60 Sekunden', { duration: 3000 });
 
     try {
-      const response = await axios.post(`${API}/admin/run-bot-tests`, {}, { timeout: 60000 });
+      const response = await axios.post(`${API}/admin/run-bot-tests`, {}, { timeout: 150000 });
       setReport(response.data);
       
       const bugsCount = response.data.bugs_found || 0;
@@ -29,7 +29,11 @@ export default function BotTestingPage() {
         toast.warning(`🐛 ${bugsCount} Bugs gefunden`, { duration: 5000 });
       }
     } catch (err) {
-      toast.error(err.response?.data?.detail || 'Bot-Tests fehlgeschlagen');
+      const errorMsg = err.response?.data?.detail || err.message || 'Bot-Tests fehlgeschlagen';
+      toast.error(errorMsg);
+      
+      // If API fails, show manual instructions
+      setManualMode(true);
     } finally {
       setTesting(false);
     }
@@ -106,7 +110,7 @@ export default function BotTestingPage() {
       {/* Control Panel */}
       <Card className="border-[color:var(--game-border-subtle)] bg-[color:var(--aeth-stone-2)]">
         <CardContent className="pt-6">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap">
             <Button
               onClick={runBotTests}
               disabled={testing}
@@ -114,7 +118,7 @@ export default function BotTestingPage() {
               data-testid="start-bot-tests"
             >
               <Play size={16} className="mr-2" />
-              {testing ? 'Bots laufen...' : 'Bot-Tests starten'}
+              {testing ? 'Bots laufen...' : 'Bot-Tests starten (API)'}
             </Button>
             
             {report && (
@@ -130,10 +134,26 @@ export default function BotTestingPage() {
             )}
           </div>
           
+          {manualMode && (
+            <div className="mt-4 p-4 rounded-lg bg-black/20 border border-[color:var(--aeth-gold)]">
+              <p className="font-semibold mb-2" style={{ color: 'var(--aeth-gold)' }}>
+                Manuelle Ausführung (auf eurem Server):
+              </p>
+              <pre className="text-xs p-3 rounded bg-black/40 overflow-x-auto" style={{ color: 'var(--aeth-parchment)' }}>
+                cd /opt/aethoria
+                python3 game_bot_tester.py
+                cat bot_test_report.json
+              </pre>
+              <p className="text-xs mt-2" style={{ color: 'var(--aeth-parchment-dim)' }}>
+                Kopiert den Report-Inhalt und fügt ihn für Neo ein.
+              </p>
+            </div>
+          )}
+          
           {testing && (
             <div className="mt-4 flex items-center gap-2" style={{ color: 'var(--aeth-gold)' }}>
               <Bot className="animate-pulse" size={20} />
-              <span className="text-sm">Bots spielen das Spiel durch... (~30 Sekunden)</span>
+              <span className="text-sm">Bots spielen das Spiel durch... (~60 Sekunden)</span>
             </div>
           )}
         </CardContent>
