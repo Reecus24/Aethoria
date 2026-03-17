@@ -1,42 +1,26 @@
 [
   {
-    "content": "Backend-Verifizierung abgeschlossen - Echte Daten funktionieren",
+    "content": "Falsche Marketing-Zahlen aus About Section entfernen/anpassen",
     "status": "completed"
   },
   {
-    "content": "Frontend-Komponenten analysiert und verstanden",
+    "content": "Trust Markers im Hero Section korrigieren (50k, Free Forever entfernen)",
     "status": "completed"
   },
   {
-    "content": "Frontend: Leere-Zustände für Leaderboard, Reviews und Ticker implementieren",
+    "content": "PLACEHOLDER_TICKER Filler-Charaktere entfernen",
     "status": "completed"
   },
   {
-    "content": "Frontend: Review-Formular für eingeloggte User hinzufügen",
+    "content": "App.js aktualisieren um stats an AboutSection zu übergeben",
     "status": "completed"
   },
   {
-    "content": "Frontend-Code auf Fehler prüfen (esbuild lint)",
+    "content": "Frontend-Code auf Fehler prüfen",
     "status": "completed"
   },
   {
-    "content": "E2E Testing mit testing_agent_v3 durchführen",
-    "status": "completed"
-  },
-  {
-    "content": "Bug Fix: Duplicate review prevention verifiziert - funktioniert korrekt",
-    "status": "completed"
-  },
-  {
-    "content": "Bug Analysis: Online Counter und JOIN Button Issues analysiert",
-    "status": "completed"
-  },
-  {
-    "content": "Screenshots zur finalen Verifikation erstellen",
-    "status": "completed"
-  },
-  {
-    "content": "Plan.md mit Phase 5 abschließen",
+    "content": "Screenshots zur Verifikation erstellen",
     "status": "completed"
   }
 ]

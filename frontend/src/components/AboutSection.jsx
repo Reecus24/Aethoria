@@ -22,14 +22,19 @@ const oaths = [
   },
 ];
 
-const stats = [
-  { icon: <Users size={16} />, value: '50,000+', label: 'Active Adventurers' },
-  { icon: <Scroll size={16} />, value: '42', label: 'Game Features' },
-  { icon: <Star size={16} />, value: '4.8', label: 'Community Rating' },
-  { icon: <Crown size={16} />, value: '20+', label: 'Years Running' },
+// Stats will be passed as props from parent to show real data
+const statsConfig = [
+  { key: 'features', icon: <Scroll size={16} />, label: 'Game Features' },
+  { key: 'kingdoms', icon: <Crown size={16} />, label: 'Kingdoms to Explore' },
 ];
 
-export const AboutSection = () => {
+export const AboutSection = ({ stats }) => {
+  // Build display stats from real data
+  const displayStats = [
+    { icon: <Scroll size={16} />, value: stats?.features || '42', label: 'Game Features' },
+    { icon: <Crown size={16} />, value: stats?.kingdoms || '11', label: 'Kingdoms' },
+  ];
+
   return (
     <section
       id="about"
@@ -97,7 +102,7 @@ export const AboutSection = () => {
 
             {/* Mini stats row */}
             <div className="grid grid-cols-2 gap-4">
-              {stats.map((s) => (
+              {displayStats.map((s) => (
                 <div
                   key={s.label}
                   className="aeth-card px-4 py-3 flex items-center gap-3"

@@ -29,13 +29,11 @@ import {
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-// Placeholder ticker events shown immediately before API loads
+// Placeholder ticker events shown immediately before API loads (generic messages only, no fake character names)
 const PLACEHOLDER_TICKER = [
-  { event: 'The Realm awaits your arrival — Join thousands of adventurers today!', type: 'quest' },
-  { event: 'LordDrakon has defeated another challenger and defended the #1 rank', type: 'combat' },
-  { event: 'Guild of the Iron Fist has declared war on the Crimson Order', type: 'guild' },
-  { event: 'ShadowQueen was caught robbing the Royal Treasury vaults', type: 'dungeon' },
-  { event: 'The Grand Tournament begins at sundown — enter now at the Tournament Grounds', type: 'quest' },
+  { event: 'Das Reich von Aethoria erwacht... Trete bei und schreibe Geschichte!', type: 'quest' },
+  { event: 'Neue Abenteurer betreten täglich das Reich — sei einer von ihnen!', type: 'quest' },
+  { event: 'Die Heldenhalle wartet auf deinen Namen — beginne deine Legende jetzt!', type: 'combat' },
 ];
 
 function AppInner() {
@@ -109,7 +107,7 @@ function AppInner() {
       {!dataLoading && <OnlineCounter online={landingData?.online} />}
 
       {/* About */}
-      <AboutSection />
+      <AboutSection stats={{ features: landingData?.features?.length || 42, kingdoms: landingData?.kingdoms?.length || 11 }} />
 
       {/* Features */}
       {dataLoading ? <FeaturesSkeletonSection /> : <FeaturesSection features={landingData?.features || []} />}

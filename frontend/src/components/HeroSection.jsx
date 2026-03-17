@@ -254,9 +254,8 @@ export const HeroSection = ({ onJoin, onLogin }) => {
             style={{ borderTop: '1px solid var(--aeth-iron)' }}
           >
             {[
-              { icon: <Sword size={13} />, text: '50,000+ Adventurers' },
-              { icon: <Shield size={13} />, text: 'Free Forever' },
               { icon: <Crown size={13} />, text: 'No Resets · Ever' },
+              { icon: <Shield size={13} />, text: 'Your Legend Persists' },
             ].map(({ icon, text }) => (
               <div
                 key={text}
