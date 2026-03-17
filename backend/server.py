@@ -3,13 +3,16 @@
 # Medieval Fantasy torn.com-inspired Browser RPG
 # ============================================================================
 
-from fastapi import FastAPI, HTTPException, Depends, status, Query
+from fastapi import FastAPI, HTTPException, Depends, status, Query, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, EmailStr
 from typing import List, Optional, Dict, Any, Literal
 from datetime import datetime, timedelta, timezone
 from motor.motor_asyncio import AsyncIOMotorClient
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 import os
 import jwt
 import bcrypt
@@ -362,7 +365,49 @@ def ensure_tz_aware(dt):
         dt = dt.replace(tzinfo=timezone.utc)
     return dt
 
-    return LEVEL_XP_REQUIREMENTS[current_level] - current_xp
+
+async def check_idempotency(idempotency_key: str, user_id: str, operation: str) -> Optional[dict]:
+    """
+    Check if operation was already executed with this idempotency key.
+    Returns cached result if found, None if this is a new operation.
+    Idempotency keys expire after 24 hours.
+    """
+    if not idempotency_key:
+        return None
+    
+    # Check for existing operation
+    existing = await db.idempotency_keys.find_one({
+        'key': idempotency_key,
+        'user_id': user_id,
+        'operation': operation
+    })
+    
+    if existing:
+        # Key exists - return cached result
+        logger.info(f"Idempotent request detected: {operation} - {idempotency_key}")
+        return existing.get('result')
+    
+    return None
+
+async def store_idempotency_result(idempotency_key: str, user_id: str, operation: str, result: dict):
+    """Store operation result for idempotency checks"""
+    if not idempotency_key:
+        return
+    
+    await db.idempotency_keys.insert_one({
+        'key': idempotency_key,
+        'user_id': user_id,
+        'operation': operation,
+        'result': result,
+        'created_at': datetime.now(timezone.utc),
+        'expires_at': datetime.now(timezone.utc) + timedelta(hours=24)
+    })
+    
+    # Create TTL index for automatic cleanup (only once)
+    try:
+        await db.idempotency_keys.create_index('expires_at', expireAfterSeconds=0)
+    except:
+        pass  # Index may already exist
 
 async def regenerate_energy(user: dict) -> int:
     """Calculate and update current energy"""
@@ -571,12 +616,15 @@ class MarketListingCreate(BaseModel):
 class MarketBuyRequest(BaseModel):
     listing_id: str
     quantity: int = Field(..., ge=1)
+    idempotency_key: Optional[str] = None  # Optional idempotency key for preventing duplicate purchases
 
 class BankDepositRequest(BaseModel):
     amount: int = Field(..., ge=1)
+    idempotency_key: Optional[str] = None  # Optional idempotency key for preventing duplicate deposits
 
 class BankWithdrawRequest(BaseModel):
     amount: int = Field(..., ge=1)
+    idempotency_key: Optional[str] = None  # Optional idempotency key for preventing duplicate withdrawals
 
 class GuildCreateRequest(BaseModel):
     name: str = Field(..., min_length=3, max_length=50)
@@ -665,10 +713,15 @@ async def seed_database():
     logger.info("✓ Refreshed news collection")
 
 # ============================================================================
-# FASTAPI APP SETUP
+# FASTAPI APP SETUP + RATE LIMITING
 # ============================================================================
 
+# Initialize rate limiter (in-memory backend)
+limiter = Limiter(key_func=get_remote_address)
+
 app = FastAPI(title="Realm of Aethoria API")
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 @app.on_event("startup")
 async def startup_event():
@@ -917,7 +970,8 @@ async def get_game_state(current_user: dict = Depends(get_current_user)):
 # ============================================================================
 
 @app.post("/api/game/training/start")
-async def start_training(req: TrainRequest, current_user: dict = Depends(get_current_user)):
+@limiter.limit("40/minute")  # Max 40 training sessions per minute
+async def start_training(req: TrainRequest, request: Request, current_user: dict = Depends(get_current_user)):
     user_id = current_user['id']
     
     # Check restrictions
@@ -1052,7 +1106,8 @@ async def get_crimes(current_user: dict = Depends(get_current_user)):
     return crimes
 
 @app.post("/api/game/crimes/commit")
-async def commit_crime(req: CrimeRequest, current_user: dict = Depends(get_current_user)):
+@limiter.limit("30/minute")  # Max 30 crimes per minute per IP
+async def commit_crime(req: CrimeRequest, request: Request, current_user: dict = Depends(get_current_user)):
     user_id = current_user['id']
     
     # Check dungeon
@@ -1147,6 +1202,9 @@ async def commit_crime(req: CrimeRequest, current_user: dict = Depends(get_curre
             level_up = True
         
         await log_event('crime', f'{current_user["username"]} successfully committed: {crime["name"]}', user_id)
+        
+        # Economy log
+        logger.info(f"Crime success: {user_id} | {crime['name']} | +{gold_reward}g, +{xp_reward}xp | Roll: {roll}/{success_chance}")
         
         message = f'Erfolg! +{gold_reward} Gold, +{xp_reward} XP'
         if item_gained:
@@ -1262,7 +1320,8 @@ async def get_combat_targets(current_user: dict = Depends(get_current_user)):
     return serialize_doc(targets)
 
 @app.post("/api/game/combat/attack")
-async def attack_player(req: CombatRequest, current_user: dict = Depends(get_current_user)):
+@limiter.limit("20/minute")  # Max 20 attacks per minute per IP
+async def attack_player(req: CombatRequest, request: Request, current_user: dict = Depends(get_current_user)):
     user_id = current_user['id']
     
     # Check restrictions
@@ -1393,6 +1452,9 @@ async def attack_player(req: CombatRequest, current_user: dict = Depends(get_cur
         # Event
         action_text = 'angegriffen' if req.action == 'attack' else 'ausgeraubt' if req.action == 'mug' else 'ins Lazarett geschickt'
         await log_event('combat', f'{current_user["username"]} hat {target["username"]} {action_text}!', user_id)
+        
+        # Economy log
+        logger.info(f"Combat victory: {user_id} vs {target['id']} | {req.action} | dmg:{damage} | gold:{gold_stolen} | xp:{xp_gain}")
         
         # Check level up
         updated_user = await db.users.find_one({'id': user_id})
@@ -1796,7 +1858,8 @@ async def get_shop_items(current_user: dict = Depends(get_current_user)):
     return available
 
 @app.post("/api/game/shop/buy")
-async def buy_from_shop(item_id: str, quantity: int = 1, current_user: dict = Depends(get_current_user)):
+@limiter.limit("60/minute")  # Max 60 shop purchases per minute
+async def buy_from_shop(item_id: str, quantity: int = 1, request: Request = None, current_user: dict = Depends(get_current_user)):
     """Buy from shop"""
     user_id = current_user['id']
     
@@ -1827,11 +1890,16 @@ async def buy_from_shop(item_id: str, quantity: int = 1, current_user: dict = De
             'acquired_at': datetime.now(timezone.utc)
         })
     
-    return {
+    result = {
         'success': True,
         'message': f'{quantity}x {item_data["name"]} gekauft für {total_cost} Gold',
         'cost': total_cost
     }
+    
+    # Economy log
+    logger.info(f"Shop purchase: {user_id} | {quantity}x {item_id} | -{total_cost}g")
+    
+    return result
 
 # ============================================================================
 # MARKET SYSTEM
@@ -1902,9 +1970,16 @@ async def create_market_listing(req: MarketListingCreate, current_user: dict = D
     }
 
 @app.post("/api/game/market/buy")
-async def buy_from_market(req: MarketBuyRequest, current_user: dict = Depends(get_current_user)):
-    """Buy from market"""
+@limiter.limit("60/minute")  # Max 60 market purchases per minute
+async def buy_from_market(req: MarketBuyRequest, request: Request, current_user: dict = Depends(get_current_user)):
+    """Buy from market with idempotency support"""
     user_id = current_user['id']
+    
+    # Check idempotency
+    if req.idempotency_key:
+        cached = await check_idempotency(req.idempotency_key, user_id, 'market_buy')
+        if cached:
+            return cached
     
     listing = await db.market_listings.find_one({'id': req.listing_id, 'active': True})
     if not listing:
@@ -1920,7 +1995,7 @@ async def buy_from_market(req: MarketBuyRequest, current_user: dict = Depends(ge
     if current_user['gold'] < total_cost:
         raise HTTPException(status_code=400, detail=f"Nicht genug Gold (benötigt: {total_cost})")
     
-    # Transfer gold
+    # Transfer gold (atomic)
     await db.users.update_one({'id': user_id}, {'$inc': {'gold': -total_cost}})
     await db.users.update_one({'id': listing['seller_id']}, {'$inc': {'gold': total_cost}})
     
@@ -1958,11 +2033,18 @@ async def buy_from_market(req: MarketBuyRequest, current_user: dict = Depends(ge
     if total_trade_value and total_trade_value[0]['total'] >= 1000:
         await check_and_award_achievement(user_id, 'merchant')
     
-    return {
+    result = {
         'success': True,
         'message': f'{req.quantity}x {listing["item_name"]} gekauft für {total_cost} Gold',
         'cost': total_cost
     }
+    
+    # Store for idempotency
+    if req.idempotency_key:
+        await store_idempotency_result(req.idempotency_key, user_id, 'market_buy', result)
+    
+    logger.info(f"Market purchase: {user_id} bought {req.quantity}x {listing['item_id']} for {total_cost} gold from {listing['seller_id']}")
+    return result
 
 @app.get("/api/game/market/my-listings")
 async def get_my_listings(current_user: dict = Depends(get_current_user)):
@@ -2023,13 +2105,21 @@ async def get_bank_account(current_user: dict = Depends(get_current_user)):
     return serialize_doc(account)
 
 @app.post("/api/game/bank/deposit")
-async def bank_deposit(req: BankDepositRequest, current_user: dict = Depends(get_current_user)):
-    """Deposit to bank"""
+@limiter.limit("60/minute")  # Max 60 deposits per minute
+async def bank_deposit(req: BankDepositRequest, request: Request, current_user: dict = Depends(get_current_user)):
+    """Deposit to bank with idempotency support"""
     user_id = current_user['id']
+    
+    # Check idempotency
+    if req.idempotency_key:
+        cached = await check_idempotency(req.idempotency_key, user_id, 'bank_deposit')
+        if cached:
+            return cached
     
     if current_user['gold'] < req.amount:
         raise HTTPException(status_code=400, detail="Nicht genug Gold")
     
+    # Atomic transaction
     await db.users.update_one({'id': user_id}, {'$inc': {'gold': -req.amount}})
     await db.bank_accounts.update_one(
         {'user_id': user_id},
@@ -2037,17 +2127,32 @@ async def bank_deposit(req: BankDepositRequest, current_user: dict = Depends(get
         upsert=True
     )
     
-    return {'success': True, 'message': f'{req.amount} Gold eingezahlt'}
+    result = {'success': True, 'message': f'{req.amount} Gold eingezahlt'}
+    
+    # Store for idempotency
+    if req.idempotency_key:
+        await store_idempotency_result(req.idempotency_key, user_id, 'bank_deposit', result)
+    
+    logger.info(f"Bank deposit: {user_id} deposited {req.amount} gold")
+    return result
 
 @app.post("/api/game/bank/withdraw")
-async def bank_withdraw(req: BankWithdrawRequest, current_user: dict = Depends(get_current_user)):
-    """Withdraw from bank"""
+@limiter.limit("60/minute")  # Max 60 withdrawals per minute
+async def bank_withdraw(req: BankWithdrawRequest, request: Request, current_user: dict = Depends(get_current_user)):
+    """Withdraw from bank with idempotency support"""
     user_id = current_user['id']
+    
+    # Check idempotency
+    if req.idempotency_key:
+        cached = await check_idempotency(req.idempotency_key, user_id, 'bank_withdraw')
+        if cached:
+            return cached
     
     account = await db.bank_accounts.find_one({'user_id': user_id})
     if not account or account['balance'] < req.amount:
         raise HTTPException(status_code=400, detail="Nicht genug Gold auf dem Bankkonto")
     
+    # Atomic transaction
     await db.bank_accounts.update_one({'user_id': user_id}, {'$inc': {'balance': -req.amount}})
     await db.users.update_one({'id': user_id}, {'$inc': {'gold': req.amount}})
     
@@ -2056,7 +2161,14 @@ async def bank_withdraw(req: BankWithdrawRequest, current_user: dict = Depends(g
     if updated_user['gold'] >= 10000:
         await check_and_award_achievement(user_id, 'rich')
     
-    return {'success': True, 'message': f'{req.amount} Gold abgehoben'}
+    result = {'success': True, 'message': f'{req.amount} Gold abgehoben'}
+    
+    # Store for idempotency
+    if req.idempotency_key:
+        await store_idempotency_result(req.idempotency_key, user_id, 'bank_withdraw', result)
+    
+    logger.info(f"Bank withdraw: {user_id} withdrew {req.amount} gold")
+    return result
 
 # ============================================================================
 # GUILDS SYSTEM
