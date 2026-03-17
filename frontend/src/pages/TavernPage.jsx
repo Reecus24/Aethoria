@@ -80,7 +80,7 @@ export default function TavernPage() {
             Würfelspiel
           </CardTitle>
           <CardDescription style={{ color: 'var(--aeth-parchment-dim)' }}>
-            Würfle zwei Würfel. Summe 7-12 = Gewinn (2x Einsatz), 2-6 = Verlust
+            Würfle sechs Würfel (6d6). Summe ≥21 = Gewinn (2x Einsatz), &lt;21 = Verlust
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -126,18 +126,18 @@ export default function TavernPage() {
               <motion.div
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                className="flex justify-center gap-8 mb-6"
+                className="flex justify-center flex-wrap gap-4 mb-6"
               >
-                {[result.die1, result.die2].map((die, idx) => {
-                  const DiceIcon = DICE_ICONS[die - 1];
+                {(result.rolls || []).map((die, idx) => {
+                  const DiceIcon = DICE_ICONS[die - 1] || Dice1;
                   return (
                     <motion.div
                       key={idx}
                       initial={{ rotate: 0 }}
                       animate={{ rotate: 360 }}
-                      transition={{ duration: 0.6, delay: idx * 0.2 }}
+                      transition={{ duration: 0.6, delay: idx * 0.1 }}
                     >
-                      <DiceIcon size={80} style={{ color: 'var(--aeth-gold)' }} data-testid={`dice-result-${idx + 1}`} />
+                      <DiceIcon size={60} style={{ color: 'var(--aeth-gold)' }} data-testid={`dice-result-${idx + 1}`} />
                     </motion.div>
                   );
                 })}
@@ -147,14 +147,14 @@ export default function TavernPage() {
             {result && !rolling && (
               <div className="text-center space-y-2">
                 <p className="text-5xl font-bold font-mono-az" style={{ color: 'var(--aeth-gold)' }} data-testid="dice-sum">
-                  {result.sum}
+                  {result.total}
                 </p>
                 <Badge
                   variant={result.won ? 'default' : 'destructive'}
                   className="text-lg px-4 py-1"
                   data-testid="dice-result-badge"
                 >
-                  {result.won ? `Gewonnen: ${result.payout} Gold` : `Verloren: ${wager} Gold`}
+                  {result.won ? `Gewonnen: ${result.winnings} Gold` : `Verloren: ${wager} Gold`}
                 </Badge>
               </div>
             )}
@@ -198,9 +198,9 @@ export default function TavernPage() {
                 Spielregeln:
               </p>
               <ul className="list-disc list-inside space-y-1">
-                <li>Würfle zwei Würfel</li>
-                <li>Summe 7-12: Du gewinnst das Doppelte deines Einsatzes</li>
-                <li>Summe 2-6: Du verlierst deinen Einsatz</li>
+                <li>Würfle sechs Würfel (6d6)</li>
+                <li>Summe ≥21: Du gewinnst das Doppelte deines Einsatzes</li>
+                <li>Summe &lt;21: Du verlierst deinen Einsatz</li>
               </ul>
             </div>
           </div>

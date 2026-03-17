@@ -29,7 +29,7 @@ export default function CombatPage() {
   };
 
   const attackPlayer = async (username, action = 'attack') => {
-    if (gameState.resources.energy < 25) {
+    if ((gameState?.resources?.energy || 0) < 25) {
       toast.error('Nicht genug Energie (benötigt: 25)');
       return;
     }

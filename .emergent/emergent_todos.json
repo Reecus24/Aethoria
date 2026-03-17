@@ -1,46 +1,38 @@
 [
   {
-    "content": "Phase 7A: Comprehensive E2E Testing aller 42 Features mit testing_agent",
+    "content": "MEGA-BUILD: Alle 22 Game-Pages erstellen",
+    "status": "completed"
+  },
+  {
+    "content": "React Router Integration",
+    "status": "completed"
+  },
+  {
+    "content": "Axios Interceptor für Auth",
+    "status": "completed"
+  },
+  {
+    "content": "Backend Datetime Timezone Bugs systematisch fixen (9 Stellen)",
+    "status": "completed"
+  },
+  {
+    "content": "Optional Chaining für gameState",
+    "status": "completed"
+  },
+  {
+    "content": "TavernPage: 6 Würfel statt 2, Win-Condition ≥21",
+    "status": "completed"
+  },
+  {
+    "content": "CombatPage Optional Chaining fix",
+    "status": "completed"
+  },
+  {
+    "content": "API Tests: Combat, Crimes, Bank, Tavern verified",
+    "status": "completed"
+  },
+  {
+    "content": "Final Comprehensive E2E Screenshot Test",
     "status": "in_progress"
-  },
-  {
-    "content": "Combat System vollständig testen (Attack, Mug, Hospitalize)",
-    "status": "pending"
-  },
-  {
-    "content": "Quest System testen (Accept, Complete, Rewards)",
-    "status": "pending"
-  },
-  {
-    "content": "Shop → Inventory → Equipment Flow testen",
-    "status": "pending"
-  },
-  {
-    "content": "Market Listing/Buying Flow testen",
-    "status": "pending"
-  },
-  {
-    "content": "Guild Create/Join/Leave Flow testen",
-    "status": "pending"
-  },
-  {
-    "content": "Travel System vollständig testen (Start → Complete)",
-    "status": "pending"
-  },
-  {
-    "content": "Properties Buy → Collect Income testen",
-    "status": "pending"
-  },
-  {
-    "content": "Message Send/Read Flow testen",
-    "status": "pending"
-  },
-  {
-    "content": "Alle High-Priority Bugs aus Test-Report fixen",
-    "status": "pending"
-  },
-  {
-    "content": "Balance-Pass: Energie-Kosten, Belohnungen, Timer anpassen",
-    "status": "pending"
   }
 ]

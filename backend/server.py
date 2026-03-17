@@ -351,6 +351,15 @@ def calculate_level(xp: int) -> int:
 def calculate_xp_for_next_level(current_xp: int, current_level: int) -> int:
     if current_level >= len(LEVEL_XP_REQUIREMENTS):
         return 0
+
+def ensure_tz_aware(dt):
+    """Ensure datetime is timezone-aware (UTC)"""
+    if isinstance(dt, str):
+        dt = datetime.fromisoformat(dt.replace('Z', '+00:00'))
+    if isinstance(dt, datetime) and dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt
+
     return LEVEL_XP_REQUIREMENTS[current_level] - current_xp
 
 async def regenerate_energy(user: dict) -> int:
@@ -386,8 +395,7 @@ async def regenerate_hp(user: dict) -> int:
     hospital_session = await db.hospital_sessions.find_one({'user_id': user['id'], 'released': False})
     if hospital_session:
         release_time = hospital_session['release_time']
-        if isinstance(release_time, str):
-            release_time = datetime.fromisoformat(release_time.replace('Z', '+00:00'))
+        release_time = ensure_tz_aware(release_time)
         
         if datetime.now(timezone.utc) >= release_time:
             await db.hospital_sessions.update_one(
@@ -429,8 +437,7 @@ async def check_dungeon_status(user: dict) -> Optional[dict]:
     dungeon_session = await db.dungeon_sessions.find_one({'user_id': user['id'], 'released': False})
     if dungeon_session:
         release_time = dungeon_session['release_time']
-        if isinstance(release_time, str):
-            release_time = datetime.fromisoformat(release_time.replace('Z', '+00:00'))
+        release_time = ensure_tz_aware(release_time)
         
         if datetime.now(timezone.utc) >= release_time:
             await db.dungeon_sessions.update_one(
@@ -453,8 +460,7 @@ async def check_hospital_status(user: dict) -> Optional[dict]:
     hospital_session = await db.hospital_sessions.find_one({'user_id': user['id'], 'released': False})
     if hospital_session:
         release_time = hospital_session['release_time']
-        if isinstance(release_time, str):
-            release_time = datetime.fromisoformat(release_time.replace('Z', '+00:00'))
+        release_time = ensure_tz_aware(release_time)
         
         if datetime.now(timezone.utc) >= release_time:
             await db.hospital_sessions.update_one(
@@ -800,8 +806,7 @@ async def get_game_state(current_user: dict = Depends(get_current_user)):
     training_session = await db.training_sessions.find_one({'user_id': user_id, 'completed': False})
     if training_session:
         complete_time = training_session['complete_time']
-        if isinstance(complete_time, str):
-            complete_time = datetime.fromisoformat(complete_time.replace('Z', '+00:00'))
+        complete_time = ensure_tz_aware(complete_time)
         
         if datetime.now(timezone.utc) < complete_time:
             timers['training'] = {
@@ -814,8 +819,7 @@ async def get_game_state(current_user: dict = Depends(get_current_user)):
     active_quest = await db.user_quests.find_one({'user_id': user_id, 'status': 'active'})
     if active_quest:
         complete_time = active_quest['complete_time']
-        if isinstance(complete_time, str):
-            complete_time = datetime.fromisoformat(complete_time.replace('Z', '+00:00'))
+        complete_time = ensure_tz_aware(complete_time)
         
         if datetime.now(timezone.utc) < complete_time:
             timers['quest'] = {
@@ -828,8 +832,7 @@ async def get_game_state(current_user: dict = Depends(get_current_user)):
     travel_session = await db.travel_sessions.find_one({'user_id': user_id, 'completed': False})
     if travel_session:
         arrival_time = travel_session['arrival_time']
-        if isinstance(arrival_time, str):
-            arrival_time = datetime.fromisoformat(arrival_time.replace('Z', '+00:00'))
+        arrival_time = ensure_tz_aware(arrival_time)
         
         if datetime.now(timezone.utc) < arrival_time:
             timers['travel'] = {
