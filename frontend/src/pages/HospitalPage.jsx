@@ -49,7 +49,13 @@ export default function HospitalPage() {
   }
 
   const isInjured = currentHP < maxHP;
-  const isInHospital = hospitalTimer !== null;
+  const isInHospital = hospitalTimer?.in_hospital === true;
+  
+  // Calculate estimated healing for injured users
+  const hpMissing = maxHP - currentHP;
+  const estimatedHealingSeconds = hpMissing * 360;
+  const estimatedHealingMinutes = Math.floor(estimatedHealingSeconds / 60);
+  const estimatedHealingHours = Math.floor(estimatedHealingMinutes / 60);
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -121,20 +127,31 @@ export default function HospitalPage() {
         </motion.div>
       )}
 
-      {/* Info Card */}
+      {/* Info Card - for injured users not in hospital */}
       {!isInHospital && isInjured && (
         <Card className="border-[color:var(--game-border-subtle)] bg-[color:var(--aeth-stone-2)]">
           <CardContent className="pt-6">
             <div className="flex items-start gap-3">
               <AlertCircle size={24} style={{ color: 'var(--aeth-gold)' }} />
-              <div className="text-sm" style={{ color: 'var(--aeth-parchment-dim)' }}>
+              <div className="text-sm space-y-3" style={{ color: 'var(--aeth-parchment-dim)' }}>
                 <p className="font-semibold mb-2" style={{ color: 'var(--aeth-parchment)' }}>
-                  Wie wird geheilt?
+                  Natürliche Heilung
                 </p>
+                
+                <div className="bg-black/20 p-3 rounded-lg">
+                  <p className="text-xs mb-1">Geschätzte Zeit bis Vollheilung:</p>
+                  <p className="text-lg font-bold font-mono-az" style={{ color: 'var(--aeth-gold)' }} data-testid="natural-healing-timer">
+                    {estimatedHealingHours}h {estimatedHealingMinutes % 60}m
+                  </p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--aeth-parchment-dim)' }}>
+                    ({hpMissing} HP fehlen × 6 Min/HP)
+                  </p>
+                </div>
+                
                 <ul className="list-disc list-inside space-y-1">
-                  <li>Leben regeneriert sich automatisch über Zeit (1 HP / 5 Minuten)</li>
-                  <li>Bei schweren Verletzungen (unter 20 HP) wirst du automatisch ins Hospital gebracht</li>
-                  <li>Im Hospital heilst du schneller: 5 HP / Minute</li>
+                  <li>Leben regeneriert sich automatisch (1 HP alle 6 Minuten)</li>
+                  <li>Du kannst weiterspielen und Abenteuer erleben</li>
+                  <li>Bei schweren Verletzungen kommst du automatisch hierher</li>
                 </ul>
               </div>
             </div>

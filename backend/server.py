@@ -550,23 +550,6 @@ async def check_hospital_status(user: dict) -> Optional[dict]:
                 'seconds_remaining': max(0, seconds_remaining),
                 'reason': hospital_session.get('reason', 'Unknown')
             }
-    
-    # If not in active hospital session but injured, calculate estimated healing time
-    current_hp = user.get('hp', MAX_HP)
-    if current_hp < MAX_HP:
-        hp_missing = MAX_HP - current_hp
-        # Natural regen: 10 HP per hour = 1 HP per 6 minutes = 360 seconds per HP
-        seconds_to_heal = hp_missing * 360
-        estimated_release = datetime.now(timezone.utc) + timedelta(seconds=seconds_to_heal)
-        
-        return {
-            'in_hospital': False,
-            'injured': True,
-            'release_time': estimated_release.isoformat(),
-            'seconds_remaining': seconds_to_heal,
-            'reason': 'Natural regeneration'
-        }
-    
     return None
 
 async def log_event(event_type: str, message: str, user_id: Optional[str] = None):
