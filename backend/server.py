@@ -1859,7 +1859,7 @@ async def get_available_quests(current_user: dict = Depends(get_current_user)):
 async def accept_quest(req: QuestRequest, current_user: dict = Depends(get_current_user)):
     user_id = current_user['id']
     
-    # Check training
+    # Check training FIRST (highest priority block)
     training_session = await db.training_sessions.find_one({'user_id': user_id, 'completed': False})
     if training_session:
         raise HTTPException(status_code=400, detail="Du kannst keine Quest annehmen während du trainierst")
