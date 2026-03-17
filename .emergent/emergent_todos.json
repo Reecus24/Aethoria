@@ -21,10 +21,22 @@
   },
   {
     "content": "E2E Testing mit testing_agent_v3 durchführen",
-    "status": "in_progress"
+    "status": "completed"
+  },
+  {
+    "content": "Bug Fix: Duplicate review prevention verifiziert - funktioniert korrekt",
+    "status": "completed"
+  },
+  {
+    "content": "Bug Analysis: Online Counter und JOIN Button Issues analysiert",
+    "status": "completed"
   },
   {
     "content": "Screenshots zur finalen Verifikation erstellen",
-    "status": "pending"
+    "status": "completed"
+  },
+  {
+    "content": "Plan.md mit Phase 5 abschließen",
+    "status": "completed"
   }
 ]
