@@ -1,0 +1,26 @@
+[
+  {
+    "content": "Phase 1: Backend skeleton + MongoDB seed + /api/landing endpoint",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 1: Python POC test script to verify data flow",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 2: Get design guidelines from design_agent",
+    "status": "in_progress"
+  },
+  {
+    "content": "Phase 2: Build full backend (all endpoints, auth, seeded data)",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 2: Build full frontend (all landing page sections)",
+    "status": "pending"
+  },
+  {
+    "content": "Phase 2: E2E Testing with testing_agent_v3",
+    "status": "pending"
+  }
+]
