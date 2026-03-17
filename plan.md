@@ -9,10 +9,10 @@
   - **Protected profile endpoint** (`/api/me`) and explicit logout.
 - Extend user accounts into “characters”:
   - **path_choice** (Knight / Shadow / Noble)
-  - character stats (**strength / dexterity / speed / defense / gold / xp / level / title / days**).
+  - character stats (**strength / dexterity / speed / defense / gold / xp / level / title / days_in_realm**).
 - Add premium, game-like landing experiences:
   - “**Venture into the Realm**” simulated text-game preview (console/terminal)
-  - “**11 Kingdoms World Map**” section (atmospheric images)
+  - “**11 Kingdoms World Map**” section (atmospheric images + click-to-open details)
   - Character dashboard panel (slide-in) for logged-in users
   - Back-to-top floating button
 - Ensure the site remains responsive, fast, accessible, and visually consistent (stone/iron UI, gold accents, fantasy typography).
@@ -21,8 +21,10 @@
 - ✅ Phase 1 complete (data-flow POC verified)
 - ✅ Phase 2 complete (full backend + full landing page UI implemented)
 - ✅ Phase 3 complete (UX polish + content enhancements shipped)
-- ✅ Testing complete through Phase 3: **Backend 100%**, **Frontend 95%+** (all critical paths pass)
-- 🟡 Phase 4 approved (Auth hardening + character profile + new immersive sections) — **Not started**
+- ✅ **Phase 4 complete** (JWT auth + character identity layer + immersive sections shipped)
+- ✅ Phase 4 regression fixes applied:
+  - ✅ **JWT persistence improved**: tokens only cleared on explicit `401` (not on network errors)
+  - ✅ **Ticker shows immediately**: placeholder ticker events render before API payload arrives
 
 ---
 
@@ -136,98 +138,103 @@ Goal: make V1 feel premium, responsive, and “alive”, without expanding scope
 
 ---
 
-### Phase 4: Auth Hardening + Character Profile + Immersive Sections — 🟡 Approved / Not Started
-Goal: upgrade MVP auth into production-style sessions and introduce a lightweight “character identity” layer, plus add two immersive landing sections.
+### Phase 4: Auth Hardening + Character Profile + Immersive Sections — ✅ Completed
+Goal: upgrade MVP auth into production-style sessions and introduce a lightweight “character identity” layer, plus add immersive landing sections.
 
-#### Phase 4A — Backend: JWT + Character Model
-- Add dependencies:
-  - `PyJWT` for signing/verifying access tokens
-  - optional: `python-jose` alternative (choose one)
-- Extend user schema in MongoDB:
-  - `path_choice`: one of `knight | shadow | noble`
-  - character stats: `strength, dexterity, speed, defense, gold, xp, level, title, created_at, days`
+#### Phase 4A — Backend: JWT + Character Model — ✅ Completed
+- Added JWT capability using **PyJWT**.
+- Extended user schema in MongoDB:
+  - ✅ `path_choice`: one of `knight | shadow | noble`
+  - ✅ character stats: `strength, dexterity, speed, defense, gold, xp, level, title, created_at`
+  - ✅ computed `days_in_realm` in profile response
 - Auth endpoints:
-  - Update `POST /api/auth/register` to accept `path_choice` and seed stats by path
-  - Update `POST /api/auth/login` to return JWT token + user snapshot
-  - Add `POST /api/auth/logout` (client-side token invalidation; optional server blacklist)
-  - Add `GET /api/me` protected endpoint (requires `Authorization: Bearer <token>`)
-- Security basics:
-  - Token expiration (e.g., 7 days)
-  - Password hashing stays bcrypt
-  - Rate-limiting placeholder or basic throttling (optional MVP)
+  - ✅ Updated `POST /api/auth/register` to accept `path_choice` and seed stats by path
+  - ✅ Updated `POST /api/auth/login` to return JWT token + user profile snapshot
+  - ✅ Added `POST /api/auth/logout` (stateless JWT: client-side invalidation)
+  - ✅ Added `GET /api/me` protected endpoint (requires `Authorization: Bearer <token>`)
+- Token handling:
+  - ✅ Token expiration configured (7 days)
+  - ✅ Password hashing remains bcrypt
+- Expanded landing payload:
+  - ✅ Added `kingdoms` to `GET /api/landing`
+  - ✅ Added `GET /api/kingdoms`
 
-#### Phase 4B — Frontend: Persistent Auth + Register Step 2
-- Add Auth context/provider:
-  - Store token in `localStorage`
-  - Auto-restore session on reload (`/api/me` bootstrap)
-  - Axios interceptor to attach bearer token
-- Register modal becomes 2-step:
-  1. Username/email/password
-  2. Path selection (Knight/Shadow/Noble) with rich cards matching Paths section
+#### Phase 4B — Frontend: Persistent Auth + Register Step 2 — ✅ Completed
+- Added `AuthProvider` / context:
+  - ✅ Stores token in `localStorage` (`aeth_token`)
+  - ✅ Auto-restores session on reload via `/api/me`
+  - ✅ Axios interceptor attaches bearer token
+- Register modal upgraded to 2-step:
+  1. ✅ Username/email/password
+  2. ✅ Path selection (Knight/Shadow/Noble) with rich cards + mini-stats
 - Login modal:
-  - On success: persist token and load `/api/me`
-- Add explicit logout (clear token, clear user state)
+  - ✅ On success: persists token + updates user state
+- Logout:
+  - ✅ Clears token + user state
 
-#### Phase 4C — Character Dashboard Panel (Slide-in)
-- Add a right-side slide-in panel for logged-in users:
-  - Username, title, level, days in realm
-  - Path badge (Knight/Shadow/Noble)
-  - Stat bars for strength/dexterity/speed/defense
-  - Gold + XP indicators
+#### Phase 4C — Character Dashboard Panel (Slide-in) — ✅ Completed
+- Added right-side slide-in panel for logged-in users:
+  - ✅ Username, title, level, days in realm
+  - ✅ Path badge (Knight/Shadow/Noble)
+  - ✅ Stat bars (strength/dexterity/speed/defense)
+  - ✅ Gold + XP indicators
 - Entry points:
-  - “Character” button in navbar when logged in
-  - Optional: show mini badge in user banner to open panel
+  - ✅ Username button in navbar opens the dashboard
 
-#### Phase 4D — New Landing Content Sections
-1. **Venture into the Realm** (Text Game Preview)
-   - Terminal/console UI that types/rotates sample actions:
-     - “Train at the Barracks”, “Commit a Dark Deed”, “Join a Guild War”, “Trade on the Exchange”, etc.
-   - Show outcomes and rewards (gold/xp/items) as simulated content (no gameplay backend required).
+#### Phase 4D — New Landing Content Sections — ✅ Completed
+1. ✅ **Venture into the Realm** (Text Game Preview)
+   - Terminal/console UI that animates sample actions and outcomes
+   - Rotating scenes for Knight/Shadow/Noble
+2. ✅ **11 Kingdoms World Map**
+   - Responsive grid of 11 kingdoms (images, type badge, danger badge)
+   - Click opens a details modal (lore + travel details)
 
-2. **11 Kingdoms World Map**
-   - Grid/map section with 11 kingdoms:
-     - Atmospheric images, kingdom names, 1-line flavor text
-   - Optional interactions:
-     - Hover to reveal details
-     - Click opens a modal with lore + sample loot
-
-#### Phase 4E — Utility Additions
-- Back-to-top floating button:
+#### Phase 4E — Utility Additions — ✅ Completed
+- ✅ Back-to-top floating button
   - Appears after scroll threshold
-  - Smooth scroll to hero
+  - Smooth scroll to top
   - Respects reduced motion
 
-**Phase 4 user stories (updated)**
-1. User stays logged in across refreshes.
+#### Phase 4F — Phase 4 Regression Fixes — ✅ Completed
+- ✅ **JWT persistence hardening**: tokens are only cleared on explicit `401` (invalid/expired), not on network errors.
+- ✅ **Ticker UX**: ticker now shows immediately using placeholder events until landing payload arrives.
+
+**Phase 4 user stories — ✅ Completed**
+1. User stays logged in across refreshes (persistent JWT sessions).
 2. User sessions are secure (JWT + expiry).
 3. User chooses a path at registration and gets path-based starter stats.
 4. User can view a character dashboard at any time.
 5. Visitor can experience “how the game feels” via a simulated text-console preview.
 6. Visitor can explore the 11-kingdom world map section.
 
-**Phase 4 Testing Plan**
-- Backend:
-  - Register with path_choice seeds stats correctly
+**Testing (end of Phase 4) — ✅ Completed**
+- ✅ Backend verification:
+  - Register seeds path stats correctly
   - Login returns valid JWT
-  - `/api/me` rejects missing/invalid token and accepts valid token
-  - Logout clears client session (and blacklist if implemented)
-- Frontend:
-  - Register 2-step flow works and persists token
-  - Refresh restores session (calls `/api/me`)
-  - Dashboard opens, renders stats, closes
-  - Back-to-top appears and works
-  - Game preview section animates and is accessible
-  - World map section responsive + hover/click works
+  - `/api/me` enforces authentication
+- ✅ Frontend verification:
+  - Register 2-step flow works end-to-end
+  - Session persists across reload (with improved error handling)
+  - Dashboard opens/closes and shows correct stats
+  - Kingdom modal opens from card click
+  - Ticker visible immediately
 
 ---
 
 ## Next Actions
-1. Implement Phase 4A backend JWT + `/api/me`.
-2. Implement Phase 4B persistent auth + register step 2.
-3. Implement Phase 4C character dashboard panel.
-4. Implement Phase 4D immersive sections (Game Preview + 11 Kingdoms).
-5. Implement Phase 4E back-to-top.
-6. Run full regression with testing_agent_v3.
+### Phase 5 (Optional) — If requested
+- Gameplay-adjacent demo features (still landing-safe):
+  - Mini “quest generator” demo endpoint + UI
+  - Search/filter for features and kingdoms
+  - Newsletter/Waitlist signup flow
+  - A “Join a Guild” marketing funnel section
+- Auth hardening (beyond MVP):
+  - Refresh tokens
+  - Server-side token revocation/blacklist
+  - Rate limiting / brute force protections
+- SEO + performance:
+  - Metadata and OpenGraph improvements
+  - Lighthouse performance pass
 
 ---
 
@@ -237,10 +244,12 @@ Goal: upgrade MVP auth into production-style sessions and introduce a lightweigh
 - ✅ Features list contains **42 medieval-adapted entries** and is browsable.
 - ✅ Leaderboard, reviews, and news display correctly with interactions.
 - ✅ UX polish delivered: skeleton loaders, mobile hamburger nav, animated counters, improved ticker badges, hero particles.
-- 🟡 Phase 4 success (new):
-  - JWT login persists across reload
-  - `/api/me` provides protected user snapshot
-  - Registration includes path selection and seeds character stats
-  - Character dashboard panel renders stats cleanly
-  - Back-to-top works
-  - Game preview console and 11-kingdom map sections ship and are responsive
+- ✅ Phase 4 success achieved:
+  - ✅ JWT login persists across reload
+  - ✅ `/api/me` provides protected user snapshot
+  - ✅ Registration includes path selection and seeds character stats
+  - ✅ Character dashboard panel renders stats cleanly
+  - ✅ Back-to-top works
+  - ✅ Game preview console ships and rotates scenes
+  - ✅ 11-kingdom map section ships with modal details
+  - ✅ Ticker shows immediately (placeholder → real data)

@@ -29,6 +29,15 @@ import {
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
+// Placeholder ticker events shown immediately before API loads
+const PLACEHOLDER_TICKER = [
+  { event: 'The Realm awaits your arrival — Join thousands of adventurers today!', type: 'quest' },
+  { event: 'LordDrakon has defeated another challenger and defended the #1 rank', type: 'combat' },
+  { event: 'Guild of the Iron Fist has declared war on the Crimson Order', type: 'guild' },
+  { event: 'ShadowQueen was caught robbing the Royal Treasury vaults', type: 'dungeon' },
+  { event: 'The Grand Tournament begins at sundown — enter now at the Tournament Grounds', type: 'quest' },
+];
+
 function AppInner() {
   const { user, loading: authLoading, loginWithData } = useAuth();
   const [landingData, setLandingData] = useState(null);
@@ -83,8 +92,8 @@ function AppInner() {
         richColors
       />
 
-      {/* Event Ticker */}
-      <EventTicker events={landingData?.ticker || []} />
+      {/* Event Ticker - show placeholder immediately, replace with real data when loaded */}
+      <EventTicker events={(landingData?.ticker && landingData.ticker.length > 0) ? landingData.ticker : PLACEHOLDER_TICKER} />
 
       {/* Navigation */}
       <NavBar

@@ -28,7 +28,15 @@
     "status": "completed"
   },
   {
-    "content": "Phase 4H: E2E Testing with testing_agent_v3",
-    "status": "in_progress"
+    "content": "Phase 4H: JWT restore fix (only clear on 401, not network errors)",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 4I: Ticker shows immediately with placeholder events",
+    "status": "completed"
+  },
+  {
+    "content": "Phase 4H: E2E Testing + all bugs fixed",
+    "status": "completed"
   }
 ]

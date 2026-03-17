@@ -35,11 +35,14 @@ export const AuthProvider = ({ children }) => {
       });
       setUser(res.data.user);
       setToken(storedToken);
-    } catch {
-      // Token expired or invalid — clear it silently
-      localStorage.removeItem('aeth_token');
-      setToken(null);
-      setUser(null);
+    } catch (err) {
+      // Only clear on explicit 401 auth failure — preserve token on network errors
+      if (err.response && err.response.status === 401) {
+        localStorage.removeItem('aeth_token');
+        setToken(null);
+        setUser(null);
+      }
+      // On network/timeout errors, keep the token so user stays logged in on retry
     } finally {
       setLoading(false);
     }
