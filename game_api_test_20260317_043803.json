@@ -1,0 +1,31 @@
+{
+  "timestamp": "2026-03-17T04:38:03.313371",
+  "tests_run": 21,
+  "tests_passed": 18,
+  "success_rate": 85.71428571428571,
+  "failures": [
+    "Find valid quest: No valid quest structure",
+    "Buy weapon: Expected 200, got 422 - {\"detail\":[{\"type\":\"missing\",\"loc\":[\"query\",\"item_id\"],\"msg\":\"Field required\",\"input\":null,\"url\":\"https://errors.pydantic.dev/2.12/v/missing\"}]}",
+    "Find equippable item in inventory: No items found"
+  ],
+  "successes": [
+    "Register main test user",
+    "Register as KNIGHT with correct path choice",
+    "Register as SHADOW with correct path choice",
+    "Register as NOBLE with correct path choice",
+    "Login flow works",
+    "Session persistence works",
+    "Start strength training",
+    "Training energy cost correct (6 energy)",
+    "Training timer active",
+    "Commit 'Brot stehlen' - Success (+7 gold, +2 XP)",
+    "Crime energy cost correct (3 energy)",
+    "Combat attack - Defeat (26 damage)",
+    "Combat energy cost correct (15 energy)",
+    "Game state API returns all required sections",
+    "Game state API contains all required fields",
+    "Energy cap is 100 (correct)",
+    "Energy is within valid range (0-100)",
+    "Energy economy basics working"
+  ]
+}

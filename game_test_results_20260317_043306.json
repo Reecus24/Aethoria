@@ -1,0 +1,13 @@
+{
+  "timestamp": "20260317_043306",
+  "tests_run": 4,
+  "tests_passed": 0,
+  "success_rate": 0.0,
+  "failures": [
+    "Register as KNIGHT: Expected 200, got 422 - {\"detail\":[{\"type\":\"value_error\",\"loc\":[\"body\",\"email\"],\"msg\":\"value is not a valid email address: The part after the @-sign is a special-use or reserved name that cannot be used with email.\",\"input\":",
+    "Register as SHADOW: Expected 200, got 422 - {\"detail\":[{\"type\":\"value_error\",\"loc\":[\"body\",\"email\"],\"msg\":\"value is not a valid email address: The part after the @-sign is a special-use or reserved name that cannot be used with email.\",\"input\":",
+    "Register as NOBLE: Expected 200, got 422 - {\"detail\":[{\"type\":\"value_error\",\"loc\":[\"body\",\"email\"],\"msg\":\"value is not a valid email address: The part after the @-sign is a special-use or reserved name that cannot be used with email.\",\"input\":",
+    "Register main test user: Expected 200, got 422 - {\"detail\":[{\"type\":\"value_error\",\"loc\":[\"body\",\"email\"],\"msg\":\"value is not a valid email address: The part after the @-sign is a special-use or reserved name that cannot be used with email.\",\"input\":"
+  ],
+  "successes": []
+}
