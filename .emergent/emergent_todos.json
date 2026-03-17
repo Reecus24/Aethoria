@@ -1,10 +1,6 @@
 [
   {
-    "content": "VISUAL TEST: Screenshots von Dungeon/Hospital/Map/Character Pages machen",
+    "content": "ZUSAMMENFASSUNG: Alle Fixes dokumentieren und User informieren",
     "status": "completed"
-  },
-  {
-    "content": "TESTING: Umfassende Tests aller Fixes mit testing_agent_v3",
-    "status": "in_progress"
   }
 ]
