@@ -7,8 +7,8 @@ import os
 import logging
 import random
 from pathlib import Path
-from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
+from pydantic import BaseModel
+from typing import Optional, Dict
 import uuid
 from datetime import datetime, timezone, timedelta
 import bcrypt
@@ -24,7 +24,7 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-JWT_SECRET = os.environ.get('JWT_SECRET', 'aethoria-fallback-secret-key-2026')
+JWT_SECRET    = os.environ.get('JWT_SECRET', 'aethoria-realm-secret-key-2026')
 JWT_ALGORITHM = 'HS256'
 JWT_EXPIRE_DAYS = 7
 
@@ -38,79 +38,40 @@ logger = logging.getLogger(__name__)
 # ─────────────────────────────────────────────
 # Pydantic Models
 # ─────────────────────────────────────────────
-
 class UserRegister(BaseModel):
     username: str
     email: str
     password: str
-    path_choice: Optional[str] = "knight"   # knight | shadow | noble
+    path_choice: Optional[str] = "knight"
 
 class UserLogin(BaseModel):
     email: str
     password: str
 
-# ─────────────────────────────────────────────
-# Path Starter Stats
-# ─────────────────────────────────────────────
+class ReviewCreate(BaseModel):
+    text: str
+    rating: int   # 1-5
 
+class NewsCreate(BaseModel):
+    title: str
+    password: str  # simple admin passphrase
+
+# ─────────────────────────────────────────────
+# Path Starters
+# ─────────────────────────────────────────────
 PATH_STARTERS: Dict[str, Dict] = {
-    "knight": {
-        "title": "Novice Knight",
-        "strength": 12,
-        "dexterity": 6,
-        "speed": 8,
-        "defense": 10,
-        "gold": 150,
-        "xp": 0,
-    },
-    "shadow": {
-        "title": "Fledgling Rogue",
-        "strength": 7,
-        "dexterity": 14,
-        "speed": 12,
-        "defense": 5,
-        "gold": 200,
-        "xp": 0,
-    },
-    "noble": {
-        "title": "Minor Noble",
-        "strength": 5,
-        "dexterity": 8,
-        "speed": 6,
-        "defense": 7,
-        "gold": 500,
-        "xp": 0,
-    },
+    "knight": {"title": "Novice Knight",  "strength": 12, "dexterity": 6,  "speed": 8,  "defense": 10, "gold": 150, "xp": 0},
+    "shadow": {"title": "Fledgling Rogue","strength": 7,  "dexterity": 14, "speed": 12, "defense": 5,  "gold": 200, "xp": 0},
+    "noble":  {"title": "Minor Noble",    "strength": 5,  "dexterity": 8,  "speed": 6,  "defense": 7,  "gold": 500, "xp": 0},
 }
+PATH_LABELS = {"knight": "The Knight", "shadow": "The Shadow", "noble": "The Noble"}
+PATH_ICONS  = {"knight": "⚔️", "shadow": "🗡️", "noble": "👑"}
 
-PATH_LABELS = {
-    "knight": "The Knight",
-    "shadow": "The Shadow",
-    "noble":  "The Noble",
-}
+ADMIN_PASS = os.environ.get("ADMIN_PASS", "aethoria-admin-2026")
 
 # ─────────────────────────────────────────────
-# Seed Data
+# Static Seed Data  (features, paths, kingdoms only)
 # ─────────────────────────────────────────────
-
-TICKER_EVENTS = [
-    {"event": "Sir Aldric was thrown into the dungeon: caught stealing from the market stalls", "type": "dungeon", "time": "moments ago"},
-    {"event": "Lady Seraphina defeated Lord Malachar in brutal combat", "type": "combat", "time": "moments ago"},
-    {"event": "The Shadow Theron pickpocketed a travelling merchant", "type": "crime", "time": "moments ago"},
-    {"event": "Guild of the Iron Fist declared war on the Order of the Crimson Rose", "type": "guild", "time": "moments ago"},
-    {"event": "Drakon the Bold completed the Quest of the Dragon's Eye", "type": "quest", "time": "moments ago"},
-    {"event": "Morgana was arrested: caught brewing forbidden elixirs in the Alchemist Quarter", "type": "dungeon", "time": "moments ago"},
-    {"event": "Knight Commander Voss challenged and hospitalised a rival noble", "type": "combat", "time": "moments ago"},
-    {"event": "The Rogue Silas robbed the Royal Treasury vaults", "type": "crime", "time": "moments ago"},
-    {"event": "Lady Elara left Baron Halvorn wounded at the crossroads", "type": "combat", "time": "moments ago"},
-    {"event": "Brother Cedric escaped the dungeon using an ancient key", "type": "dungeon", "time": "moments ago"},
-    {"event": "Merchant Lord Cassius cornered the iron ore market", "type": "market", "time": "moments ago"},
-    {"event": "The Archer Lyra placed a bounty on the head of Darkblade", "type": "bounty", "time": "moments ago"},
-    {"event": "Wizard Orenthal was caught casting forbidden curses", "type": "dungeon", "time": "moments ago"},
-    {"event": "Shield-Maiden Brunhild won the Grand Tournament", "type": "quest", "time": "moments ago"},
-    {"event": "The Order of Shadows completed an organized raid on the Merchant District", "type": "guild", "time": "moments ago"},
-]
-
 FEATURES = [
     {"title": "Merchant Exchange", "desc": "Invest in the Realm's bustling trade market and watch your gold multiply!", "icon": "📈"},
     {"title": "Open Realm", "desc": "Play your way. Be a knight, a rogue, a noble — limited only by your ambition!", "icon": "⚔️"},
@@ -156,86 +117,56 @@ FEATURES = [
     {"title": "Guilds & Trades", "desc": "Try your hand at dozens of professions: healer, soldier, court scribe and more!", "icon": "⚒️"},
 ]
 
-LEADERBOARD = [
-    {"rank": 1, "username": "LordDrakon", "age": 1605, "level": 87, "improvement": 37.62, "title": "Dragon Slayer"},
-    {"rank": 2, "username": "ShadowQueen", "age": 3542, "level": 74, "improvement": 37.36, "title": "Guild Mistress"},
-    {"rank": 3, "username": "IronFistVoss", "age": 21, "level": 69, "improvement": 36.76, "title": "Warlord"},
-    {"rank": 4, "username": "ArcaneSeraphina", "age": 1499, "level": 65, "improvement": 36.71, "title": "Archmage"},
-    {"rank": 5, "username": "BladedRaven", "age": 775, "level": 63, "improvement": 36.12, "title": "Master Rogue"},
-    {"rank": 6, "username": "NobleCassius", "age": 920, "level": 61, "improvement": 35.88, "title": "Merchant Lord"},
-    {"rank": 7, "username": "ThunderSword", "age": 440, "level": 59, "improvement": 35.42, "title": "Champion"},
-    {"rank": 8, "username": "MoonHuntress", "age": 310, "level": 57, "improvement": 34.95, "title": "Ranger Lord"},
-    {"rank": 9, "username": "CrimsonBaron", "age": 1820, "level": 55, "improvement": 34.71, "title": "Noble Crusader"},
-    {"rank": 10, "username": "DarkWarden", "age": 670, "level": 53, "improvement": 34.23, "title": "Shadow Walker"},
-]
-
-REVIEWS = [
-    {"author": "DragonKnight88", "rating": 5, "text": "This realm is a masterpiece! The depth of gameplay is unmatched — from the guilds to the tournaments. Years of adventure await you!", "date": "December 13, 2025"},
-    {"author": "ShadowRogue42", "rating": 5, "text": "Best text-based RPG I have ever played. The community is incredible, and the developers are always adding new content. Truly a living world!", "date": "December 09, 2025"},
-    {"author": "NobleMerchant", "rating": 5, "text": "I have been playing Aethoria for 3 YEARS and I STILL love it! Definitely one of my favourite games of all time. The guild system alone is worth it!", "date": "December 07, 2025"},
-    {"author": "ArcaneMage77", "rating": 4, "text": "Incredible game, mainly because the developers are actively online and the staff help you. The community makes it a 5/5 experience!", "date": "November 28, 2025"},
-    {"author": "IronFistBrunhild", "rating": 5, "text": "This is a truly awesome game. I even invested real gold because I never do that! The depth and community are unparalleled. Cheers to 21 years of adventure!", "date": "November 15, 2025"},
-    {"author": "SwiftArcher", "rating": 4, "text": "Great game — years of fun with a massive community. You can be in a thieves guild, a merchant house, or a knightly order. It is all there and more!", "date": "November 03, 2025"},
-    {"author": "DuskCrawler", "rating": 5, "text": "Best game I have played in a very long time! The depth is astounding and the community is friendly and helpful. This game does not disappoint!", "date": "November 02, 2025"},
-    {"author": "MoonlitPaladin", "rating": 4, "text": "There is no game like this one out there. Very hard to learn but once you master it, you will not play anything else. A true legend of the genre.", "date": "October 10, 2025"},
-]
-
-NEWS = [
-    {"title": "Chronicles #424: Level 100 Honour Badges, 20 New Legendary Items, Combat Finale Bonus Adjusted", "date": "March 01, 2026", "url": "#"},
-    {"title": "Chronicles #423: Practice Duel NPCs, Favourite Counters for Bazaars now live", "date": "February 22, 2026", "url": "#"},
-    {"title": "Chronicles #422: Fallen Hero Badges, Advanced Quest Sorting, New Scenario, Bomb Counters", "date": "February 15, 2026", "url": "#"},
-    {"title": "Chronicles #421: Balance adjustments and guild war improvements", "date": "February 17, 2026", "url": "#"},
-    {"title": "Chronicles #420: Merchant House overhaul and new trade routes added", "date": "February 10, 2026", "url": "#"},
-    {"title": "Chronicles #419: New dungeon mechanics and escape rune system", "date": "February 03, 2026", "url": "#"},
-    {"title": "Chronicles #418: Seasonal tournament results and prize distribution", "date": "January 27, 2026", "url": "#"},
-    {"title": "Updated Realm Rules: Arcane Scripting & Forbidden Knowledge Policy", "date": "January 25, 2026", "url": "#"},
-]
-
 PATHS = {
-    "knight": {
-        "title": "The Knight",
-        "subtitle": "Master of Combat & Honour",
-        "description": "Forge yourself into an unstoppable warrior. Train daily at the Royal Barracks, master every weapon from the humble shortsword to the legendary dragon-forged blade. Win glory in the tournament grounds, defend your guild in faction wars, and rise to become the most feared combatant in all of Aethoria.",
-        "highlights": ["Melee Weapons: axes, swords, maces, legendary enchanted blades", "Train Strength, Speed, Defence and Dexterity at the Barracks", "Compete in Grand Tournaments and Faction Wars", "Earn the rank of Champion and be enshrined in the Hall of Legends"],
-        "icon": "⚔️",
-        "color": "#C0392B"
-    },
-    "shadow": {
-        "title": "The Shadow",
-        "subtitle": "Master of Darkness & Cunning",
-        "description": "Slip through the cracks of society, unseen and unstoppable. Master the art of dark deeds, pickpocketing, burglary and guild-organised crimes. Craft arcane curses. Place bounties and collect them. The shadows of Aethoria hold more power than any sword — if you dare to wield them.",
-        "highlights": ["50+ Dark Deeds with hundreds of unique outcomes", "Craft and deploy Arcane Curses against enemies", "Place and collect Hunter's Contracts (Bounties)", "Master the art of Guild-organised shadow operations"],
-        "icon": "🗡️",
-        "color": "#8E44AD"
-    },
-    "noble": {
-        "title": "The Noble",
-        "subtitle": "Master of Gold & Power",
-        "description": "True power lies not in strength but in wealth and influence. Build your Merchant House, hire players as your retainers, dominate the trade markets, invest in the Royal Treasury, and acquire magnificent strongholds. The Realm's economy bends to the will of those with enough gold — and the cunning to use it.",
-        "highlights": ["Found and manage one of 39 Merchant Houses", "Dominate the Merchant Exchange and drive prices", "Acquire Strongholds — from modest manors to grand castles", "Forge Noble Bonds and political alliances"],
-        "icon": "👑",
-        "color": "#D4AC0D"
-    }
+    "knight": {"title": "The Knight", "subtitle": "Master of Combat & Honour", "description": "Forge yourself into an unstoppable warrior. Train daily at the Royal Barracks, master every weapon from the humble shortsword to the legendary dragon-forged blade. Win glory in the tournament grounds, defend your guild in faction wars, and rise to become the most feared combatant in all of Aethoria.", "highlights": ["Melee Weapons: axes, swords, maces, legendary enchanted blades", "Train Strength, Speed, Defence and Dexterity at the Barracks", "Compete in Grand Tournaments and Faction Wars", "Earn the rank of Champion and be enshrined in the Hall of Legends"], "icon": "⚔️", "color": "#C0392B"},
+    "shadow": {"title": "The Shadow", "subtitle": "Master of Darkness & Cunning", "description": "Slip through the cracks of society, unseen and unstoppable. Master the art of dark deeds, pickpocketing, burglary and guild-organised crimes. Craft arcane curses. Place bounties and collect them. The shadows of Aethoria hold more power than any sword — if you dare to wield them.", "highlights": ["50+ Dark Deeds with hundreds of unique outcomes", "Craft and deploy Arcane Curses against enemies", "Place and collect Hunter's Contracts (Bounties)", "Master the art of Guild-organised shadow operations"], "icon": "🗡️", "color": "#8E44AD"},
+    "noble":  {"title": "The Noble",  "subtitle": "Master of Gold & Power",    "description": "True power lies not in strength but in wealth and influence. Build your Merchant House, hire players as your retainers, dominate the trade markets, invest in the Royal Treasury, and acquire magnificent strongholds. The Realm's economy bends to the will of those with enough gold — and the cunning to use it.", "highlights": ["Found and manage one of 39 Merchant Houses", "Dominate the Merchant Exchange and drive prices", "Acquire Strongholds — from modest manors to grand castles", "Forge Noble Bonds and political alliances"], "icon": "👑", "color": "#D4AC0D"},
 }
 
 KINGDOMS = [
     {"name": "Aethoria Prime", "desc": "The capital of the Realm. Trade, power, and intrigue converge.", "image": "https://images.unsplash.com/photo-1533154683836-84ea7a0bc310?w=400&q=50", "type": "Capital", "danger": "Medium"},
-    {"name": "Ironhold", "desc": "A fortress city of steel and fire. Home to the greatest warriors.", "image": "https://images.unsplash.com/photo-1621947081720-86970823b77a?w=400&q=50", "type": "Military", "danger": "High"},
-    {"name": "Shadowfen", "desc": "A city of fog and secrets, where rogues and thieves hold court.", "image": "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?w=400&q=50", "type": "Underworld", "danger": "Very High"},
-    {"name": "Goldenveil", "desc": "The Realm's most prosperous trading city. Every merchant dreams of it.", "image": "https://images.unsplash.com/photo-1501183638710-841dd1904471?w=400&q=50", "type": "Commerce", "danger": "Low"},
-    {"name": "Stonecrest", "desc": "Ancient mountains hiding powerful arcane secrets in their caves.", "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&q=50", "type": "Arcane", "danger": "High"},
-    {"name": "Crystalmere", "desc": "A lakeside city of extraordinary beauty and political scheming.", "image": "https://images.unsplash.com/photo-1499678329028-101435549a4e?w=400&q=50", "type": "Noble", "danger": "Medium"},
-    {"name": "Embervast", "desc": "The volcanic borderlands, rich in dragon-forged materials.", "image": "https://images.unsplash.com/photo-1527482797697-8795b05a13fe?w=400&q=50", "type": "Wilds", "danger": "Extreme"},
-    {"name": "Tidehaven", "desc": "A port city where smugglers and merchants clash over sea routes.", "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=50", "type": "Maritime", "danger": "High"},
-    {"name": "Duskwood", "desc": "An ancient forest kingdom where shapeshifters and druids dwell.", "image": "https://images.unsplash.com/photo-1448375240586-882707db888b?w=400&q=50", "type": "Forest", "danger": "Medium"},
-    {"name": "Frostholm", "desc": "The frozen north: hard people, rare pelts, and glacier-locked tombs.", "image": "https://images.unsplash.com/photo-1491555103944-7c647fd857e6?w=400&q=50", "type": "Frozen", "danger": "Very High"},
-    {"name": "Sunkeep", "desc": "A desert kingdom where ruins of the First Empire still stand.", "image": "https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=400&q=50", "type": "Desert", "danger": "High"},
+    {"name": "Ironhold",       "desc": "A fortress city of steel and fire. Home to the greatest warriors.", "image": "https://images.unsplash.com/photo-1621947081720-86970823b77a?w=400&q=50", "type": "Military", "danger": "High"},
+    {"name": "Shadowfen",      "desc": "A city of fog and secrets, where rogues and thieves hold court.", "image": "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?w=400&q=50", "type": "Underworld", "danger": "Very High"},
+    {"name": "Goldenveil",     "desc": "The Realm's most prosperous trading city. Every merchant dreams of it.", "image": "https://images.unsplash.com/photo-1501183638710-841dd1904471?w=400&q=50", "type": "Commerce", "danger": "Low"},
+    {"name": "Stonecrest",     "desc": "Ancient mountains hiding powerful arcane secrets in their caves.", "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&q=50", "type": "Arcane", "danger": "High"},
+    {"name": "Crystalmere",    "desc": "A lakeside city of extraordinary beauty and political scheming.", "image": "https://images.unsplash.com/photo-1499678329028-101435549a4e?w=400&q=50", "type": "Noble", "danger": "Medium"},
+    {"name": "Embervast",      "desc": "The volcanic borderlands, rich in dragon-forged materials.", "image": "https://images.unsplash.com/photo-1527482797697-8795b05a13fe?w=400&q=50", "type": "Wilds", "danger": "Extreme"},
+    {"name": "Tidehaven",      "desc": "A port city where smugglers and merchants clash over sea routes.", "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=50", "type": "Maritime", "danger": "High"},
+    {"name": "Duskwood",       "desc": "An ancient forest kingdom where shapeshifters and druids dwell.", "image": "https://images.unsplash.com/photo-1448375240586-882707db888b?w=400&q=50", "type": "Forest", "danger": "Medium"},
+    {"name": "Frostholm",      "desc": "The frozen north: hard people, rare pelts, and glacier-locked tombs.", "image": "https://images.unsplash.com/photo-1491555103944-7c647fd857e6?w=400&q=50", "type": "Frozen", "danger": "Very High"},
+    {"name": "Sunkeep",        "desc": "A desert kingdom where ruins of the First Empire still stand.", "image": "https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=400&q=50", "type": "Desert", "danger": "High"},
 ]
+
+# ─────────────────────────────────────────────
+# NEWS with real computed dates (relative to now)
+# ─────────────────────────────────────────────
+def make_initial_news():
+    now = datetime.now(timezone.utc)
+    entries = [
+        {"title": "Realm of Aethoria opens its gates — welcome, adventurers!",         "days_ago": 0},
+        {"title": "Character Paths launched: Choose Knight, Shadow, or Noble",           "days_ago": 1},
+        {"title": "11 Kingdoms now available for exploration — travel system active",    "days_ago": 3},
+        {"title": "Hall of Legends now displays real registered adventurers",            "days_ago": 5},
+        {"title": "Review system launched — share your experience with the Realm",      "days_ago": 7},
+        {"title": "Online counter now tracks real active adventurers in real-time",      "days_ago": 10},
+        {"title": "Character Dashboard released — view your stats and path anytime",     "days_ago": 14},
+        {"title": "Realm Event Ticker now shows real activity from real adventurers",    "days_ago": 18},
+    ]
+    result = []
+    for e in entries:
+        ts = now - timedelta(days=e["days_ago"])
+        result.append({
+            "id": str(uuid.uuid4()),
+            "title": e["title"],
+            "date": ts.strftime("%-d. %B %Y"),   # e.g. "17. March 2026"
+            "date_iso": ts.isoformat(),
+            "url": "#",
+        })
+    return result
 
 # ─────────────────────────────────────────────
 # JWT Helpers
 # ─────────────────────────────────────────────
-
 def create_access_token(user_id: str, username: str) -> str:
     payload = {
         "sub": user_id,
@@ -245,77 +176,36 @@ def create_access_token(user_id: str, username: str) -> str:
     }
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
-
 def decode_access_token(token: str) -> dict:
     try:
-        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        return payload
+        return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Session expired — please log in again")
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token — please log in again")
 
-
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
     if not credentials:
-        raise HTTPException(status_code=401, detail="Authentication required — enter the gate first")
+        raise HTTPException(status_code=401, detail="Authentication required")
     payload = decode_access_token(credentials.credentials)
     user = await db.users.find_one({"id": payload["sub"]})
     if not user:
         raise HTTPException(status_code=401, detail="Adventurer not found in the Realm")
     return user
 
+async def get_optional_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """Returns user if authenticated, None otherwise."""
+    if not credentials:
+        return None
+    try:
+        payload = decode_access_token(credentials.credentials)
+        return await db.users.find_one({"id": payload["sub"]})
+    except Exception:
+        return None
 
 # ─────────────────────────────────────────────
-# Seed DB on startup
+# Serialization
 # ─────────────────────────────────────────────
-
-async def seed_database():
-    count = await db.ticker_events.count_documents({})
-    if count == 0:
-        await db.ticker_events.insert_many([{"id": str(uuid.uuid4()), **e} for e in TICKER_EVENTS])
-
-    count = await db.features.count_documents({})
-    if count == 0:
-        await db.features.insert_many([{"id": str(uuid.uuid4()), "index": i, **f} for i, f in enumerate(FEATURES)])
-
-    count = await db.leaderboard.count_documents({})
-    if count == 0:
-        await db.leaderboard.insert_many([{"id": str(uuid.uuid4()), **e} for e in LEADERBOARD])
-
-    count = await db.reviews.count_documents({})
-    if count == 0:
-        await db.reviews.insert_many([{"id": str(uuid.uuid4()), **r} for r in REVIEWS])
-
-    count = await db.news.count_documents({})
-    if count == 0:
-        await db.news.insert_many([{"id": str(uuid.uuid4()), **n} for n in NEWS])
-
-    count = await db.paths.count_documents({})
-    if count == 0:
-        await db.paths.insert_many([{"id": str(uuid.uuid4()), "key": k, **v} for k, v in PATHS.items()])
-
-    count = await db.kingdoms.count_documents({})
-    if count == 0:
-        await db.kingdoms.insert_many([{"id": str(uuid.uuid4()), **k} for k in KINGDOMS])
-
-    logger.info("Database seeded successfully")
-
-
-@app.on_event("startup")
-async def startup_event():
-    await seed_database()
-
-
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()
-
-
-# ─────────────────────────────────────────────
-# Serialization helper
-# ─────────────────────────────────────────────
-
 def serialize_doc(doc):
     if doc is None:
         return None
@@ -326,20 +216,11 @@ def serialize_doc(doc):
         for k, v in doc.items():
             if k == "_id":
                 continue
-            elif isinstance(v, dict):
-                result[k] = serialize_doc(v)
-            elif isinstance(v, list):
-                result[k] = [serialize_doc(i) if isinstance(i, dict) else i for i in v]
-            elif isinstance(v, datetime):
-                result[k] = v.isoformat()
-            else:
-                result[k] = v
+            result[k] = serialize_doc(v) if isinstance(v, (dict, list)) else (v.isoformat() if isinstance(v, datetime) else v)
         return result
     return doc
 
-
 def user_to_profile(user: dict) -> dict:
-    """Return safe public profile (no password)."""
     created = user.get("created_at", datetime.now(timezone.utc).isoformat())
     if isinstance(created, datetime):
         created = created.isoformat()
@@ -348,7 +229,6 @@ def user_to_profile(user: dict) -> dict:
         days_in_realm = (datetime.now(timezone.utc) - created_dt).days
     except Exception:
         days_in_realm = 0
-
     path_key = user.get("path_choice", "knight")
     return {
         "id": user.get("id"),
@@ -368,88 +248,209 @@ def user_to_profile(user: dict) -> dict:
         "created_at": created,
     }
 
+def format_created_at(iso_str: str) -> str:
+    """Return human-readable date like '17. March 2026'"""
+    try:
+        dt = datetime.fromisoformat(iso_str.replace("Z", "+00:00"))
+        return dt.strftime("%-d. %B %Y")
+    except Exception:
+        return iso_str
 
 # ─────────────────────────────────────────────
-# Landing / Aggregated Endpoint
+# Event Logging Helper
 # ─────────────────────────────────────────────
+EVENT_TEMPLATES = {
+    "register": [
+        "{username} joined the Realm as {path_label}",
+        "A new adventurer, {username}, has entered Aethoria as {path_label}",
+        "{username} forged their legend — {path_label} path chosen",
+    ],
+    "login": [
+        "{username} returned to the Realm",
+        "The gate opened for {username}",
+        "{username} entered Aethoria once more",
+    ],
+}
+EVENT_TYPES = {
+    "register": "quest",
+    "login": "combat",
+}
 
-@api_router.get("/landing")
-async def get_landing():
-    ticker = await db.ticker_events.find({}, {"_id": 0}).to_list(100)
-    features = await db.features.find({}, {"_id": 0}).sort("index", 1).to_list(100)
-    leaderboard = await db.leaderboard.find({}, {"_id": 0}).sort("rank", 1).to_list(50)
-    reviews = await db.reviews.find({}, {"_id": 0}).to_list(50)
-    news = await db.news.find({}, {"_id": 0}).to_list(20)
-    paths = await db.paths.find({}, {"_id": 0}).to_list(10)
-    kingdoms = await db.kingdoms.find({}, {"_id": 0}).to_list(20)
+async def log_event(event_type: str, username: str, path_label: str = ""):
+    templates = EVENT_TEMPLATES.get(event_type, ["{username} did something"])
+    template = random.choice(templates)
+    text = template.format(username=username, path_label=path_label)
+    doc = {
+        "id": str(uuid.uuid4()),
+        "event": text,
+        "type": EVENT_TYPES.get(event_type, "default"),
+        "username": username,
+        "time": "moments ago",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.events.insert_one(doc)
+    # Keep only last 100 events
+    count = await db.events.count_documents({})
+    if count > 100:
+        oldest = await db.events.find({}, {"_id": 1}).sort("created_at", 1).limit(count - 100).to_list(None)
+        if oldest:
+            ids = [d["_id"] for d in oldest]
+            await db.events.delete_many({"_id": {"$in": ids}})
+
+# ─────────────────────────────────────────────
+# Seed DB — only static data (no fake users/leaderboard/reviews)
+# ─────────────────────────────────────────────
+async def seed_database():
+    if await db.features.count_documents({}) == 0:
+        await db.features.insert_many([{"id": str(uuid.uuid4()), "index": i, **f} for i, f in enumerate(FEATURES)])
+
+    if await db.paths.count_documents({}) == 0:
+        await db.paths.insert_many([{"id": str(uuid.uuid4()), "key": k, **v} for k, v in PATHS.items()])
+
+    if await db.kingdoms.count_documents({}) == 0:
+        await db.kingdoms.insert_many([{"id": str(uuid.uuid4()), **k} for k in KINGDOMS])
+
+    # News: always wipe and re-seed with correct real dates
+    await db.news.delete_many({})
+    await db.news.insert_many(make_initial_news())
+
+    logger.info("Database seeded successfully (real data only)")
+
+@app.on_event("startup")
+async def startup_event():
+    await seed_database()
+
+@app.on_event("shutdown")
+async def shutdown_db_client():
+    client.close()
+
+# ─────────────────────────────────────────────
+# Real Leaderboard (from db.users)
+# ─────────────────────────────────────────────
+async def get_real_leaderboard(limit: int = 10) -> list:
+    users = await db.users.find(
+        {},
+        {"_id": 0, "password": 0, "email": 0}
+    ).sort([("level", -1), ("xp", -1)]).limit(limit).to_list(limit)
+
+    result = []
+    for rank, u in enumerate(users, start=1):
+        created = u.get("created_at", datetime.now(timezone.utc).isoformat())
+        if isinstance(created, datetime):
+            created = created.isoformat()
+        try:
+            created_dt = datetime.fromisoformat(created.replace("Z", "+00:00"))
+            days_in_realm = (datetime.now(timezone.utc) - created_dt).days
+        except Exception:
+            days_in_realm = 0
+
+        path_key = u.get("path_choice", "knight")
+        result.append({
+            "rank": rank,
+            "username": u.get("username", "Unknown"),
+            "title": u.get("title", "Adventurer"),
+            "age": days_in_realm,
+            "level": u.get("level", 1),
+            "xp": u.get("xp", 0),
+            "path_choice": path_key,
+            "path_label": PATH_LABELS.get(path_key, "Knight"),
+            "path_icon": PATH_ICONS.get(path_key, "⚔️"),
+            "improvement": round(u.get("xp", 0) / max(days_in_realm, 1), 2) if days_in_realm > 0 else 0.0,
+            "created_at": format_created_at(created),
+        })
+    return result
+
+# ─────────────────────────────────────────────
+# Real Online Counter (from last_seen)
+# ─────────────────────────────────────────────
+async def get_real_online_stats() -> dict:
+    now = datetime.now(timezone.utc)
+    iso_15m = (now - timedelta(minutes=15)).isoformat()
+    iso_1h  = (now - timedelta(hours=1)).isoformat()
+    iso_24h = (now - timedelta(hours=24)).isoformat()
+
+    now_count    = await db.users.count_documents({"last_seen": {"$gte": iso_15m}})
+    hour_count   = await db.users.count_documents({"last_seen": {"$gte": iso_1h}})
+    day_count    = await db.users.count_documents({"last_seen": {"$gte": iso_24h}})
+    total_count  = await db.users.count_documents({})
 
     return {
-        "ticker": serialize_doc(ticker),
-        "features": serialize_doc(features),
-        "leaderboard": serialize_doc(leaderboard),
-        "reviews": serialize_doc(reviews),
-        "news": serialize_doc(news),
-        "paths": serialize_doc(paths),
-        "kingdoms": serialize_doc(kingdoms),
-        "online": {
-            "now": random.randint(2800, 3500),
-            "last_hour": random.randint(8000, 12000),
-            "last_24h": random.randint(35000, 55000),
-        },
+        "now": now_count,
+        "last_hour": hour_count,
+        "last_24h": day_count,
+        "total": total_count,
     }
 
+# ─────────────────────────────────────────────
+# Real Ticker (from db.events)
+# ─────────────────────────────────────────────
+async def get_real_ticker() -> list:
+    events = await db.events.find({}, {"_id": 0}).sort("created_at", -1).limit(50).to_list(50)
+    return serialize_doc(events)
+
+# ─────────────────────────────────────────────
+# Landing Endpoint (all real data)
+# ─────────────────────────────────────────────
+@api_router.get("/landing")
+async def get_landing():
+    leaderboard = await get_real_leaderboard(10)
+    ticker      = await get_real_ticker()
+    online      = await get_real_online_stats()
+    features    = await db.features.find({}, {"_id": 0}).sort("index", 1).to_list(100)
+    reviews     = await db.reviews.find({}, {"_id": 0}).sort("created_at", -1).to_list(50)
+    news        = await db.news.find({}, {"_id": 0}).sort("date_iso", -1).to_list(20)
+    paths       = await db.paths.find({}, {"_id": 0}).to_list(10)
+    kingdoms    = await db.kingdoms.find({}, {"_id": 0}).to_list(20)
+
+    return {
+        "ticker":      serialize_doc(ticker),
+        "features":    serialize_doc(features),
+        "leaderboard": leaderboard,
+        "reviews":     serialize_doc(reviews),
+        "news":        serialize_doc(news),
+        "paths":       serialize_doc(paths),
+        "kingdoms":    serialize_doc(kingdoms),
+        "online":      online,
+    }
 
 @api_router.get("/ticker")
-async def get_ticker():
-    ticker = await db.ticker_events.find({}, {"_id": 0}).to_list(100)
-    return serialize_doc(ticker)
-
+async def get_ticker_endpoint():
+    return await get_real_ticker()
 
 @api_router.get("/leaderboard")
-async def get_leaderboard():
-    entries = await db.leaderboard.find({}, {"_id": 0}).sort("rank", 1).to_list(50)
-    return serialize_doc(entries)
-
+async def get_leaderboard_endpoint():
+    return await get_real_leaderboard(10)
 
 @api_router.get("/reviews")
-async def get_reviews():
-    return serialize_doc(await db.reviews.find({}, {"_id": 0}).to_list(50))
-
+async def get_reviews_endpoint():
+    reviews = await db.reviews.find({}, {"_id": 0}).sort("created_at", -1).to_list(50)
+    return serialize_doc(reviews)
 
 @api_router.get("/news")
-async def get_news():
-    return serialize_doc(await db.news.find({}, {"_id": 0}).to_list(20))
-
+async def get_news_endpoint():
+    news = await db.news.find({}, {"_id": 0}).sort("date_iso", -1).to_list(20)
+    return serialize_doc(news)
 
 @api_router.get("/features")
-async def get_features():
+async def get_features_endpoint():
     features = await db.features.find({}, {"_id": 0}).sort("index", 1).to_list(100)
     return serialize_doc(features)
 
-
 @api_router.get("/paths")
-async def get_paths():
+async def get_paths_endpoint():
     return serialize_doc(await db.paths.find({}, {"_id": 0}).to_list(10))
 
-
 @api_router.get("/kingdoms")
-async def get_kingdoms():
+async def get_kingdoms_endpoint():
     return serialize_doc(await db.kingdoms.find({}, {"_id": 0}).to_list(20))
 
-
 @api_router.get("/stats/online")
-async def get_online_stats():
-    return {
-        "now": random.randint(2800, 3500),
-        "last_hour": random.randint(8000, 12000),
-        "last_24h": random.randint(35000, 55000),
-    }
-
+async def get_online_stats_endpoint():
+    return await get_real_online_stats()
 
 # ─────────────────────────────────────────────
-# Auth Endpoints
+# Auth
 # ─────────────────────────────────────────────
-
 @api_router.post("/auth/register")
 async def register(user: UserRegister):
     if not user.username or not user.email or not user.password:
@@ -466,31 +467,34 @@ async def register(user: UserRegister):
     if await db.users.find_one({"username": user.username}):
         raise HTTPException(status_code=400, detail="This adventurer name is already taken in the Realm")
 
-    hashed = bcrypt.hashpw(user.password.encode(), bcrypt.gensalt()).decode()
-    starter = PATH_STARTERS[path_choice].copy()
+    hashed   = bcrypt.hashpw(user.password.encode(), bcrypt.gensalt()).decode()
+    starter  = PATH_STARTERS[path_choice].copy()
+    now_iso  = datetime.now(timezone.utc).isoformat()
 
     user_doc = {
         "id": str(uuid.uuid4()),
         "username": user.username,
         "email": user.email,
         "password": hashed,
-        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_at": now_iso,
+        "last_seen": now_iso,
         "level": 1,
         "path_choice": path_choice,
         **starter,
     }
     await db.users.insert_one(user_doc)
 
-    token = create_access_token(user_doc["id"], user.username)
-    profile = user_to_profile(user_doc)
+    # Log real event
+    await log_event("register", user.username, PATH_LABELS.get(path_choice, "Knight"))
 
+    token   = create_access_token(user_doc["id"], user.username)
+    profile = user_to_profile(user_doc)
     return {
         "success": True,
         "message": f"Welcome to the Realm, {user.username}! Your legend begins now.",
         "token": token,
         "user": profile,
     }
-
 
 @api_router.post("/auth/login")
 async def login(credentials: UserLogin):
@@ -503,9 +507,17 @@ async def login(credentials: UserLogin):
     if not bcrypt.checkpw(credentials.password.encode(), user["password"].encode()):
         raise HTTPException(status_code=401, detail="Incorrect passphrase — the dungeon guards grow suspicious")
 
-    token = create_access_token(user["id"], user["username"])
-    profile = user_to_profile(user)
+    # Update last_seen
+    now_iso = datetime.now(timezone.utc).isoformat()
+    await db.users.update_one({"id": user["id"]}, {"$set": {"last_seen": now_iso}})
 
+    # Log real event (only log occasionally to avoid flooding ticker)
+    existing = await db.events.count_documents({"username": user["username"], "type": "combat"})
+    if existing == 0 or random.random() < 0.3:
+        await log_event("login", user["username"])
+
+    token   = create_access_token(user["id"], user["username"])
+    profile = user_to_profile({**user, "last_seen": now_iso})
     return {
         "success": True,
         "message": f"Welcome back, {user['username']}! The Realm awaits your return.",
@@ -513,17 +525,72 @@ async def login(credentials: UserLogin):
         "user": profile,
     }
 
-
 @api_router.post("/auth/logout")
 async def logout():
-    # Client-side token invalidation (stateless JWT)
     return {"success": True, "message": "You have left the Realm safely. Until next time."}
-
 
 @api_router.get("/me")
 async def get_me(current_user: dict = Depends(get_current_user)):
-    return {"success": True, "user": user_to_profile(current_user)}
+    # Update last_seen on every /me call (keeps "online now" accurate)
+    now_iso = datetime.now(timezone.utc).isoformat()
+    await db.users.update_one({"id": current_user["id"]}, {"$set": {"last_seen": now_iso}})
+    return {"success": True, "user": user_to_profile({**current_user, "last_seen": now_iso})}
 
+# ─────────────────────────────────────────────
+# Reviews — real user submissions
+# ─────────────────────────────────────────────
+@api_router.post("/reviews")
+async def create_review(review: ReviewCreate, current_user: dict = Depends(get_current_user)):
+    if not review.text or len(review.text.strip()) < 10:
+        raise HTTPException(status_code=400, detail="Review must be at least 10 characters")
+    if review.rating < 1 or review.rating > 5:
+        raise HTTPException(status_code=400, detail="Rating must be between 1 and 5")
+    # Prevent duplicate reviews from same user
+    existing = await db.reviews.find_one({"user_id": current_user["id"]})
+    if existing:
+        raise HTTPException(status_code=400, detail="You have already submitted a review for the Realm")
+
+    now = datetime.now(timezone.utc)
+    doc = {
+        "id": str(uuid.uuid4()),
+        "user_id": current_user["id"],
+        "author": current_user["username"],
+        "path_label": PATH_LABELS.get(current_user.get("path_choice", "knight"), "Knight"),
+        "rating": review.rating,
+        "text": review.text.strip(),
+        "date": now.strftime("%-d. %B %Y"),
+        "created_at": now.isoformat(),
+    }
+    await db.reviews.insert_one(doc)
+    return {"success": True, "message": "Your testimonial has been inscribed in the Realm's annals!", "review": serialize_doc(doc)}
+
+@api_router.delete("/reviews/mine")
+async def delete_my_review(current_user: dict = Depends(get_current_user)):
+    result = await db.reviews.delete_one({"user_id": current_user["id"]})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="No review found for your adventurer")
+    return {"success": True, "message": "Your review has been removed from the annals"}
+
+# ─────────────────────────────────────────────
+# News — admin can add real patch notes
+# ─────────────────────────────────────────────
+@api_router.post("/news")
+async def create_news(item: NewsCreate):
+    if item.password != ADMIN_PASS:
+        raise HTTPException(status_code=403, detail="Invalid admin passphrase")
+    if not item.title or len(item.title.strip()) < 5:
+        raise HTTPException(status_code=400, detail="Title must be at least 5 characters")
+
+    now = datetime.now(timezone.utc)
+    doc = {
+        "id": str(uuid.uuid4()),
+        "title": item.title.strip(),
+        "date": now.strftime("%-d. %B %Y"),
+        "date_iso": now.isoformat(),
+        "url": "#",
+    }
+    await db.news.insert_one(doc)
+    return {"success": True, "message": "Chronicle added to the Royal Gazette!", "news": serialize_doc(doc)}
 
 # ─────────────────────────────────────────────
 app.include_router(api_router)

@@ -118,7 +118,7 @@ function AppInner() {
       {dataLoading ? <LeaderboardSkeleton /> : <LeaderboardSection leaderboard={landingData?.leaderboard || []} />}
 
       {/* Reviews */}
-      {dataLoading ? <ReviewsSkeleton /> : <ReviewsSection reviews={landingData?.reviews || []} />}
+      {dataLoading ? <ReviewsSkeleton /> : <ReviewsSection reviews={landingData?.reviews || []} onReviewSubmitted={fetchLanding} />}
 
       {/* Paths */}
       <PathsSection paths={landingData?.paths || []} />

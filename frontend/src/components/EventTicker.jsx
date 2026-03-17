@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { Sparkles } from 'lucide-react';
 
 const eventTypeColors = {
   dungeon: '#E57373',
@@ -24,15 +25,27 @@ const eventTypeIcons = {
 };
 
 const eventTypeLabels = {
-  dungeon: 'Dungeon',
-  combat: 'Combat',
-  crime: 'Crime',
-  guild: 'Guild',
+  dungeon: 'Kerker',
+  combat: 'Kampf',
+  crime: 'Verbrechen',
+  guild: 'Gilde',
   quest: 'Quest',
-  market: 'Market',
-  bounty: 'Bounty',
+  market: 'Markt',
+  bounty: 'Kopfgeld',
   default: 'Event',
 };
+
+const EmptyTickerMessage = () => (
+  <div
+    className="flex items-center gap-3 px-4 py-2"
+    style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}
+  >
+    <Sparkles size={14} style={{ color: 'var(--aeth-gold)' }} />
+    <span style={{ color: 'var(--aeth-parchment-dim)', fontSize: '0.8rem' }}>
+      Das Reich erwacht... Sei der Erste, der Geschichte schreibt!
+    </span>
+  </div>
+);
 
 export const EventTicker = ({ events = [] }) => {
   const [displayEvents, setDisplayEvents] = useState([]);
@@ -56,8 +69,6 @@ export const EventTicker = ({ events = [] }) => {
     flashTimerRef.current = setInterval(pick, 6000);
     return () => clearInterval(flashTimerRef.current);
   }, [events]);
-
-  if (displayEvents.length === 0) return null;
 
   return (
     <div
@@ -86,49 +97,53 @@ export const EventTicker = ({ events = [] }) => {
           <span
             className="w-1.5 h-1.5 rounded-full"
             style={{
-              backgroundColor: '#4CAF50',
-              boxShadow: '0 0 6px #4CAF50',
+              backgroundColor: events.length > 0 ? '#4CAF50' : '#666',
+              boxShadow: events.length > 0 ? '0 0 6px #4CAF50' : 'none',
               display: 'inline-block',
-              animation: 'pulse-dot 2s infinite',
+              animation: events.length > 0 ? 'pulse-dot 2s infinite' : 'none',
             }}
           />
-          Realm Events
+          Reich Events
         </div>
 
-        {/* Scrolling track */}
+        {/* Scrolling track or empty message */}
         <div className="overflow-hidden flex-1 marquee-container">
-          <div className="marquee-track" data-testid="event-ticker-track">
-            {displayEvents.map((evt, i) => (
-              <span
-                key={i}
-                data-testid="event-ticker-item"
-                className="flex items-center gap-2 px-4 whitespace-nowrap text-xs"
-                style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}
-              >
-                {/* Category badge */}
+          {displayEvents.length === 0 ? (
+            <EmptyTickerMessage />
+          ) : (
+            <div className="marquee-track" data-testid="event-ticker-track">
+              {displayEvents.map((evt, i) => (
                 <span
-                  className="text-xs px-1.5 py-0.5 rounded"
-                  style={{
-                    backgroundColor: `${eventTypeColors[evt.type] || eventTypeColors.default}18`,
-                    color: eventTypeColors[evt.type] || eventTypeColors.default,
-                    border: `1px solid ${eventTypeColors[evt.type] || eventTypeColors.default}40`,
-                    fontFamily: "'Azeret Mono', monospace",
-                    fontSize: '0.62rem',
-                    letterSpacing: '0.06em',
-                  }}
+                  key={i}
+                  data-testid="event-ticker-item"
+                  className="flex items-center gap-2 px-4 whitespace-nowrap text-xs"
+                  style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}
                 >
-                  {eventTypeIcons[evt.type] || eventTypeIcons.default} {eventTypeLabels[evt.type] || 'Event'}
+                  {/* Category badge */}
+                  <span
+                    className="text-xs px-1.5 py-0.5 rounded"
+                    style={{
+                      backgroundColor: `${eventTypeColors[evt.type] || eventTypeColors.default}18`,
+                      color: eventTypeColors[evt.type] || eventTypeColors.default,
+                      border: `1px solid ${eventTypeColors[evt.type] || eventTypeColors.default}40`,
+                      fontFamily: "'Azeret Mono', monospace",
+                      fontSize: '0.62rem',
+                      letterSpacing: '0.06em',
+                    }}
+                  >
+                    {eventTypeIcons[evt.type] || eventTypeIcons.default} {eventTypeLabels[evt.type] || 'Event'}
+                  </span>
+                  <span style={{ color: 'var(--aeth-parchment-dim)' }}>{evt.event}</span>
+                  <span
+                    className="mx-2"
+                    style={{ color: 'var(--aeth-iron)', fontSize: '0.55rem' }}
+                  >
+                    ✦
+                  </span>
                 </span>
-                <span style={{ color: 'var(--aeth-parchment-dim)' }}>{evt.event}</span>
-                <span
-                  className="mx-2"
-                  style={{ color: 'var(--aeth-iron)', fontSize: '0.55rem' }}
-                >
-                  ✦
-                </span>
-              </span>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

@@ -1,42 +1,30 @@
 [
   {
-    "content": "Phase 4A: Backend JWT + extended user model + /api/me",
+    "content": "Backend-Verifizierung abgeschlossen - Echte Daten funktionieren",
     "status": "completed"
   },
   {
-    "content": "Phase 4B: Frontend Auth context + axios interceptor + persistent sessions",
+    "content": "Frontend-Komponenten analysiert und verstanden",
     "status": "completed"
   },
   {
-    "content": "Phase 4C: Register modal Step 2 (path selection)",
+    "content": "Frontend: Leere-Zustände für Leaderboard, Reviews und Ticker implementieren",
     "status": "completed"
   },
   {
-    "content": "Phase 4D: Character Dashboard slide-in panel",
+    "content": "Frontend: Review-Formular für eingeloggte User hinzufügen",
     "status": "completed"
   },
   {
-    "content": "Phase 4E: 'Venture into the Realm' text game preview section",
+    "content": "Frontend-Code auf Fehler prüfen (esbuild lint)",
     "status": "completed"
   },
   {
-    "content": "Phase 4F: 11 Kingdoms world map section",
-    "status": "completed"
+    "content": "E2E Testing mit testing_agent_v3 durchführen",
+    "status": "in_progress"
   },
   {
-    "content": "Phase 4G: Back-to-top floating button",
-    "status": "completed"
-  },
-  {
-    "content": "Phase 4H: JWT restore fix (only clear on 401, not network errors)",
-    "status": "completed"
-  },
-  {
-    "content": "Phase 4I: Ticker shows immediately with placeholder events",
-    "status": "completed"
-  },
-  {
-    "content": "Phase 4H: E2E Testing + all bugs fixed",
-    "status": "completed"
+    "content": "Screenshots zur finalen Verifikation erstellen",
+    "status": "pending"
   }
 ]
