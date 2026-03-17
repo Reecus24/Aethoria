@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../utils/axios';
 import { motion } from 'framer-motion';
 import { Heart, Clock, Coins, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -112,7 +112,7 @@ export default function HospitalPage() {
                 <div className="text-right">
                   <p className="text-sm mb-1" style={{ color: 'var(--aeth-parchment-dim)' }}>Verbleibend:</p>
                   <p className="text-xl font-bold font-mono-az" style={{ color: 'var(--aeth-gold)' }} data-testid="hospital-timer">
-                    {Math.floor(hospitalTimer.seconds_remaining / 60)}:{String(hospitalTimer.seconds_remaining % 60).padStart(2, '0')}
+                    {Math.floor((hospitalTimer?.seconds_remaining || 0) / 60)}:{String((hospitalTimer?.seconds_remaining || 0) % 60).padStart(2, '0')}
                   </p>
                 </div>
               </div>

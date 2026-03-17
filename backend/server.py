@@ -363,6 +363,8 @@ async def regenerate_energy(user: dict) -> int:
     
     if isinstance(last_regen, str):
         last_regen = datetime.fromisoformat(last_regen.replace('Z', '+00:00'))
+    elif isinstance(last_regen, datetime) and last_regen.tzinfo is None:
+        last_regen = last_regen.replace(tzinfo=timezone.utc)
     
     now = datetime.now(timezone.utc)
     hours_passed = (now - last_regen).total_seconds() / 3600
@@ -405,6 +407,8 @@ async def regenerate_hp(user: dict) -> int:
     
     if isinstance(last_regen, str):
         last_regen = datetime.fromisoformat(last_regen.replace('Z', '+00:00'))
+    elif isinstance(last_regen, datetime) and last_regen.tzinfo is None:
+        last_regen = last_regen.replace(tzinfo=timezone.utc)
     
     now = datetime.now(timezone.utc)
     hours_passed = (now - last_regen).total_seconds() / 3600
@@ -2705,6 +2709,9 @@ async def get_real_leaderboard(limit: int = 10) -> list:
         created = u.get("created_at")
         if isinstance(created, datetime):
             created_dt = created
+            # Ensure timezone awareness for datetime objects
+            if created_dt.tzinfo is None:
+                created_dt = created_dt.replace(tzinfo=timezone.utc)
         else:
             created_dt = datetime.fromisoformat(str(created).replace("Z", "+00:00"))
         

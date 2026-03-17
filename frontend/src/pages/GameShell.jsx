@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import axios from 'axios';
+import axios from '../utils/axios';
 import { 
   Home, Dumbbell, Skull, Swords, Scroll, Package, ShoppingCart, 
   Store, Landmark, Users, Dice6, Map, CircleDollarSign, Trophy,

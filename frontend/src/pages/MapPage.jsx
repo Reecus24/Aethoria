@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../utils/axios';
 import { motion } from 'framer-motion';
 import { MapPin, Clock, Coins, Navigation } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

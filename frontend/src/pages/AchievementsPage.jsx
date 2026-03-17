@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../utils/axios';
 import { motion } from 'framer-motion';
 import { Trophy, Award, Crown, Target, Swords, Coins, Lock, CheckCircle2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';

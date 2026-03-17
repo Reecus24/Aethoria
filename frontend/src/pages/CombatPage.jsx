@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../utils/axios';
 import { motion } from 'framer-motion';
 import { Swords, Target, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';

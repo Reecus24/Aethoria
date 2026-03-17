@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../utils/axios';
 import { motion } from 'framer-motion';
 import { Skull, Zap, Trophy, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
@@ -19,7 +19,9 @@ export default function CrimesPage() {
 
   const fetchCrimes = async () => {
     try {
-      const res = await axios.get(`${API}/game/crimes`);
+      const res = await axios.get(`${API}/game/crimes`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
       setCrimes(res.data);
       setLoading(false);
     } catch (err) {
@@ -31,7 +33,11 @@ export default function CrimesPage() {
   const commitCrime = async (crimeId) => {
     setCommitting(true);
     try {
-      const res = await axios.post(`${API}/game/crimes/commit`, { crime_id: crimeId });
+      const res = await axios.post(
+        `${API}/game/crimes/commit`,
+        { crime_id: crimeId },
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      );
       if (res.data.victory) {
         toast.success(res.data.message, { icon: '✅', duration: 4000 });
         if (res.data.level_up) {

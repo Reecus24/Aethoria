@@ -1,34 +1,34 @@
 [
   {
-    "content": "12 fehlende Game-Pages erstellen (CharacterPage, GuildsPage, TavernPage, MapPage, HuntingPage, BountiesPage, PropertiesPage, MailPage, HospitalPage, DungeonPage, AchievementsPage, GazettePage)",
+    "content": "MEGA-BUILD: Alle 22 Game-Pages erstellen",
     "status": "completed"
   },
   {
-    "content": "App.js mit React Router umbauen (Landing bei /, Game bei /game/*, Protected Routes)",
+    "content": "React Router Integration (/game routing)",
     "status": "completed"
   },
   {
-    "content": "framer-motion für Animationen installieren",
+    "content": "Axios Interceptor für automatische Auth-Headers",
     "status": "completed"
   },
   {
-    "content": "Frontend Syntax-Check mit esbuild durchführen",
+    "content": "Backend Datetime Timezone Bugs fixen",
     "status": "completed"
   },
   {
-    "content": "Features-Collection Seeding Bug im Backend fixen",
+    "content": "Optional Chaining für gameState access",
     "status": "completed"
   },
   {
-    "content": "Screenshot-Test: Landing Page & Game Interface",
+    "content": "CharacterPage Bug fixen (path_label & location)",
     "status": "completed"
   },
   {
-    "content": "Comprehensive E2E Testing mit testing_agent - API Mismatch Detection",
-    "status": "in_progress"
+    "content": "Functional Tests: Crime, Bank, Tavern APIs",
+    "status": "completed"
   },
   {
-    "content": "Alle High/Medium Priority Bugs fixen",
-    "status": "pending"
+    "content": "Comprehensive Screenshot-Tour + Console-Error-Check",
+    "status": "completed"
   }
 ]

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useOutletContext, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import axios from 'axios';
+import axios from '../utils/axios';
 import { motion } from 'framer-motion';
 import { TrendingUp, Swords, Skull, Scroll, Trophy, MessageSquare } from 'lucide-react';
 

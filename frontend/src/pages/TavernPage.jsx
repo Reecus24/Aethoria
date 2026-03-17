@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../utils/axios';
 import { motion } from 'framer-motion';
 import { Dice1, Dice2, Dice3, Dice4, Dice5, Dice6, Coins } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
