@@ -1,6 +1,18 @@
 [
   {
-    "content": "Finale Tests und Zusammenfassung",
+    "content": "Training: Energie-Kosten 6 → 100",
     "status": "completed"
+  },
+  {
+    "content": "TrainingPage: Text korrigieren (zeigt noch 3 Min statt 12h)",
+    "status": "completed"
+  },
+  {
+    "content": "Alle Actions blocken während Training (Combat, Crime, Travel, Quest, etc.)",
+    "status": "in_progress"
+  },
+  {
+    "content": "Testing aller Änderungen",
+    "status": "pending"
   }
 ]
