@@ -28,6 +28,7 @@ import HospitalPage from './pages/HospitalPage';
 import DungeonPage from './pages/DungeonPage';
 import AchievementsPage from './pages/AchievementsPage';
 import GazettePage from './pages/GazettePage';
+import CharacterPage from './pages/CharacterPage';
 import BotTestingPage from './pages/BotTestingPage';
 
 // Protected Route wrapper
