@@ -1,0 +1,49 @@
+{
+  "tests_run": 28,
+  "tests_passed": 22,
+  "tests_failed": 6,
+  "success_rate": 78.6,
+  "critical_issues": 1,
+  "high_issues": 5,
+  "medium_issues": 0,
+  "failed_tests": [
+    {
+      "name": "Game State API",
+      "priority": "CRITICAL",
+      "details": "Status: No response",
+      "timestamp": "2026-03-17T03:52:54.409789"
+    },
+    {
+      "name": "Equipment Bonuses",
+      "priority": "HIGH",
+      "details": "Item not found in equipped items",
+      "timestamp": "2026-03-17T03:52:54.410465"
+    },
+    {
+      "name": "Guild Creation",
+      "priority": "HIGH",
+      "details": "Status: No response",
+      "timestamp": "2026-03-17T03:52:54.819532"
+    },
+    {
+      "name": "Kingdoms Data",
+      "priority": "HIGH",
+      "details": "Status: No response",
+      "timestamp": "2026-03-17T03:52:54.938756"
+    },
+    {
+      "name": "Send Message",
+      "priority": "HIGH",
+      "details": "Status: No response",
+      "timestamp": "2026-03-17T03:52:55.137611"
+    },
+    {
+      "name": "Dice Logic",
+      "priority": "HIGH",
+      "details": "Roll: 0, Won: True (incorrect logic)",
+      "timestamp": "2026-03-17T03:52:55.755634"
+    }
+  ],
+  "duration": 3.63,
+  "major_functionality_broken": false
+}

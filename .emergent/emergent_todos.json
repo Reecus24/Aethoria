@@ -1,34 +1,46 @@
 [
   {
-    "content": "MEGA-BUILD: Alle 22 Game-Pages erstellen",
-    "status": "completed"
+    "content": "Phase 7A: Comprehensive E2E Testing aller 42 Features mit testing_agent",
+    "status": "in_progress"
   },
   {
-    "content": "React Router Integration (/game routing)",
-    "status": "completed"
+    "content": "Combat System vollständig testen (Attack, Mug, Hospitalize)",
+    "status": "pending"
   },
   {
-    "content": "Axios Interceptor für automatische Auth-Headers",
-    "status": "completed"
+    "content": "Quest System testen (Accept, Complete, Rewards)",
+    "status": "pending"
   },
   {
-    "content": "Backend Datetime Timezone Bugs fixen",
-    "status": "completed"
+    "content": "Shop → Inventory → Equipment Flow testen",
+    "status": "pending"
   },
   {
-    "content": "Optional Chaining für gameState access",
-    "status": "completed"
+    "content": "Market Listing/Buying Flow testen",
+    "status": "pending"
   },
   {
-    "content": "CharacterPage Bug fixen (path_label & location)",
-    "status": "completed"
+    "content": "Guild Create/Join/Leave Flow testen",
+    "status": "pending"
   },
   {
-    "content": "Functional Tests: Crime, Bank, Tavern APIs",
-    "status": "completed"
+    "content": "Travel System vollständig testen (Start → Complete)",
+    "status": "pending"
   },
   {
-    "content": "Comprehensive Screenshot-Tour + Console-Error-Check",
-    "status": "completed"
+    "content": "Properties Buy → Collect Income testen",
+    "status": "pending"
+  },
+  {
+    "content": "Message Send/Read Flow testen",
+    "status": "pending"
+  },
+  {
+    "content": "Alle High-Priority Bugs aus Test-Report fixen",
+    "status": "pending"
+  },
+  {
+    "content": "Balance-Pass: Energie-Kosten, Belohnungen, Timer anpassen",
+    "status": "pending"
   }
 ]
