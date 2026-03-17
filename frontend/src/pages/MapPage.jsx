@@ -39,7 +39,7 @@ export default function MapPage() {
     try {
       const res = await axios.post(
         `${API}/game/travel`,
-        { destination: travelTarget.id },
+        { kingdom_id: travelTarget.id },
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
       toast.success(res.data.message, { icon: '🗺️', duration: 4000 });

@@ -135,14 +135,16 @@ export default function CombatPage() {
                 >
                   Angreifen
                 </button>
-                <button
-                  onClick={() => attackPlayer(target.username, 'mug')}
-                  disabled={attacking || gameState.resources.energy < 15 || !gameState.status.can_act}
-                  className="btn-gold px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40"
-                  data-testid={`mug-${target.username}`}
-                >
-                  Ausrauben
-                </button>
+                {gameState?.user?.path === 'shadow' && (
+                  <button
+                    onClick={() => attackPlayer(target.username, 'mug')}
+                    disabled={attacking || gameState.resources.energy < 15 || !gameState.status.can_act}
+                    className="btn-gold px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40"
+                    data-testid={`mug-${target.username}`}
+                  >
+                    Ausrauben
+                  </button>
+                )}
               </div>
             </div>
           </div>

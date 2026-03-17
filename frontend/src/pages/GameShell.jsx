@@ -42,28 +42,32 @@ export const GameShell = () => {
   };
 
   const navItems = [
-    { path: '/game', icon: Home, label: 'Dashboard', exact: true },
-    { path: '/game/character', icon: User, label: 'Character' },
-    { path: '/game/training', icon: Dumbbell, label: 'Training Grounds' },
-    { path: '/game/crimes', icon: Skull, label: 'Dark Deeds' },
-    { path: '/game/combat', icon: Swords, label: 'Combat' },
-    { path: '/game/quests', icon: Scroll, label: 'Quests' },
-    { path: '/game/inventory', icon: Package, label: 'Inventory' },
-    { path: '/game/shop', icon: Store, label: 'Armour Shop' },
-    { path: '/game/market', icon: ShoppingCart, label: 'Markets' },
-    { path: '/game/bank', icon: Landmark, label: 'Royal Bank' },
-    { path: '/game/guilds', icon: Users, label: 'Guilds & Orders' },
-    { path: '/game/tavern', icon: Dice6, label: 'Tavern' },
-    { path: '/game/travel', icon: Map, label: 'Realm Map' },
-    { path: '/game/hunting', icon: Target, label: 'Creature Hunting' },
-    { path: '/game/properties', icon: Castle, label: 'Strongholds' },
-    { path: '/game/bounties', icon: CircleDollarSign, label: "Hunter's Contracts" },
-    { path: '/game/hospital', icon: Hospital, label: "Healer's Sanctuary" },
-    { path: '/game/dungeon', icon: LockKeyhole, label: 'The Dungeon' },
-    { path: '/game/achievements', icon: Award, label: 'Royal Honours' },
-    { path: '/game/messages', icon: MessageSquare, label: 'Messages' },
-    { path: '/game/gazette', icon: Trophy, label: 'Royal Gazette' },
+    { path: '/game', icon: Home, label: 'Dashboard', exact: true, paths: ['knight', 'shadow', 'noble'] },
+    { path: '/game/character', icon: User, label: 'Character', paths: ['knight', 'shadow', 'noble'] },
+    { path: '/game/training', icon: Dumbbell, label: 'Training Grounds', paths: ['knight', 'shadow', 'noble'] },
+    { path: '/game/crimes', icon: Skull, label: 'Dark Deeds', paths: ['shadow'] },
+    { path: '/game/combat', icon: Swords, label: 'Combat', paths: ['knight', 'shadow', 'noble'] },
+    { path: '/game/quests', icon: Scroll, label: 'Quests', paths: ['knight', 'shadow', 'noble'] },
+    { path: '/game/inventory', icon: Package, label: 'Inventory', paths: ['knight', 'shadow', 'noble'] },
+    { path: '/game/shop', icon: Store, label: 'Armour Shop', paths: ['knight', 'shadow', 'noble'] },
+    { path: '/game/market', icon: ShoppingCart, label: 'Markets', paths: ['noble'] },
+    { path: '/game/bank', icon: Landmark, label: 'Royal Bank', paths: ['noble', 'knight'] },
+    { path: '/game/guilds', icon: Users, label: 'Guilds & Orders', paths: ['knight', 'shadow', 'noble'] },
+    { path: '/game/tavern', icon: Dice6, label: 'Tavern', paths: ['knight', 'shadow', 'noble'] },
+    { path: '/game/travel', icon: Map, label: 'Realm Map', paths: ['knight', 'shadow', 'noble'] },
+    { path: '/game/hunting', icon: Target, label: 'Creature Hunting', paths: ['knight', 'shadow'] },
+    { path: '/game/properties', icon: Castle, label: 'Strongholds', paths: ['noble'] },
+    { path: '/game/bounties', icon: CircleDollarSign, label: "Hunter's Contracts", paths: ['shadow', 'knight'] },
+    { path: '/game/hospital', icon: Hospital, label: "Healer's Sanctuary", paths: ['knight', 'shadow', 'noble'] },
+    { path: '/game/dungeon', icon: LockKeyhole, label: 'The Dungeon', paths: ['knight', 'shadow', 'noble'] },
+    { path: '/game/achievements', icon: Award, label: 'Royal Honours', paths: ['knight', 'shadow', 'noble'] },
+    { path: '/game/messages', icon: MessageSquare, label: 'Messages', paths: ['knight', 'shadow', 'noble'] },
+    { path: '/game/gazette', icon: Trophy, label: 'Royal Gazette', paths: ['knight', 'shadow', 'noble'] },
   ];
+
+  // Filter navigation based on user's path
+  const userPath = gameState?.user?.path || 'knight';
+  const filteredNavItems = navItems.filter(item => item.paths.includes(userPath));
 
   if (loading) {
     return (
@@ -90,7 +94,7 @@ export const GameShell = () => {
       >
         <div className="h-full overflow-y-auto p-4" style={{ paddingTop: '80px' }}>
           <nav className="space-y-1">
-            {navItems.map(item => {
+            {filteredNavItems.map(item => {
               const Icon = item.icon;
               const isActive = item.exact ? location.pathname === item.path : location.pathname.startsWith(item.path);
               return (

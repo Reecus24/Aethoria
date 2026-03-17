@@ -44,7 +44,7 @@ export default function TavernPage() {
       setTimeout(() => {
         setResult(res.data);
         if (res.data.won) {
-          toast.success(`Gewonnen! +${res.data.payout} Gold`, { icon: '🎉', duration: 4000 });
+          toast.success(`Gewonnen! +${res.data.winnings} Gold`, { icon: '🎉', duration: 4000 });
         } else {
           toast.error(`Verloren! -${wager} Gold`, { icon: '💀' });
         }

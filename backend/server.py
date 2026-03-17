@@ -163,14 +163,26 @@ MASTER_CRIMES = [
 # ============================================================================
 
 MASTER_QUESTS = [
-    # Early game quests - reduced energy/time for faster progression
-    {'id': 'quest_rats', 'name': 'Rattenplage', 'description': 'Töte 10 Ratten in den Stadtkanälen', 'min_level': 1, 'energy_cost': 10, 'duration_minutes': 15, 'rewards': {'gold': 60, 'xp': 12}, 'repeatable': True},
-    {'id': 'quest_escort', 'name': 'Händler-Eskorte', 'description': 'Eskortiere einen Händler sicher durch den Wald', 'min_level': 3, 'energy_cost': 14, 'duration_minutes': 20, 'rewards': {'gold': 120, 'xp': 30}, 'repeatable': True},
-    {'id': 'quest_wolves', 'name': 'Wolfsrudel', 'description': 'Eliminiere ein Wolfsrudel das Reisende bedroht', 'min_level': 5, 'energy_cost': 18, 'duration_minutes': 30, 'rewards': {'gold': 240, 'xp': 48}, 'repeatable': True},
-    {'id': 'quest_bandit_camp', 'name': 'Banditenlager', 'description': 'Zerstöre ein Banditenlager außerhalb der Stadt', 'min_level': 5, 'energy_cost': 22, 'duration_minutes': 45, 'rewards': {'gold': 300, 'xp': 60, 'item': 'sword_steel'}, 'repeatable': False},
-    {'id': 'quest_rescue', 'name': 'Rettungsmission', 'description': 'Rette einen verschleppten Bürger aus Feindeshand', 'min_level': 8, 'energy_cost': 25, 'duration_minutes': 60, 'rewards': {'gold': 600, 'xp': 96}, 'repeatable': True},
-    {'id': 'quest_artifact', 'name': 'Verlorenes Artefakt', 'description': 'Finde ein verlorenes Artefakt in den Ruinen', 'min_level': 10, 'energy_cost': 30, 'duration_minutes': 90, 'rewards': {'gold': 960, 'xp': 144}, 'repeatable': False},
-    {'id': 'quest_dragon', 'name': 'Drachen-Bedrohung', 'description': 'Vertreibe einen jungen Drachen aus den Bergen', 'min_level': 15, 'energy_cost': 35, 'duration_minutes': 90, 'rewards': {'gold': 2400, 'xp': 240, 'item': 'relic_dragon_tooth'}, 'repeatable': False},
+    # Knight Quests - Combat & Honor focused
+    {'id': 'quest_rats', 'name': 'Rattenplage', 'description': 'Töte 10 Ratten in den Stadtkanälen', 'min_level': 1, 'energy_cost': 10, 'duration_minutes': 15, 'rewards': {'gold': 60, 'xp': 12}, 'repeatable': True, 'paths': ['knight', 'shadow']},
+    {'id': 'quest_escort', 'name': 'Händler-Eskorte', 'description': 'Eskortiere einen Händler sicher durch den Wald', 'min_level': 3, 'energy_cost': 14, 'duration_minutes': 20, 'rewards': {'gold': 120, 'xp': 30}, 'repeatable': True, 'paths': ['knight', 'noble']},
+    {'id': 'quest_wolves', 'name': 'Wolfsrudel', 'description': 'Eliminiere ein Wolfsrudel das Reisende bedroht', 'min_level': 5, 'energy_cost': 18, 'duration_minutes': 30, 'rewards': {'gold': 240, 'xp': 48}, 'repeatable': True, 'paths': ['knight']},
+    {'id': 'quest_bandit_camp', 'name': 'Banditenlager', 'description': 'Zerstöre ein Banditenlager außerhalb der Stadt', 'min_level': 5, 'energy_cost': 22, 'duration_minutes': 45, 'rewards': {'gold': 300, 'xp': 60, 'item': 'sword_steel'}, 'repeatable': False, 'paths': ['knight']},
+    {'id': 'quest_rescue', 'name': 'Rettungsmission', 'description': 'Rette einen verschleppten Bürger aus Feindeshand', 'min_level': 8, 'energy_cost': 25, 'duration_minutes': 60, 'rewards': {'gold': 600, 'xp': 96}, 'repeatable': True, 'paths': ['knight']},
+    {'id': 'quest_artifact', 'name': 'Verlorenes Artefakt', 'description': 'Finde ein verlorenes Artefakt in den Ruinen', 'min_level': 10, 'energy_cost': 30, 'duration_minutes': 90, 'rewards': {'gold': 960, 'xp': 144}, 'repeatable': False, 'paths': ['knight', 'shadow']},
+    {'id': 'quest_dragon', 'name': 'Drachen-Bedrohung', 'description': 'Vertreibe einen jungen Drachen aus den Bergen', 'min_level': 15, 'energy_cost': 35, 'duration_minutes': 90, 'rewards': {'gold': 2400, 'xp': 240, 'item': 'relic_dragon_tooth'}, 'repeatable': False, 'paths': ['knight']},
+    
+    # Shadow Quests - Stealth & Crime focused
+    {'id': 'quest_shadow_intel', 'name': 'Geheime Informationen', 'description': 'Beschaffe vertrauliche Informationen aus dem Stadtarchiv', 'min_level': 1, 'energy_cost': 10, 'duration_minutes': 15, 'rewards': {'gold': 80, 'xp': 12}, 'repeatable': True, 'paths': ['shadow']},
+    {'id': 'quest_shadow_heist', 'name': 'Einbruch', 'description': 'Stehle wertvolle Ware aus einem Händlerhaus', 'min_level': 4, 'energy_cost': 16, 'duration_minutes': 25, 'rewards': {'gold': 200, 'xp': 40}, 'repeatable': True, 'paths': ['shadow']},
+    {'id': 'quest_shadow_assassin', 'name': 'Auftragsmord', 'description': 'Eliminiere ein Ziel im Auftrag der Gilde', 'min_level': 8, 'energy_cost': 24, 'duration_minutes': 50, 'rewards': {'gold': 720, 'xp': 100}, 'repeatable': True, 'paths': ['shadow']},
+    {'id': 'quest_shadow_poison', 'name': 'Giftmischer', 'description': 'Braue ein tödliches Gift für die Schattengilde', 'min_level': 12, 'energy_cost': 28, 'duration_minutes': 75, 'rewards': {'gold': 1200, 'xp': 160}, 'repeatable': False, 'paths': ['shadow']},
+    
+    # Noble Quests - Commerce & Diplomacy focused
+    {'id': 'quest_noble_trade', 'name': 'Handelsabkommen', 'description': 'Verhandle ein profitables Handelsabkommen mit einem Königreich', 'min_level': 1, 'energy_cost': 8, 'duration_minutes': 12, 'rewards': {'gold': 100, 'xp': 10}, 'repeatable': True, 'paths': ['noble']},
+    {'id': 'quest_noble_invest', 'name': 'Investition', 'description': 'Investiere in ein vielversprechendes Handelsunternehmen', 'min_level': 4, 'energy_cost': 12, 'duration_minutes': 20, 'rewards': {'gold': 250, 'xp': 35}, 'repeatable': True, 'paths': ['noble']},
+    {'id': 'quest_noble_caravan', 'name': 'Karawanen-Geschäft', 'description': 'Organisiere eine profitable Handelskarawane', 'min_level': 7, 'energy_cost': 18, 'duration_minutes': 40, 'rewards': {'gold': 600, 'xp': 80}, 'repeatable': True, 'paths': ['noble']},
+    {'id': 'quest_noble_monopoly', 'name': 'Marktmonopol', 'description': 'Erlange die Kontrolle über den Gewürzhandel', 'min_level': 12, 'energy_cost': 26, 'duration_minutes': 80, 'rewards': {'gold': 1800, 'xp': 180}, 'repeatable': False, 'paths': ['noble']},
 ]
 
 # ============================================================================
@@ -493,11 +505,11 @@ async def check_dungeon_status(user: dict) -> Optional[dict]:
             )
             return None
         else:
-            minutes_remaining = int((release_time - datetime.now(timezone.utc)).total_seconds() / 60)
+            seconds_remaining = int((release_time - datetime.now(timezone.utc)).total_seconds())
             return {
                 'in_dungeon': True,
-                'release_time': release_time,
-                'minutes_remaining': minutes_remaining,
+                'release_time': release_time.isoformat(),
+                'seconds_remaining': max(0, seconds_remaining),
                 'crime': dungeon_session.get('crime_name', 'Unknown')
             }
     return None
@@ -517,11 +529,11 @@ async def check_hospital_status(user: dict) -> Optional[dict]:
             await db.users.update_one({'id': user['id']}, {'$set': {'hp': MAX_HP}})
             return None
         else:
-            minutes_remaining = int((release_time - datetime.now(timezone.utc)).total_seconds() / 60)
+            seconds_remaining = int((release_time - datetime.now(timezone.utc)).total_seconds())
             return {
                 'in_hospital': True,
-                'release_time': release_time,
-                'minutes_remaining': minutes_remaining,
+                'release_time': release_time.isoformat(),
+                'seconds_remaining': max(0, seconds_remaining),
                 'reason': hospital_session.get('reason', 'Unknown')
             }
     return None
@@ -1564,10 +1576,14 @@ async def get_available_quests(current_user: dict = Depends(get_current_user)):
     completed_ids = [q['quest_id'] for q in completed_non_repeat]
     
     # Filter available
+    user_path = current_user.get('path_choice', 'knight')
     available = []
     for quest in MASTER_QUESTS:
         # Check level
         if current_user['level'] < quest['min_level']:
+            continue
+        # Check path compatibility
+        if user_path not in quest.get('paths', ['knight', 'shadow', 'noble']):
             continue
         # Check if already completed (and not repeatable)
         if not quest.get('repeatable', False) and quest['id'] in completed_ids:
@@ -1813,9 +1829,19 @@ async def equip_item(req: EquipItemRequest, current_user: dict = Depends(get_cur
         {'$set': {f'equipment.{req.slot}': req.item_id}}
     )
     
+    # Get updated equipment
+    updated_user = await db.users.find_one({'id': user_id})
+    equipped_items = {}
+    for slot, item_id in updated_user.get('equipment', {}).items():
+        if item_id:
+            item_info = next((i for i in MASTER_ITEMS if i['id'] == item_id), None)
+            if item_info:
+                equipped_items[slot] = item_info
+    
     return {
         'success': True,
-        'message': f'{item_data["name"]} ausgerüstet'
+        'message': f'{item_data["name"]} ausgerüstet',
+        'equipment': equipped_items
     }
 
 @app.post("/api/game/inventory/unequip")
@@ -2602,7 +2628,7 @@ async def get_available_properties(current_user: dict = Depends(get_current_user
     # Filter available
     available = [p for p in MASTER_PROPERTIES if p['id'] not in owned_ids and current_user['level'] >= p['min_level']]
     
-    return available
+    return {'properties': available}
 
 @app.post("/api/game/properties/buy")
 async def buy_property(req: PropertyBuyRequest, current_user: dict = Depends(get_current_user)):
@@ -2670,10 +2696,15 @@ async def get_my_properties(current_user: dict = Depends(get_current_user)):
             enriched.append({
                 **serialize_doc(prop),
                 'property_details': prop_data,
-                'available_income': available_income
+                'available_income': available_income,
+                'income_ready': available_income > 0,
+                # Add all property data fields
+                'name': prop_data['name'],
+                'description': prop_data['description'],
+                'income_per_day': prop_data['daily_income']
             })
     
-    return enriched
+    return {'properties': enriched}
 
 @app.post("/api/game/properties/collect/{property_id}")
 async def collect_property_income(property_id: str, current_user: dict = Depends(get_current_user)):
@@ -2780,14 +2811,24 @@ async def get_hospital_patients(limit: int = 30):
     return serialize_doc(sessions)
 
 @app.get("/api/game/dungeon")
-async def get_dungeon_inmates(limit: int = 30):
-    """Get jailed players"""
-    sessions = await db.dungeon_sessions.find(
-        {'released': False},
+async def get_dungeon_inmates(current_user: dict = Depends(get_current_user), limit: int = 30):
+    """Get jailed players (only showing current user's session if exists, plus public list)"""
+    # Get current user's session
+    user_session = await db.dungeon_sessions.find_one(
+        {'user_id': current_user['id'], 'released': False},
+        {'_id': 0}
+    )
+    
+    # Get other inmates (public list)
+    other_sessions = await db.dungeon_sessions.find(
+        {'released': False, 'user_id': {'$ne': current_user['id']}},
         {'_id': 0}
     ).sort('arrest_time', -1).limit(limit).to_list(limit)
     
-    return serialize_doc(sessions)
+    return {
+        'user_session': serialize_doc(user_session) if user_session else None,
+        'other_inmates': serialize_doc(other_sessions)
+    }
 
 # ============================================================================
 # ACHIEVEMENTS

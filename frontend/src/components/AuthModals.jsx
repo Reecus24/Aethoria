@@ -20,7 +20,7 @@ const PATHS = [
     subtitle: 'Master of Combat',
     desc: 'Dominate through strength. Train at the Barracks, win tournaments, become the most feared warrior.',
     color: '#C0392B',
-    stats: { Strength: 12, Dexterity: 6, Speed: 8, Defense: 10, Gold: 150 },
+    stats: { Strength: 15, Dexterity: 10, Speed: 10, Defense: 15, Gold: 100 },
   },
   {
     key: 'shadow',
@@ -29,7 +29,7 @@ const PATHS = [
     subtitle: 'Master of Cunning',
     desc: 'Rule from the darkness. Dark deeds, guild crimes, and arcane curses await the bold.',
     color: '#8E44AD',
-    stats: { Strength: 7, Dexterity: 14, Speed: 12, Defense: 5, Gold: 200 },
+    stats: { Strength: 10, Dexterity: 15, Speed: 15, Defense: 10, Gold: 100 },
   },
   {
     key: 'noble',
@@ -38,7 +38,7 @@ const PATHS = [
     subtitle: 'Master of Wealth',
     desc: 'Bend the economy to your will. Merchant Houses, Strongholds, and the Exchange await.',
     color: '#D4AC0D',
-    stats: { Strength: 5, Dexterity: 8, Speed: 6, Defense: 7, Gold: 500 },
+    stats: { Strength: 12, Dexterity: 12, Speed: 12, Defense: 12, Gold: 100 },
   },
 ];
 

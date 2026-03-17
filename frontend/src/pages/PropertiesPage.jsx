@@ -241,7 +241,7 @@ export default function PropertiesPage() {
                         onClick={() => handleBuyProperty(prop.id)}
                         disabled={
                           (gameState?.resources?.gold || 0) < prop.price ||
-                          (gameState?.character?.level || 0) < prop.min_level
+                          (gameState?.user?.level || 0) < prop.min_level
                         }
                         className="btn-gold w-full"
                         data-testid={`buy-property-${prop.id}-button`}

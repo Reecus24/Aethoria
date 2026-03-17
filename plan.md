@@ -1,4 +1,4 @@
-# plan.md
+# plan.md (aktualisiert)
 
 ## Objectives
 - Build a medieval dark-fantasy **torn.com-inspired browser RPG** rebranded as **Realm of Aethoria**.
@@ -25,6 +25,10 @@
 - **World “liveness” objective (Phase 8 add-on):** keep the realm visibly active for new visitors without breaking integrity:
   - Readable, non-distracting event ticker speed
   - Optional AI/bot players that **follow the same rules** (energy, level gates, timers)
+- **New objective (Phase 9): Production Bugfix + Class Differentiation:**
+  - Fix game-breaking production bugs discovered post-deployment (inventory/equipment, quests payouts, travel gating, timers, tavern reward display, messaging)
+  - Make class/path choice meaningfully distinct (actions, permissions, quest lines, economic identity)
+  - Ensure stats/rewards shown in UI match backend truth (no misleading tooltips)
 
 **Current status (updated):**
 - ✅ Phase 1 complete (data-flow POC verified)
@@ -37,6 +41,13 @@
 - ✅ **Phase 7 complete: Login/Register flow hardening + Balancing pass (energy/time economy + rewards)**
 - ✅ **Phase 8 complete: Comprehensive E2E testing + security hardening (rate limiting, idempotency) + economy logging + final verification**
 - ✅ **Phase 8 add-on complete: Event ticker readability improvements + bot-player scripts for realm activity**
+- ✅ **Deployment completed on Hetzner**
+  - ✅ Fixed frontend build issue (missing `yarn.lock`) by adjusting Dockerfile.
+  - ✅ Fixed backend build issue (non-public `emergentintegrations`) by removing from requirements.
+  - ✅ Fixed backend runtime (FastAPI app wasn’t being served) by using `uvicorn server:app`.
+  - ✅ Fixed compose override bug (`command: python server.py`) by removing command override in `docker-compose.yml`.
+  - ✅ Confirmed `/api/landing` returns valid JSON and Nginx serves the app.
+- 🔴 **Phase 9 needed:** multiple critical gameplay bugs discovered in real usage (see below).
 
 ---
 
@@ -139,60 +150,6 @@ User request: “mach einfach alles fertig … die 42 Features bitte komplett au
 - ✅ Build/syntax validation with esbuild.
 - ✅ Screenshot-based navigation smoke tests across pages.
 - ✅ Automated test reports generated: `/app/test_reports/iteration_5.json` and `/app/test_reports/iteration_6.json`.
-- ✅ Verified working flows (session highlights):
-  - Auth: login/register → redirect to `/game`
-  - HUD reflects live values (Gold/Energy/HP/Level)
-  - Crimes API success path (commit crime, rewards applied, level-up observed)
-  - Bank deposit/withdraw verified via curl
-  - Tavern dice verified via curl
-  - Character page renders correct identity: e.g. **“The Knight • Level 2 • Aethoria Prime”**
-  - Landing event ticker shows real player activity (level ups, crimes, combats)
-
-### Phase 6A: Game Shell + Navigation + Routing (Foundation) — ✅ Completed
-**Frontend — ✅ Completed**
-- `/game` route with nested pages implemented.
-- `GameShell` layout implemented with:
-  - left sidebar navigation
-  - top HUD with resources
-  - outlet-based page rendering
-- Implemented/added pages (22):
-  - Dashboard, Character, Training, Crimes, Combat, Quests,
-  - Inventory, Shop, Market, Bank,
-  - Guilds, Tavern, Travel/Map, Hunting,
-  - Bounties, Properties,
-  - Messages/Mail,
-  - Hospital, Dungeon,
-  - Achievements/Honours, Gazette.
-
-**Backend — ✅ Completed**
-- `/api/game/state` endpoint returns core HUD values.
-
-### Phase 6B–6K: Feature Modules (42 features) — ✅ Completed
-- Training loop (timer-based start/claim)
-- Crimes + consequences (hospital/jail)
-- Combat + logs
-- Quests
-- Items/inventory/equipment
-- Shop
-- Market
-- Bank
-- Guilds
-- Tavern dice
-- Travel (11 kingdoms) + travel completion
-- Hunting (level-gated)
-- Bounties
-- Properties
-- Messages
-- Achievements
-- Gazette / landing-derived news + leaderboard views
-
-### Phase 6L: Testing + Stability — ✅ Completed
-- Screenshot-based navigation testing across key pages
-- Build/syntax validation with esbuild
-- Functional API spot-checks (crime/bank/tavern)
-- Fixed critical backend 500s:
-  - `/api/landing` leaderboard datetime crash
-  - `/api/game/state` energy regeneration datetime crash
 
 ---
 
@@ -200,169 +157,125 @@ User request: “mach einfach alles fertig … die 42 Features bitte komplett au
 Goal: move from “all features exist + verified smoke tests” to “the game is consistently accessible and feels playable”.
 
 ### Phase 7A: Auth / Onboarding Flow Hardening — ✅ Completed
-**Problem addressed:** intermittent UX issues where registration/login did not reliably transition to `/game`.
-
-**Fix shipped:**
-- ✅ Hardened navigation by adding **direct `navigate('/game')` calls inside AuthModals** right after `loginWithData()`.
-- ✅ Removed redundant delayed navigations in `LandingPage` success callbacks (kept toasts only).
-
-**Files changed:**
-- `/app/frontend/src/components/AuthModals.jsx`
-- `/app/frontend/src/pages/LandingPage.jsx`
-
-**Result:**
-- ✅ Register → choose path → enter game works reliably.
-- ✅ Login → enter game works reliably.
+- ✅ Direct navigation in AuthModals after login/register.
 
 ### Phase 7B: Balancing Pass (Energy / Time / Rewards) — ✅ Completed
-**Problem addressed:** Energy starvation and long wait-times due to slow regen and high action costs.
-
-**Backend economy changes:**
-- ✅ **Energy regen:** `ENERGY_REGEN_PER_HOUR` **10 → 25** (full bar in ~4h instead of 10h)
-- ✅ **HP regen:** `HP_REGEN_PER_HOUR` **5 → 10**
-
-**Training changes:**
-- ✅ Training energy **10 → 6**
-- ✅ Training duration **5 → 3 minutes**
-- ✅ Training XP **2 → 3**
-
-**Crime changes (broad tuning):**
-- ✅ Energy costs reduced (~25–40%)
-- ✅ Rewards increased (~20%)
-- ✅ Jail times reduced (~30%)
-- ✅ Slight success-rate improvements for early crimes
-
-**Quest changes:**
-- ✅ Energy costs reduced (~30%)
-- ✅ Rewards increased (~20%)
-- ✅ Durations reduced (~25%)
-
-**Hunting changes:**
-- ✅ Energy costs reduced (~30–40%)
-- ✅ Rewards increased (~20%)
-
-**Combat changes:**
-- ✅ Energy per attack **25 → 15**
-
-**Frontend alignment:**
-- ✅ Updated Training UI texts and gating to match new values.
-- ✅ Updated Combat UI texts and gating to match new values.
-
-**Files changed (key):**
-- `/app/backend/server.py`
-- `/app/frontend/src/pages/TrainingPage.jsx`
-- `/app/frontend/src/pages/CombatPage.jsx`
-- Added analysis doc: `/app/balancing_analysis.md`
+- ✅ Faster regen, lower costs, higher rewards.
 
 ### Phase 7C: Manual E2E Verification After Balancing — ✅ Completed
-- ✅ Performed UI-driven gameplay loop test:
-  - Register (multiple paths) → Dashboard
-  - Start training → observe timer
-  - Commit crime → observe gold/xp change and level-up
-- ✅ Verified updated displayed costs (e.g., training shows **6 Energie / 3 Min**, crimes show **3 Energie**, combat shows **15 Energie**).
+- ✅ UI-driven loops verified.
 
 ---
 
 ## Phase 8: Production Hardening & Security — ✅ Completed
 Goal: move from “playable baseline” to “production-hardened & abuse-resistant”.
-
-### Phase 8A: Deep Automated E2E (all 42 features) — ✅ Completed
-- ✅ Ran comprehensive testing suite.
-- ✅ Testing Agent report: `/app/test_reports/iteration_7.json`
-  - Overall success: **87.8%**
-  - Backend: **85.7%**
-  - Frontend: **90%**
-- ✅ Confirmed core mechanics are functional and balanced:
-  - Training (6 energy / 3 min)
-  - Crimes (3 energy early)
-  - Combat (15 energy)
-  - Energy regen (25/hour)
-
-### Phase 8B: Bug Analysis & Validation — ✅ Completed
-- ✅ Investigated reported issues:
-  - `/api/game/quests/available` response format
-  - `/api/game/shop/buy` parameter format
-- ✅ Determined both were **not bugs**, but **incorrect test expectations**:
-  - Quests endpoint returns structured `{active_quest, available_quests}` (frontend expects this).
-  - Shop buy uses query params (frontend uses this).
-
-### Phase 8C: Rate Limiting (Anti-Abuse) — ✅ Completed
-Implemented SlowAPI-based rate limiting (in-memory) for critical endpoints:
-- ✅ Crimes: **30/minute**
-- ✅ Combat: **20/minute**
-- ✅ Bank deposit/withdraw: **60/minute**
-- ✅ Shop buy: **60/minute**
-- ✅ Market buy: **60/minute**
-- ✅ Training start: **40/minute**
-
-**Files changed:**
-- `/app/backend/server.py` (SlowAPI limiter setup + endpoint decorators)
-
-### Phase 8D: Idempotency Keys for Money Operations — ✅ Completed
-Implemented idempotency to prevent double-spending on retries:
-- ✅ Bank:
-  - `/api/game/bank/deposit` supports `idempotency_key`
-  - `/api/game/bank/withdraw` supports `idempotency_key`
-- ✅ Market:
-  - `/api/game/market/buy` supports `idempotency_key`
-- ✅ Added Mongo collection `idempotency_keys` with TTL expiration (24h).
-- ✅ Verified via API test: repeated call with same key returns cached result and does not double-charge.
-
-**Files changed:**
-- `/app/backend/server.py` (helper functions + request models + endpoint logic)
-
-### Phase 8E: Economy Observability (Structured Logging) — ✅ Completed
-Added structured server-side logs for economy-affecting operations:
-- ✅ Crimes (gold/xp outcome)
-- ✅ Combat (damage, gold stolen, xp)
-- ✅ Shop purchases (gold spent)
-- ✅ Bank deposits/withdrawals (gold moved)
-- ✅ Market purchases (gold + item transfer)
-
-**Files changed:**
-- `/app/backend/server.py`
-
-### Phase 8F: Final Verification — ✅ Completed
-- ✅ Final UI tour with screenshots across:
-  - Dashboard, Training, Crimes, Shop, Character, Achievements
-- ✅ Verified the balanced values appear correctly in UI.
-- ✅ Confirmed the application is stable after security hardening.
+- ✅ Deep automated E2E
+- ✅ Rate limiting
+- ✅ Idempotency keys
+- ✅ Economy logging
 
 ---
 
 ## Phase 8 (Add-on): Realm Liveness (Ticker Readability + Bot Players) — ✅ Completed
-Goal: keep the landing page feeling alive using **real events**, while ensuring readability and integrity.
+- ✅ Ticker speed slowed
+- ✅ Bot scripts exist (manual run)
 
-### Phase 8G: Event Ticker Readability — ✅ Completed
-**Problem addressed:** ticker scrolled too quickly; events were visible for <1–2 seconds.
+---
 
-**Fix shipped:**
-- ✅ Slowed marquee animation from **60s → 120s** (2× slower).
-- ✅ Maintained pause-on-hover behavior.
+## Phase 8I: Deployment & Ops Hardening (Hetzner) — ✅ Completed
+Goal: get the stack reliably running on a Hetzner server.
+- ✅ Docker/Compose-based deployment verified.
+- ✅ Fixed build issues for frontend (missing lockfile) and backend (private dependency).
+- ✅ Fixed backend serving (use uvicorn).
+- ✅ Fixed compose command override.
+- ✅ Verified Nginx serves UI and backend responds.
 
-**Files changed:**
-- `/app/frontend/src/index.css`
+---
 
-**Result:**
-- ✅ Events remain readable for ~4–6 seconds.
-- ✅ Less visually distracting; better first-impression UX.
+## Phase 9: Production Bugfix Sprint + Path/Class Differentiation — 🔴 In Progress (New)
+Goal: fix game-breaking issues discovered in production testing, then make class choice meaningful.
 
-### Phase 8H: Bot Players (5 AI Characters) — ✅ Completed
-**User request:** remove test characters and optionally run a small bot population that truly plays by the same rules.
+### Phase 9A (P0): Consistency & Economy/UX Truth (Displayed vs Real)
+- Fix starting class bonuses mismatch:
+  - Noble/Shadow show “500 Gold” but receive 100.
+  - Audit and normalize **all class starting stats** (gold, energy caps, base stats, starting items).
+  - Ensure UI texts/tooltips match backend constants.
 
-**Implementation:**
-- ✅ Created bot scripts that:
-  - Register/login characters
-  - Fetch `/api/game/state`
-  - Perform realistic actions (Crimes, Training, Shop, occasional Quests)
-  - Respect rules: energy costs, can_act restrictions, level gates
-- ✅ Ran bots and verified ticker displays mixed events across multiple players.
+### Phase 9B (P0): Combat Log UI Correctness
+- “Letzte Kämpfe” shows victory styled red.
+  - Fix frontend logic: winner/loser color mapping.
 
-**Artifacts:**
-- `/app/game_bot_quick.py` (short demo runs)
-- `/app/game_bot.py` (persistent bot implementation)
+### Phase 9C (P0): Inventory/Equipment System
+- Equipping weapon removes it from inventory but doesn’t appear in equipped slot.
+  - Fix backend update logic (inventory decrement + equipment set) and return payload.
+  - Fix frontend state update and re-fetch flow after equip/unequip.
+  - Add regression checks for item loss.
 
-**Note:** “Persistent daemon runner” attempt may depend on environment process management; quick-run script is confirmed to work and populate events.
+### Phase 9D (P0): Actions & Permissions by Class
+- Restrict “Ausrauben (Mug)” and “Dark Deeds/Verbrechen” to Shadow/Thief class only.
+- Create distinct action sets per class:
+  - Knight: honorable combat/training/guard actions
+  - Shadow: theft/crime/mugging/underworld
+  - Noble: trade/influence/market/bank/estate management
+- Explicitly display action effects before confirming (energy cost, risk, rewards, cooldown, possible jail/hospital time).
+
+### Phase 9E (P0): Tavern Rewards Display
+- Fix toast/header showing `Undefined Gold`.
+  - Ensure backend returns `gold_delta`/`reward.gold` consistently.
+  - Ensure frontend uses the correct property.
+
+### Phase 9F (P0): Quests Reward Payout & Claim Flow
+- Quest completes after timer but grants no XP/Gold.
+  - Ensure server awards rewards on completion (timer end) OR via explicit claim endpoint.
+  - Ensure frontend polls/refreshes active quest state and shows claim button/status.
+
+### Phase 9G (P0): Travel Between Kingdoms (Map)
+- “Cannot travel between kingdoms” behavior.
+  - Add travel conditions:
+    - minimum level or item requirement
+    - energy cost
+    - travel cooldown / in-travel lockout
+  - Fix frontend selection & request payload; show requirements clearly.
+
+### Phase 9H (P0): Hospital & Dungeon Timers
+- Hospital healing timer stuck at `00:00`.
+- Jail/Dungeon timer not shown; and “all players are jailed” symptom.
+  - Audit backend session storage fields (start_time/end_time) and per-user scoping.
+  - Ensure queries filter by `user_id`.
+  - Ensure frontend reads the correct `seconds_remaining` and updates via polling.
+
+### Phase 9I (P0): Messaging
+- Sending messages not working.
+  - Fix compose/API request format and backend persistence.
+  - Ensure inbox/outbox refresh.
+
+### Phase 9J (P1): Class-specific Quests
+- Create quest pools by class (Knight/Shadow/Noble), with different reward curves and narrative.
+- Ensure quest availability endpoint filters by `path_choice`.
+
+### Phase 9K (P1): Properties / Real Estate
+- No properties available to buy/sell.
+  - Seed properties correctly.
+  - Ensure listing/purchase endpoints return expected data.
+  - Display requirements and income/benefits clearly.
+
+### Phase 9L (P2, deferred): Real-time Updates
+User request: real-time updates for messages/attacks.
+- Defer to future phase to avoid destabilizing the production bugfix sprint.
+- Candidate implementation:
+  - WebSockets (FastAPI) for chat/messages/notifications
+  - Or Server-Sent Events (SSE) for ticker + notifications
+  - Fallback: short polling for critical UX while keeping server load manageable
+
+### Phase 9M: Deep Research + Verification (Two-character E2E)
+- Perform an end-to-end verification with **two real accounts**:
+  - Register 2 users with different classes
+  - Verify combat interactions: attack/mugging permissions, gold transfer correctness
+  - Verify XP calculation and level-up consistency
+  - Verify timers (quest/travel/hospital/jail) update correctly
+  - Verify messaging delivery and UI refresh
+  - Verify economy invariants (no negative balances, no double-spend)
+- Produce a new test report artifact (iteration_8.json) with pass/fail and reproduction steps.
 
 ---
 
@@ -386,7 +299,7 @@ MongoDB collections now exist/are used (high-level):
 - `bounties`
 - `properties`, `user_properties`
 - `achievements`, `user_achievements`
-- ✅ **Phase 8 addition:** `idempotency_keys` (TTL, 24h)
+- ✅ `idempotency_keys` (TTL, 24h)
 
 ---
 
@@ -407,30 +320,29 @@ MongoDB collections now exist/are used (high-level):
 - ✅ `/api/game/state` is stable (datetime regen bug fixed).
 - ✅ Authenticated requests consistently include JWT (axios interceptor).
 
-### Game (met: playable baseline)
-- ✅ Login/register transition to game is reliable (Auth flow hardened).
-- ✅ Energy/HP regen and action costs are balanced enough for active play sessions.
-- ✅ Training/Crimes/Quests/Hunting/Combat tuned to reduce waiting and improve progression feel.
+### Deployment (met)
+- ✅ Running on Hetzner via Docker Compose.
+- ✅ Backend served via uvicorn; Nginx routes to frontend/backend.
 
-### Game (met: production hardening)
-- ✅ Comprehensive E2E testing completed (iteration_7.json).
-- ✅ Rate limiting enabled for critical endpoints.
-- ✅ Idempotency implemented for key money-moving operations.
-- ✅ Structured economy logging in place for debugging/monitoring.
-- ✅ Final verification completed post-hardening.
-
-### Realm Liveness (met)
-- ✅ Event ticker scroll speed is readable.
-- ✅ Multi-player activity present via bot scripts that follow game rules.
+### Phase 9 (pending)
+- [ ] Path starting stats shown == stats granted (all classes).
+- [ ] Combat log styling correct.
+- [ ] Equip/unequip does not lose items; equipped UI reflects server state.
+- [ ] Class permissions enforced (mug/crimes restricted; Noble gets trade-focused actions).
+- [ ] Tavern shows correct winnings (no undefined).
+- [ ] Quests pay rewards reliably.
+- [ ] Travel works with clear requirements.
+- [ ] Hospital/Jail timers show and are user-scoped.
+- [ ] Messaging works.
+- [ ] Properties available.
+- [ ] Two-account E2E report completed.
 
 ---
 
-## Next Phase (Optional): Phase 9 — ⏳ Future
-If desired after Phase 8 completion:
-- Refresh tokens + token rotation
-- Account lockout / progressive backoff on failed login
-- DB-level atomicity improvements (Mongo transactions where applicable)
-- WebSockets for real-time chat and event updates
-- Admin panel for economy tuning, item management, and moderation
-- Full CI pipeline with deterministic E2E suite
-- Bot service hardening (run under supervisor/systemd, configurable bot pool size, per-bot backoff strategies)
+## Next Phase (Optional): Phase 10 — ⏳ Future
+After Phase 9 stabilization:
+- Real-time notifications (WebSockets/SSE) for messages/attacks/events.
+- Refresh tokens + token rotation.
+- Admin panel for economy tuning, item management, and moderation.
+- Deterministic CI/CD pipeline with automated E2E.
+- Bot service as a managed always-on compose service (plus monitoring/backoff).

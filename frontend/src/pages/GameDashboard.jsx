@@ -123,23 +123,29 @@ export default function GameDashboard() {
             {recentLogs.combat.length === 0 ? (
               <p className="text-sm text-center py-4" style={{ color: 'var(--aeth-parchment-dim)' }}>Noch keine Kämpfe</p>
             ) : (
-              recentLogs.combat.map(log => (
-                <div
-                  key={log.id}
-                  className="p-3 rounded-lg text-xs"
-                  style={{
-                    backgroundColor: log.winner === 'attacker' && log.attacker_name === user.username ? 'rgba(129,199,132,0.1)' : 'rgba(229,115,115,0.1)',
-                    borderLeft: `3px solid ${log.winner === 'attacker' && log.attacker_name === user.username ? '#81C784' : '#E57373'}`
-                  }}
-                >
-                  <p style={{ color: 'var(--aeth-parchment)', fontFamily: "'IBM Plex Sans', sans-serif" }}>
-                    {log.attacker_name} vs {log.defender_name}
-                  </p>
-                  <p style={{ color: 'var(--aeth-parchment-dim)' }}>
-                    Sieger: {log.winner === 'attacker' ? log.attacker_name : log.defender_name} • {log.damage} Schaden
-                  </p>
-                </div>
-              ))
+              recentLogs.combat.map(log => {
+                // Determine if current user won
+                const userWon = (log.attacker_name === user.username && log.winner === 'attacker') || 
+                                (log.defender_name === user.username && log.winner === 'defender');
+                
+                return (
+                  <div
+                    key={log.id}
+                    className="p-3 rounded-lg text-xs"
+                    style={{
+                      backgroundColor: userWon ? 'rgba(129,199,132,0.1)' : 'rgba(229,115,115,0.1)',
+                      borderLeft: `3px solid ${userWon ? '#81C784' : '#E57373'}`
+                    }}
+                  >
+                    <p style={{ color: 'var(--aeth-parchment)', fontFamily: "'IBM Plex Sans', sans-serif" }}>
+                      {log.attacker_name} vs {log.defender_name}
+                    </p>
+                    <p style={{ color: 'var(--aeth-parchment-dim)' }}>
+                      Sieger: {log.winner === 'attacker' ? log.attacker_name : log.defender_name} • {log.damage} Schaden
+                    </p>
+                  </div>
+                );
+              })
             )}
           </div>
         </div>

@@ -30,7 +30,7 @@ export default function MailPage() {
       const res = await axios.get(`${API}/game/messages`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
-      setMessages(res.data.messages || []);
+      setMessages(res.data || []);
     } catch (err) {
       toast.error('Fehler beim Laden der Nachrichten');
     } finally {
@@ -51,7 +51,7 @@ export default function MailPage() {
     try {
       const res = await axios.post(
         `${API}/game/messages/send`,
-        { recipient_name: recipient, subject, body },
+        { recipient_username: recipient, subject, body },
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
       toast.success(res.data.message, { icon: '📨' });

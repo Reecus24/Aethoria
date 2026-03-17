@@ -147,6 +147,23 @@ export default function InventoryPage() {
                   <p className="text-xs mb-3" style={{ color: 'var(--aeth-parchment-dim)' }}>
                     {item.item_details.description}
                   </p>
+                  {item.item_details.effect && (
+                    <div className="text-xs mb-3 p-2 rounded" style={{ backgroundColor: 'rgba(100,181,246,0.1)', color: '#64B5F6' }}>
+                      <p className="font-semibold mb-1">Effekt:</p>
+                      {item.item_details.effect.hp && <p>+{item.item_details.effect.hp} HP</p>}
+                      {item.item_details.effect.energy && <p>+{item.item_details.effect.energy} Energie</p>}
+                      {item.item_details.effect.strength_boost && <p>+{item.item_details.effect.strength_boost} Stärke ({item.item_details.effect.duration_hours}h)</p>}
+                      {item.item_details.effect.dexterity_boost && <p>+{item.item_details.effect.dexterity_boost} Geschicklichkeit</p>}
+                      {item.item_details.effect.crime_success_boost && <p>+{item.item_details.effect.crime_success_boost}% Verbrechenserfolg</p>}
+                      {item.item_details.effect.damage_boost && <p>+{item.item_details.effect.damage_boost} Schaden</p>}
+                    </div>
+                  )}
+                  {(item.item_details.damage || item.item_details.defense) && (
+                    <div className="text-xs mb-3 flex gap-2">
+                      {item.item_details.damage && <span style={{ color: '#E57373' }}>⚔️ {item.item_details.damage} DMG</span>}
+                      {item.item_details.defense && <span style={{ color: '#81C784' }}>🛡️ {item.item_details.defense} DEF</span>}
+                    </div>
+                  )}
                   {item.item_details.type === 'consumable' && (
                     <button
                       onClick={() => handleUseItem(item.item_id)}
