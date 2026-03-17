@@ -1,4 +1,5 @@
-from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi import FastAPI, APIRouter, HTTPException, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -6,41 +7,87 @@ import os
 import logging
 import random
 from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
-from typing import List, Optional
+from pydantic import BaseModel, Field
+from typing import List, Optional, Dict, Any
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import bcrypt
+import jwt
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# MongoDB connection
+# ─────────────────────────────────────────────
+# DB + App
+# ─────────────────────────────────────────────
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
+JWT_SECRET = os.environ.get('JWT_SECRET', 'aethoria-fallback-secret-key-2026')
+JWT_ALGORITHM = 'HS256'
+JWT_EXPIRE_DAYS = 7
+
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
+security = HTTPBearer(auto_error=False)
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 # ─────────────────────────────────────────────
-# Models
+# Pydantic Models
 # ─────────────────────────────────────────────
 
 class UserRegister(BaseModel):
     username: str
     email: str
     password: str
+    path_choice: Optional[str] = "knight"   # knight | shadow | noble
 
 class UserLogin(BaseModel):
     email: str
     password: str
 
-class UserResponse(BaseModel):
-    id: str
-    username: str
-    email: str
-    created_at: str
+# ─────────────────────────────────────────────
+# Path Starter Stats
+# ─────────────────────────────────────────────
+
+PATH_STARTERS: Dict[str, Dict] = {
+    "knight": {
+        "title": "Novice Knight",
+        "strength": 12,
+        "dexterity": 6,
+        "speed": 8,
+        "defense": 10,
+        "gold": 150,
+        "xp": 0,
+    },
+    "shadow": {
+        "title": "Fledgling Rogue",
+        "strength": 7,
+        "dexterity": 14,
+        "speed": 12,
+        "defense": 5,
+        "gold": 200,
+        "xp": 0,
+    },
+    "noble": {
+        "title": "Minor Noble",
+        "strength": 5,
+        "dexterity": 8,
+        "speed": 6,
+        "defense": 7,
+        "gold": 500,
+        "xp": 0,
+    },
+}
+
+PATH_LABELS = {
+    "knight": "The Knight",
+    "shadow": "The Shadow",
+    "noble":  "The Noble",
+}
 
 # ─────────────────────────────────────────────
 # Seed Data
@@ -171,46 +218,86 @@ PATHS = {
     }
 }
 
+KINGDOMS = [
+    {"name": "Aethoria Prime", "desc": "The capital of the Realm. Trade, power, and intrigue converge.", "image": "https://images.unsplash.com/photo-1533154683836-84ea7a0bc310?w=400&q=50", "type": "Capital", "danger": "Medium"},
+    {"name": "Ironhold", "desc": "A fortress city of steel and fire. Home to the greatest warriors.", "image": "https://images.unsplash.com/photo-1621947081720-86970823b77a?w=400&q=50", "type": "Military", "danger": "High"},
+    {"name": "Shadowfen", "desc": "A city of fog and secrets, where rogues and thieves hold court.", "image": "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?w=400&q=50", "type": "Underworld", "danger": "Very High"},
+    {"name": "Goldenveil", "desc": "The Realm's most prosperous trading city. Every merchant dreams of it.", "image": "https://images.unsplash.com/photo-1501183638710-841dd1904471?w=400&q=50", "type": "Commerce", "danger": "Low"},
+    {"name": "Stonecrest", "desc": "Ancient mountains hiding powerful arcane secrets in their caves.", "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&q=50", "type": "Arcane", "danger": "High"},
+    {"name": "Crystalmere", "desc": "A lakeside city of extraordinary beauty and political scheming.", "image": "https://images.unsplash.com/photo-1499678329028-101435549a4e?w=400&q=50", "type": "Noble", "danger": "Medium"},
+    {"name": "Embervast", "desc": "The volcanic borderlands, rich in dragon-forged materials.", "image": "https://images.unsplash.com/photo-1527482797697-8795b05a13fe?w=400&q=50", "type": "Wilds", "danger": "Extreme"},
+    {"name": "Tidehaven", "desc": "A port city where smugglers and merchants clash over sea routes.", "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=50", "type": "Maritime", "danger": "High"},
+    {"name": "Duskwood", "desc": "An ancient forest kingdom where shapeshifters and druids dwell.", "image": "https://images.unsplash.com/photo-1448375240586-882707db888b?w=400&q=50", "type": "Forest", "danger": "Medium"},
+    {"name": "Frostholm", "desc": "The frozen north: hard people, rare pelts, and glacier-locked tombs.", "image": "https://images.unsplash.com/photo-1491555103944-7c647fd857e6?w=400&q=50", "type": "Frozen", "danger": "Very High"},
+    {"name": "Sunkeep", "desc": "A desert kingdom where ruins of the First Empire still stand.", "image": "https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=400&q=50", "type": "Desert", "danger": "High"},
+]
+
+# ─────────────────────────────────────────────
+# JWT Helpers
+# ─────────────────────────────────────────────
+
+def create_access_token(user_id: str, username: str) -> str:
+    payload = {
+        "sub": user_id,
+        "username": username,
+        "exp": datetime.now(timezone.utc) + timedelta(days=JWT_EXPIRE_DAYS),
+        "iat": datetime.now(timezone.utc),
+    }
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+
+def decode_access_token(token: str) -> dict:
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        return payload
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Session expired — please log in again")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token — please log in again")
+
+
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    if not credentials:
+        raise HTTPException(status_code=401, detail="Authentication required — enter the gate first")
+    payload = decode_access_token(credentials.credentials)
+    user = await db.users.find_one({"id": payload["sub"]})
+    if not user:
+        raise HTTPException(status_code=401, detail="Adventurer not found in the Realm")
+    return user
+
+
 # ─────────────────────────────────────────────
 # Seed DB on startup
 # ─────────────────────────────────────────────
 
 async def seed_database():
-    # Seed ticker events
     count = await db.ticker_events.count_documents({})
     if count == 0:
-        events = [{"id": str(uuid.uuid4()), **e} for e in TICKER_EVENTS]
-        await db.ticker_events.insert_many(events)
+        await db.ticker_events.insert_many([{"id": str(uuid.uuid4()), **e} for e in TICKER_EVENTS])
 
-    # Seed features
     count = await db.features.count_documents({})
     if count == 0:
-        features = [{"id": str(uuid.uuid4()), "index": i, **f} for i, f in enumerate(FEATURES)]
-        await db.features.insert_many(features)
+        await db.features.insert_many([{"id": str(uuid.uuid4()), "index": i, **f} for i, f in enumerate(FEATURES)])
 
-    # Seed leaderboard
     count = await db.leaderboard.count_documents({})
     if count == 0:
-        entries = [{"id": str(uuid.uuid4()), **e} for e in LEADERBOARD]
-        await db.leaderboard.insert_many(entries)
+        await db.leaderboard.insert_many([{"id": str(uuid.uuid4()), **e} for e in LEADERBOARD])
 
-    # Seed reviews
     count = await db.reviews.count_documents({})
     if count == 0:
-        revs = [{"id": str(uuid.uuid4()), **r} for r in REVIEWS]
-        await db.reviews.insert_many(revs)
+        await db.reviews.insert_many([{"id": str(uuid.uuid4()), **r} for r in REVIEWS])
 
-    # Seed news
     count = await db.news.count_documents({})
     if count == 0:
-        news_items = [{"id": str(uuid.uuid4()), **n} for n in NEWS]
-        await db.news.insert_many(news_items)
+        await db.news.insert_many([{"id": str(uuid.uuid4()), **n} for n in NEWS])
 
-    # Seed paths
     count = await db.paths.count_documents({})
     if count == 0:
-        path_items = [{"id": str(uuid.uuid4()), "key": k, **v} for k, v in PATHS.items()]
-        await db.paths.insert_many(path_items)
+        await db.paths.insert_many([{"id": str(uuid.uuid4()), "key": k, **v} for k, v in PATHS.items()])
+
+    count = await db.kingdoms.count_documents({})
+    if count == 0:
+        await db.kingdoms.insert_many([{"id": str(uuid.uuid4()), **k} for k in KINGDOMS])
 
     logger.info("Database seeded successfully")
 
@@ -226,7 +313,7 @@ async def shutdown_db_client():
 
 
 # ─────────────────────────────────────────────
-# Helper
+# Serialization helper
 # ─────────────────────────────────────────────
 
 def serialize_doc(doc):
@@ -251,6 +338,37 @@ def serialize_doc(doc):
     return doc
 
 
+def user_to_profile(user: dict) -> dict:
+    """Return safe public profile (no password)."""
+    created = user.get("created_at", datetime.now(timezone.utc).isoformat())
+    if isinstance(created, datetime):
+        created = created.isoformat()
+    try:
+        created_dt = datetime.fromisoformat(created.replace("Z", "+00:00"))
+        days_in_realm = (datetime.now(timezone.utc) - created_dt).days
+    except Exception:
+        days_in_realm = 0
+
+    path_key = user.get("path_choice", "knight")
+    return {
+        "id": user.get("id"),
+        "username": user.get("username"),
+        "email": user.get("email"),
+        "level": user.get("level", 1),
+        "title": user.get("title", "Novice Adventurer"),
+        "path_choice": path_key,
+        "path_label": PATH_LABELS.get(path_key, "Unknown"),
+        "strength": user.get("strength", 5),
+        "dexterity": user.get("dexterity", 5),
+        "speed": user.get("speed", 5),
+        "defense": user.get("defense", 5),
+        "gold": user.get("gold", 100),
+        "xp": user.get("xp", 0),
+        "days_in_realm": days_in_realm,
+        "created_at": created,
+    }
+
+
 # ─────────────────────────────────────────────
 # Landing / Aggregated Endpoint
 # ─────────────────────────────────────────────
@@ -263,10 +381,7 @@ async def get_landing():
     reviews = await db.reviews.find({}, {"_id": 0}).to_list(50)
     news = await db.news.find({}, {"_id": 0}).to_list(20)
     paths = await db.paths.find({}, {"_id": 0}).to_list(10)
-
-    online_now = random.randint(2800, 3500)
-    online_hour = random.randint(8000, 12000)
-    online_day = random.randint(35000, 55000)
+    kingdoms = await db.kingdoms.find({}, {"_id": 0}).to_list(20)
 
     return {
         "ticker": serialize_doc(ticker),
@@ -275,11 +390,12 @@ async def get_landing():
         "reviews": serialize_doc(reviews),
         "news": serialize_doc(news),
         "paths": serialize_doc(paths),
+        "kingdoms": serialize_doc(kingdoms),
         "online": {
-            "now": online_now,
-            "last_hour": online_hour,
-            "last_24h": online_day
-        }
+            "now": random.randint(2800, 3500),
+            "last_hour": random.randint(8000, 12000),
+            "last_24h": random.randint(35000, 55000),
+        },
     }
 
 
@@ -297,14 +413,12 @@ async def get_leaderboard():
 
 @api_router.get("/reviews")
 async def get_reviews():
-    reviews = await db.reviews.find({}, {"_id": 0}).to_list(50)
-    return serialize_doc(reviews)
+    return serialize_doc(await db.reviews.find({}, {"_id": 0}).to_list(50))
 
 
 @api_router.get("/news")
 async def get_news():
-    news = await db.news.find({}, {"_id": 0}).to_list(20)
-    return serialize_doc(news)
+    return serialize_doc(await db.news.find({}, {"_id": 0}).to_list(20))
 
 
 @api_router.get("/features")
@@ -315,12 +429,25 @@ async def get_features():
 
 @api_router.get("/paths")
 async def get_paths():
-    paths = await db.paths.find({}, {"_id": 0}).to_list(10)
-    return serialize_doc(paths)
+    return serialize_doc(await db.paths.find({}, {"_id": 0}).to_list(10))
+
+
+@api_router.get("/kingdoms")
+async def get_kingdoms():
+    return serialize_doc(await db.kingdoms.find({}, {"_id": 0}).to_list(20))
+
+
+@api_router.get("/stats/online")
+async def get_online_stats():
+    return {
+        "now": random.randint(2800, 3500),
+        "last_hour": random.randint(8000, 12000),
+        "last_24h": random.randint(35000, 55000),
+    }
 
 
 # ─────────────────────────────────────────────
-# Auth Endpoints (MVP)
+# Auth Endpoints
 # ─────────────────────────────────────────────
 
 @api_router.post("/auth/register")
@@ -328,17 +455,20 @@ async def register(user: UserRegister):
     if not user.username or not user.email or not user.password:
         raise HTTPException(status_code=400, detail="All fields are required")
     if len(user.password) < 6:
-        raise HTTPException(status_code=400, detail="Password must be at least 6 characters")
+        raise HTTPException(status_code=400, detail="Passphrase must be at least 6 characters")
 
-    existing = await db.users.find_one({"email": user.email})
-    if existing:
+    path_choice = (user.path_choice or "knight").lower()
+    if path_choice not in PATH_STARTERS:
+        path_choice = "knight"
+
+    if await db.users.find_one({"email": user.email}):
         raise HTTPException(status_code=400, detail="An adventurer with this email already exists in the Realm")
-
-    existing_user = await db.users.find_one({"username": user.username})
-    if existing_user:
+    if await db.users.find_one({"username": user.username}):
         raise HTTPException(status_code=400, detail="This adventurer name is already taken in the Realm")
 
     hashed = bcrypt.hashpw(user.password.encode(), bcrypt.gensalt()).decode()
+    starter = PATH_STARTERS[path_choice].copy()
+
     user_doc = {
         "id": str(uuid.uuid4()),
         "username": user.username,
@@ -346,10 +476,20 @@ async def register(user: UserRegister):
         "password": hashed,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "level": 1,
-        "title": "Novice Adventurer"
+        "path_choice": path_choice,
+        **starter,
     }
     await db.users.insert_one(user_doc)
-    return {"success": True, "message": f"Welcome to the Realm, {user.username}! Your legend begins now.", "username": user.username}
+
+    token = create_access_token(user_doc["id"], user.username)
+    profile = user_to_profile(user_doc)
+
+    return {
+        "success": True,
+        "message": f"Welcome to the Realm, {user.username}! Your legend begins now.",
+        "token": token,
+        "user": profile,
+    }
 
 
 @api_router.post("/auth/login")
@@ -360,35 +500,33 @@ async def login(credentials: UserLogin):
     user = await db.users.find_one({"email": credentials.email})
     if not user:
         raise HTTPException(status_code=401, detail="No adventurer found with those credentials")
-
     if not bcrypt.checkpw(credentials.password.encode(), user["password"].encode()):
-        raise HTTPException(status_code=401, detail="Incorrect password — the dungeon guards grow suspicious")
+        raise HTTPException(status_code=401, detail="Incorrect passphrase — the dungeon guards grow suspicious")
+
+    token = create_access_token(user["id"], user["username"])
+    profile = user_to_profile(user)
 
     return {
         "success": True,
         "message": f"Welcome back, {user['username']}! The Realm awaits your return.",
-        "username": user["username"],
-        "level": user.get("level", 1),
-        "title": user.get("title", "Adventurer")
+        "token": token,
+        "user": profile,
     }
 
 
-# ─────────────────────────────────────────────
-# Online Stats
-# ─────────────────────────────────────────────
+@api_router.post("/auth/logout")
+async def logout():
+    # Client-side token invalidation (stateless JWT)
+    return {"success": True, "message": "You have left the Realm safely. Until next time."}
 
-@api_router.get("/stats/online")
-async def get_online_stats():
-    return {
-        "now": random.randint(2800, 3500),
-        "last_hour": random.randint(8000, 12000),
-        "last_24h": random.randint(35000, 55000)
-    }
+
+@api_router.get("/me")
+async def get_me(current_user: dict = Depends(get_current_user)):
+    return {"success": True, "user": user_to_profile(current_user)}
 
 
 # ─────────────────────────────────────────────
 app.include_router(api_router)
-
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
@@ -396,9 +534,3 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)

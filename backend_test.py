@@ -101,6 +101,37 @@ class AethoriaAPITester:
             print(f"❌ Registration failed")
             return None
 
+    def test_register_with_path(self):
+        """Test user registration with path selection"""
+        timestamp = datetime.now().strftime('%H%M%S')
+        test_user = {
+            "username": f"test_shadow_{timestamp}",
+            "email": f"testshadow_{timestamp}@aethoria.realm", 
+            "password": "TestPass123!",
+            "path_choice": "shadow"
+        }
+        
+        success, response = self.run_test(
+            "User Registration with Path Selection",
+            "POST",
+            "auth/register",
+            200,
+            data=test_user
+        )
+        
+        if success and response.get('success'):
+            print(f"✓ Registration with shadow path successful for {test_user['username']}")
+            # Validate that user has correct path stats
+            user_data = response.get('user', {})
+            if user_data.get('path_choice') == 'shadow':
+                print(f"✓ Path choice correctly set to shadow")
+            if user_data.get('dexterity', 0) == 14:  # Shadow path starts with 14 dexterity
+                print(f"✓ Path stats correctly applied (dexterity: 14)")
+            return test_user
+        else:
+            print(f"❌ Registration with path failed")
+            return None
+
     def test_login_user(self, user_credentials):
         """Test user login"""
         if not user_credentials:
@@ -140,12 +171,16 @@ class AethoriaAPITester:
         self.run_test("Reviews", "GET", "reviews", 200)
         self.run_test("News", "GET", "news", 200)
         self.run_test("Paths", "GET", "paths", 200)
+        self.run_test("Kingdoms", "GET", "kingdoms", 200)
         self.run_test("Online Stats", "GET", "stats/online", 200)
         
         # Test authentication
         test_user = self.test_register_user()
         if test_user:
             self.test_login_user(test_user)
+        
+        # Test registration with path selection
+        test_shadow_user = self.test_register_with_path()
         
         # Test duplicate registration (should fail)
         if test_user:
@@ -169,6 +204,47 @@ class AethoriaAPITester:
             401,
             data=wrong_creds
         )
+        
+        # Test JWT /me endpoint with valid token
+        if test_user:
+            success, login_response = self.run_test(
+                "Get Valid JWT Token",
+                "POST",
+                "auth/login",
+                200,
+                data={
+                    "email": test_user["email"],
+                    "password": test_user["password"]
+                }
+            )
+            
+            if success and 'token' in login_response:
+                token = login_response['token']
+                headers = {
+                    'Content-Type': 'application/json',
+                    'Authorization': f'Bearer {token}'
+                }
+                
+                # Test protected /me endpoint
+                url = f"{self.base_url}/api/me"
+                try:
+                    response = requests.get(url, headers=headers, timeout=10)
+                    if response.status_code == 200:
+                        self.tests_passed += 1
+                        print(f"✅ JWT /me endpoint - Status: 200")
+                        me_data = response.json()
+                        if 'user' in me_data and me_data['user']['username'] == test_user['username']:
+                            print(f"✓ JWT authentication working - user data correct")
+                        else:
+                            print(f"⚠️  JWT user data mismatch")
+                    else:
+                        print(f"❌ JWT /me endpoint failed - Status: {response.status_code}")
+                        self.failures.append(f"JWT /me endpoint: Expected 200, got {response.status_code}")
+                    self.tests_run += 1
+                except Exception as e:
+                    print(f"❌ JWT /me endpoint failed - Error: {str(e)}")
+                    self.failures.append(f"JWT /me endpoint: {str(e)}")
+                    self.tests_run += 1
         
         # Print results
         print(f"\n📊 Backend Test Results:")

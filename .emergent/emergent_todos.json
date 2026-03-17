@@ -1,50 +1,34 @@
 [
   {
-    "content": "Phase 3: Skeleton loaders for all data sections",
+    "content": "Phase 4A: Backend JWT + extended user model + /api/me",
     "status": "completed"
   },
   {
-    "content": "Phase 3: Mobile navbar hamburger menu",
+    "content": "Phase 4B: Frontend Auth context + axios interceptor + persistent sessions",
     "status": "completed"
   },
   {
-    "content": "Phase 3: Animated stat counters in online widget",
+    "content": "Phase 4C: Register modal Step 2 (path selection)",
     "status": "completed"
   },
   {
-    "content": "Phase 3: Hero particle/ember atmosphere + deeper visuals",
+    "content": "Phase 4D: Character Dashboard slide-in panel",
     "status": "completed"
   },
   {
-    "content": "Phase 3: Live ticker auto-refresh + event categories badge",
+    "content": "Phase 4E: 'Venture into the Realm' text game preview section",
     "status": "completed"
   },
   {
-    "content": "Phase 3: Improved feature cards with rune hover glow",
+    "content": "Phase 4F: 11 Kingdoms world map section",
     "status": "completed"
   },
   {
-    "content": "Phase 3: About section enhancement - stats, oaths, quote",
+    "content": "Phase 4G: Back-to-top floating button",
     "status": "completed"
   },
   {
-    "content": "Phase 3: Toast + modal success feedback improvement",
-    "status": "completed"
-  },
-  {
-    "content": "Phase 3: Keyboard nav + reduced-motion + a11y pass",
-    "status": "completed"
-  },
-  {
-    "content": "Phase 3: Anchor nav links + sticky navbar scroll behavior",
-    "status": "completed"
-  },
-  {
-    "content": "Phase 3: Star rating glow + error message visibility fix",
-    "status": "completed"
-  },
-  {
-    "content": "Phase 3: E2E Testing with testing_agent_v3",
-    "status": "completed"
+    "content": "Phase 4H: E2E Testing with testing_agent_v3",
+    "status": "in_progress"
   }
 ]

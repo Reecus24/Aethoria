@@ -3,6 +3,7 @@ import '@/App.css';
 import axios from 'axios';
 import { Toaster, toast } from 'sonner';
 
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { NavBar } from './components/NavBar';
 import { EventTicker } from './components/EventTicker';
 import { HeroSection } from './components/HeroSection';
@@ -12,9 +13,13 @@ import { FeaturesSection } from './components/FeaturesSection';
 import { LeaderboardSection } from './components/LeaderboardSection';
 import { ReviewsSection } from './components/ReviewsSection';
 import { PathsSection } from './components/PathsSection';
+import { GamePreviewSection } from './components/GamePreviewSection';
+import { KingdomsSection } from './components/KingdomsSection';
 import { NewsSection } from './components/NewsSection';
 import { SiteFooter } from './components/SiteFooter';
 import { LoginModal, RegisterModal } from './components/AuthModals';
+import { CharacterDashboard } from './components/CharacterDashboard';
+import { BackToTop } from './components/BackToTop';
 import {
   FeaturesSkeletonSection,
   LeaderboardSkeleton,
@@ -24,12 +29,13 @@ import {
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-export default function App() {
+function AppInner() {
+  const { user, loading: authLoading, loginWithData } = useAuth();
   const [landingData, setLandingData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [dataLoading, setDataLoading] = useState(true);
   const [loginOpen, setLoginOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
-  const [user, setUser] = useState(null);
+  const [dashboardOpen, setDashboardOpen] = useState(false);
 
   const fetchLanding = useCallback(async () => {
     try {
@@ -38,14 +44,10 @@ export default function App() {
     } catch (err) {
       console.error('Failed to load landing data:', err);
       toast.error('Could not connect to the Realm. Please try again.', {
-        style: {
-          backgroundColor: 'rgba(142,29,44,0.9)',
-          border: '1px solid rgba(142,29,44,0.6)',
-          color: '#fff',
-        },
+        style: { backgroundColor: 'rgba(142,29,44,0.9)', border: '1px solid rgba(142,29,44,0.6)', color: '#fff' },
       });
     } finally {
-      setLoading(false);
+      setDataLoading(false);
     }
   }, []);
 
@@ -54,34 +56,19 @@ export default function App() {
   }, [fetchLanding]);
 
   const handleLoginSuccess = (data) => {
-    setUser(data);
-    toast.success(data.message, {
-      duration: 5000,
-      icon: '⚔️',
-    });
+    toast.success(data.message, { duration: 5000, icon: '⚔️' });
   };
 
   const handleRegisterSuccess = (data) => {
-    setUser(data);
-    toast.success(data.message, {
-      duration: 6000,
-      icon: '🏰',
-    });
+    toast.success(data.message, { duration: 6000, icon: '🏰' });
+    setDashboardOpen(true);
   };
 
-  const handleOpenLogin = () => {
-    setRegisterOpen(false);
-    setLoginOpen(true);
-  };
-
-  const handleOpenRegister = () => {
-    setLoginOpen(false);
-    setRegisterOpen(true);
-  };
+  const handleOpenLogin = () => { setRegisterOpen(false); setLoginOpen(true); };
+  const handleOpenRegister = () => { setLoginOpen(false); setRegisterOpen(true); };
 
   return (
     <div className="App" style={{ backgroundColor: 'var(--aeth-stone-0)', minHeight: '100vh' }}>
-      {/* Toast notifications */}
       <Toaster
         position="top-center"
         toastOptions={{
@@ -91,94 +78,58 @@ export default function App() {
             color: 'var(--aeth-parchment)',
             fontFamily: "'IBM Plex Sans', sans-serif",
             boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
-            zIndex: 9999,
           },
         }}
         richColors
       />
 
-      {/* Authenticated user banner */}
-      {user && (
-        <div
-          className="text-center py-2 text-sm"
-          style={{
-            backgroundColor: 'rgba(214,162,77,0.12)',
-            borderBottom: '1px solid rgba(214,162,77,0.3)',
-            color: 'var(--aeth-gold)',
-            fontFamily: "'Cinzel', serif",
-            letterSpacing: '0.04em',
-            position: 'relative',
-            zIndex: 60,
-          }}
-        >
-          ⚔️ Welcome, <strong>{user.username}</strong> — Level {user.level} {user.title} — Your legend continues
-          <button
-            onClick={() => setUser(null)}
-            className="ml-4 text-xs opacity-60 hover:opacity-100"
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              color: 'var(--aeth-gold)',
-              fontFamily: "'IBM Plex Sans', sans-serif",
-              transition: 'opacity 0.2s ease',
-            }}
-          >
-            (Logout)
-          </button>
-        </div>
-      )}
-
       {/* Event Ticker */}
       <EventTicker events={landingData?.ticker || []} />
 
-      {/* Navigation - sticky */}
-      <NavBar onLogin={handleOpenLogin} onJoin={handleOpenRegister} />
+      {/* Navigation */}
+      <NavBar
+        onLogin={handleOpenLogin}
+        onJoin={handleOpenRegister}
+        onOpenDashboard={() => setDashboardOpen(true)}
+      />
 
       {/* Hero */}
       <HeroSection onLogin={handleOpenLogin} onJoin={handleOpenRegister} />
 
       {/* Online Counter */}
-      {!loading && <OnlineCounter online={landingData?.online} />}
+      {!dataLoading && <OnlineCounter online={landingData?.online} />}
 
       {/* About */}
       <AboutSection />
 
       {/* Features */}
-      {loading ? (
-        <FeaturesSkeletonSection />
-      ) : (
-        <FeaturesSection features={landingData?.features || []} />
-      )}
+      {dataLoading ? <FeaturesSkeletonSection /> : <FeaturesSection features={landingData?.features || []} />}
 
       {/* Leaderboard */}
-      {loading ? (
-        <LeaderboardSkeleton />
-      ) : (
-        <LeaderboardSection leaderboard={landingData?.leaderboard || []} />
-      )}
+      {dataLoading ? <LeaderboardSkeleton /> : <LeaderboardSection leaderboard={landingData?.leaderboard || []} />}
 
       {/* Reviews */}
-      {loading ? (
-        <ReviewsSkeleton />
-      ) : (
-        <ReviewsSection reviews={landingData?.reviews || []} />
-      )}
+      {dataLoading ? <ReviewsSkeleton /> : <ReviewsSection reviews={landingData?.reviews || []} />}
 
       {/* Paths */}
       <PathsSection paths={landingData?.paths || []} />
 
+      {/* Game Preview terminal */}
+      <GamePreviewSection />
+
+      {/* 11 Kingdoms */}
+      <KingdomsSection kingdoms={landingData?.kingdoms || []} />
+
       {/* News */}
-      {loading ? (
-        <NewsSkeleton />
-      ) : (
-        <NewsSection news={landingData?.news || []} />
-      )}
+      {dataLoading ? <NewsSkeleton /> : <NewsSection news={landingData?.news || []} />}
 
       {/* Footer */}
       <SiteFooter onLogin={handleOpenLogin} onJoin={handleOpenRegister} />
 
-      {/* Modals */}
+      {/* Floating Back to Top */}
+      <BackToTop />
+
+      {/* Auth Modals */}
       <LoginModal
         open={loginOpen}
         onClose={() => setLoginOpen(false)}
@@ -191,6 +142,20 @@ export default function App() {
         onSwitchToLogin={handleOpenLogin}
         onSuccess={handleRegisterSuccess}
       />
+
+      {/* Character Dashboard */}
+      <CharacterDashboard
+        open={dashboardOpen && !!user}
+        onClose={() => setDashboardOpen(false)}
+      />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppInner />
+    </AuthProvider>
   );
 }
