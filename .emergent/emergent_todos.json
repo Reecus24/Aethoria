@@ -1,34 +1,18 @@
 [
   {
-    "content": "42 Features in Kategorien gruppieren und priorisieren",
+    "content": "42 Features kategorisiert und strukturiert",
     "status": "completed"
   },
   {
-    "content": "Design Guidelines für Game Interface vom design_agent holen",
+    "content": "Design Guidelines für Game Interface gelesen",
+    "status": "completed"
+  },
+  {
+    "content": "Backend Backup erstellt",
+    "status": "completed"
+  },
+  {
+    "content": "Backend: Komplettes Game Backend erstellen (alle 42 Features)",
     "status": "in_progress"
-  },
-  {
-    "content": "Detaillierten Phase 6 Plan mit allen Features erstellen",
-    "status": "pending"
-  },
-  {
-    "content": "Backend: Datenbank-Models für alle Features",
-    "status": "pending"
-  },
-  {
-    "content": "Backend: API Endpoints für alle Features",
-    "status": "pending"
-  },
-  {
-    "content": "Frontend: Game Dashboard Interface",
-    "status": "pending"
-  },
-  {
-    "content": "Frontend: Alle Feature-Seiten implementieren",
-    "status": "pending"
-  },
-  {
-    "content": "Testing: Alle neuen Features testen",
-    "status": "pending"
   }
 ]
