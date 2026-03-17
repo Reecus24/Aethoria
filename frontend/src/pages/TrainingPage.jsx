@@ -51,6 +51,20 @@ export default function TrainingPage() {
     }
   };
 
+  const cancelTraining = async () => {
+    if (!window.confirm('Training wirklich abbrechen? Du erhältst 50% Energie zurück (50 von 100).')) {
+      return;
+    }
+    
+    try {
+      const res = await axios.post(`${API}/game/training/cancel`);
+      toast.success(res.data.message, { icon: '⚠️', duration: 4000 });
+      refreshGameState();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Fehler beim Abbrechen');
+    }
+  };
+
   const activeTraining = gameState?.timers?.training;
 
   return (
@@ -103,15 +117,34 @@ export default function TrainingPage() {
               </p>
             </div>
           </div>
-          {activeTraining.seconds_remaining <= 0 && (
-            <button
-              onClick={claimTraining}
-              className="btn-gold w-full mt-4 py-3 rounded-lg font-semibold"
-              data-testid="claim-training-btn"
-            >
-              Training abschließen
-            </button>
-          )}
+          
+          <div className="flex gap-3 mt-4">
+            {activeTraining.seconds_remaining <= 0 ? (
+              <button
+                onClick={claimTraining}
+                className="btn-gold flex-1 py-3 rounded-lg font-semibold"
+                data-testid="claim-training-btn"
+              >
+                Training abschließen
+              </button>
+            ) : (
+              <button
+                onClick={cancelTraining}
+                className="flex-1 py-3 rounded-lg font-semibold"
+                style={{
+                  backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                  border: '1px solid rgba(244, 67, 54, 0.3)',
+                  color: '#ef5350',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = 'rgba(244, 67, 54, 0.2)'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = 'rgba(244, 67, 54, 0.1)'}
+                data-testid="cancel-training-btn"
+              >
+                Training abbrechen (50 Energie zurück)
+              </button>
+            )}
+          </div>
         </motion.div>
       )}
 

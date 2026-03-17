@@ -1143,6 +1143,36 @@ async def claim_training(current_user: dict = Depends(get_current_user)):
         'new_level': new_level if level_up else None
     }
 
+@app.post("/api/game/training/cancel")
+async def cancel_training(current_user: dict = Depends(get_current_user)):
+    """Cancel active training session and refund 50% energy"""
+    user_id = current_user['id']
+    
+    session = await db.training_sessions.find_one({'user_id': user_id, 'completed': False})
+    if not session:
+        raise HTTPException(status_code=404, detail="Keine aktive Trainingseinheit gefunden")
+    
+    # Refund 50% of training cost (50 energy)
+    energy_refund = 50  # 50% of 100
+    
+    await db.users.update_one(
+        {'id': user_id},
+        {'$inc': {'energy': energy_refund}}
+    )
+    
+    # Delete training session
+    await db.training_sessions.delete_one({'id': session['id']})
+    
+    # Log event
+    await log_event('training', f'{current_user["username"]} hat Training abgebrochen', user_id)
+    
+    return {
+        'success': True,
+        'message': f'Training abgebrochen. {energy_refund} Energie zurückerstattet.',
+        'energy_refunded': energy_refund
+    }
+
+
 @app.get("/api/game/training/status")
 async def get_training_status(current_user: dict = Depends(get_current_user)):
     """Get current training status"""
