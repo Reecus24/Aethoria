@@ -29,8 +29,8 @@ export default function CombatPage() {
   };
 
   const attackPlayer = async (username, action = 'attack') => {
-    if ((gameState?.resources?.energy || 0) < 25) {
-      toast.error('Nicht genug Energie (benötigt: 25)');
+    if ((gameState?.resources?.energy || 0) < 15) {
+      toast.error('Nicht genug Energie (benötigt: 15)');
       return;
     }
 
@@ -62,7 +62,7 @@ export default function CombatPage() {
           Combat Arena
         </h1>
         <p style={{ color: 'var(--aeth-parchment-dim)', fontFamily: "'IBM Plex Sans', sans-serif" }}>
-          Greife andere Spieler an • Kosten: 25 Energie pro Angriff
+          Greife andere Spieler an • Kosten: 15 Energie pro Angriff
         </p>
       </div>
 
@@ -129,7 +129,7 @@ export default function CombatPage() {
               <div className="flex gap-2">
                 <button
                   onClick={() => attackPlayer(target.username, 'attack')}
-                  disabled={attacking || gameState.resources.energy < 25 || !gameState.status.can_act}
+                  disabled={attacking || gameState.resources.energy < 15 || !gameState.status.can_act}
                   className="btn-iron px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40"
                   data-testid={`attack-${target.username}`}
                 >
@@ -137,7 +137,7 @@ export default function CombatPage() {
                 </button>
                 <button
                   onClick={() => attackPlayer(target.username, 'mug')}
-                  disabled={attacking || gameState.resources.energy < 25 || !gameState.status.can_act}
+                  disabled={attacking || gameState.resources.energy < 15 || !gameState.status.can_act}
                   className="btn-gold px-4 py-2 rounded-lg text-xs font-semibold disabled:opacity-40"
                   data-testid={`mug-${target.username}`}
                 >

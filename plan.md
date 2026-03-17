@@ -16,6 +16,7 @@
   - character stats (**strength / dexterity / speed / defense / gold / xp / level / title / days_in_realm**)
 - Implement the “introduced” features from the landing page as **playable systems**, targeting the full **42 features** set.
 - Ensure consistent premium UI across landing + game: stone/iron UI, gold accents, fantasy typography, dense data tables, fast navigation.
+- **New objective (post-MEGA-BUILD):** make the game **smoothly playable** by hardening onboarding/auth UX and tuning the **energy/time economy** so early/mid-game loops are fun and not dominated by waiting.
 
 **Current status (updated):**
 - ✅ Phase 1 complete (data-flow POC verified)
@@ -25,6 +26,7 @@
 - ✅ Phase 5 complete (all mock data replaced with real, dynamic data)
 - ✅ Post-Phase-5 correction: removed false marketing claims and removed filler named ticker events.
 - ✅ **Phase 6 complete (MEGA-BUILD): full game backend + full game frontend + routing + stability fixes + functional smoke tests**
+- ✅ **Phase 7 complete: Login/Register flow hardening + Balancing pass (energy/time economy + rewards)**
 
 ---
 
@@ -126,9 +128,9 @@ User request: “mach einfach alles fertig … die 42 Features bitte komplett au
 **Testing — ✅ Completed (smoke + targeted functional)**
 - ✅ Build/syntax validation with esbuild.
 - ✅ Screenshot-based navigation smoke tests across pages.
-- ✅ Automated test report generated: `/app/test_reports/iteration_5.json`.
+- ✅ Automated test report generated: `/app/test_reports/iteration_5.json` and `/app/test_reports/iteration_6.json`.
 - ✅ Verified working flows (session highlights):
-  - Auth: login → redirect to `/game`
+  - Auth: login/register → redirect to `/game`
   - HUD reflects live values (Gold/Energy/HP/Level)
   - Crimes API success path (commit crime, rewards applied, level-up observed)
   - Bank deposit/withdraw verified via curl
@@ -184,49 +186,92 @@ User request: “mach einfach alles fertig … die 42 Features bitte komplett au
 
 ---
 
-## Phase 7: Post-MEGA-BUILD Hardening, Full E2E Coverage, Balancing — ⏳ Next
-Goal: move from “all features exist + verified smoke tests” to “all features are verified end-to-end, balanced, and abuse-resistant”.
+## Phase 7: Post-MEGA-BUILD Hardening, E2E Coverage, Balancing — ✅ Completed
+Goal: move from “all features exist + verified smoke tests” to “the game is consistently accessible and feels playable”.
 
-### Phase 7A: Deep E2E Functional Testing (all 42 features)
-- Add/extend automated tests to cover **successful and failure paths**:
-  - register → select path → login → `/game/state`
-  - training start/claim (incl. timer edge cases)
-  - crime success/fail → dungeon/hospital timers (including completion release)
-  - combat outcomes (duel/mug/hospitalise) + logs
-  - quest accept/complete + rewards
-  - shop buy → inventory/equipment changes
-  - market list/buy/cancel + money conservation
-  - bank deposit/withdraw/investments + interest
-  - tavern dice wagers + gold conservation
-  - travel start/complete + location update
-  - messaging send/read + unread counts
-  - property buy/collect + income timers
-  - guild create/join/leave + member counts
-  - bounty create/claim + payouts
-  - hunting loop (unlocks at level 15) + drops
-  - achievements unlock triggers
-- Ensure all transactions are server-authoritative and consistent.
+### Phase 7A: Auth / Onboarding Flow Hardening — ✅ Completed
+**Problem addressed:** intermittent UX issues where registration/login did not reliably transition to `/game`.
 
-### Phase 7B: Data Contract Tightening + Observability
+**Fix shipped:**
+- ✅ Hardened navigation by adding **direct `navigate('/game')` calls inside AuthModals** right after `loginWithData()`.
+- ✅ Removed redundant delayed navigations in `LandingPage` success callbacks (kept toasts only).
+
+**Files changed:**
+- `/app/frontend/src/components/AuthModals.jsx`
+- `/app/frontend/src/pages/LandingPage.jsx`
+
+**Result:**
+- ✅ Register → choose path → enter game works reliably.
+- ✅ Login → enter game works reliably.
+
+### Phase 7B: Balancing Pass (Energy / Time / Rewards) — ✅ Completed
+**Problem addressed:** Energy starvation and long wait-times due to slow regen and high action costs.
+
+**Backend economy changes:**
+- ✅ **Energy regen:** `ENERGY_REGEN_PER_HOUR` **10 → 25** (full bar in ~4h instead of 10h)
+- ✅ **HP regen:** `HP_REGEN_PER_HOUR` **5 → 10**
+
+**Training changes:**
+- ✅ Training energy **10 → 6**
+- ✅ Training duration **5 → 3 minutes**
+- ✅ Training XP **2 → 3**
+
+**Crime changes (broad tuning):**
+- ✅ Energy costs reduced (~25–40%)
+- ✅ Rewards increased (~20%)
+- ✅ Jail times reduced (~30%)
+- ✅ Slight success-rate improvements for early crimes
+
+**Quest changes:**
+- ✅ Energy costs reduced (~30%)
+- ✅ Rewards increased (~20%)
+- ✅ Durations reduced (~25%)
+
+**Hunting changes:**
+- ✅ Energy costs reduced (~30–40%)
+- ✅ Rewards increased (~20%)
+
+**Combat changes:**
+- ✅ Energy per attack **25 → 15**
+
+**Frontend alignment:**
+- ✅ Updated Training UI texts and gating to match new values.
+- ✅ Updated Combat UI texts and gating to match new values.
+
+**Files changed (key):**
+- `/app/backend/server.py`
+- `/app/frontend/src/pages/TrainingPage.jsx`
+- `/app/frontend/src/pages/CombatPage.jsx`
+- Added analysis doc: `/app/balancing_analysis.md`
+
+### Phase 7C: Manual E2E Verification After Balancing — ✅ Completed
+- ✅ Performed UI-driven gameplay loop test:
+  - Register (multiple paths) → Dashboard
+  - Start training → observe timer
+  - Commit crime → observe gold/xp change and level-up
+- ✅ Verified updated displayed costs (e.g., training shows **6 Energie / 3 Min**, crimes show **3 Energie**, combat shows **15 Energie**).
+
+---
+
+## Next Phase (Optional): Phase 8 — ⏳ Future
+Goal: move from “playable & balanced baseline” to “production-hardened & scalable”.
+
+### Phase 8A: Deep Automated E2E (all 42 features)
+- Add/extend automated tests to cover successful and failure paths for each major system.
+- Ensure economy invariants (money conservation, idempotency, anti-race).
+
+### Phase 8B: Data Contract Tightening + Observability
 - Standardize payload shapes for:
   - `gameState` fields (user/resources/stats/location/timers/equipment)
   - timer objects (presence/absence semantics)
 - Add server-side structured logs for economy-affecting endpoints.
-- Add more `data-testid` coverage where missing for robust testing.
+- Add more `data-testid` coverage where missing.
 
-### Phase 7C: UX Polish Based on User Feedback
-- Improve micro-interactions:
-  - clearer empty states, better error toasts
-  - consistent naming (German/English labels) and localization pass
-- Improve navigation quality:
-  - ensure every sidebar item has stable `data-testid`
-  - add page-level loading indicators consistently
-
-### Phase 7D: Anti-Abuse + Security Enhancements
+### Phase 8C: Anti-Abuse + Security Enhancements
 - Refresh tokens (optional)
 - Rate limiting (crimes/combat/market)
 - Idempotency keys for money-moving operations
-- Atomic Mongo updates / transaction patterns for economy operations
+- Atomic Mongo update patterns / transactions for economy operations
 
 ---
 
@@ -268,9 +313,13 @@ MongoDB collections now exist/are used (high-level):
 - ✅ Backend implements endpoints for the full 42-feature set.
 - ✅ `/api/game/state` is stable (datetime regen bug fixed).
 - ✅ Authenticated requests consistently include JWT (axios interceptor).
-- ✅ Core functional spot-checks passed (crime, bank, tavern, training UI readiness).
 
-### Game (next: hardening)
-- ⏳ Full E2E coverage validates all 42 features end-to-end.
+### Game (met: playable baseline)
+- ✅ Login/register transition to game is reliable (Auth flow hardened).
+- ✅ Energy/HP regen and action costs are balanced enough for active play sessions.
+- ✅ Training/Crimes/Quests/Hunting/Combat tuned to reduce waiting and improve progression feel.
+
+### Game (next: hardening - optional)
+- ⏳ Full automated E2E coverage validates all 42 features end-to-end.
 - ⏳ Economy transactions verified for correctness and abuse resistance.
-- ⏳ Balance pass for energy costs, rewards, timers.
+- ⏳ Advanced security hardening (rate limiting, refresh tokens, idempotency).

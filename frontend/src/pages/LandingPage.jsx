@@ -72,18 +72,12 @@ export default function LandingPage() {
 
   const handleLoginSuccess = (data) => {
     toast.success(data.message, { duration: 5000, icon: '⚔️' });
-    // Navigate to game after successful login
-    setTimeout(() => {
-      navigate('/game');
-    }, 1000);
+    // Navigation now handled directly in AuthModals for reliability
   };
 
   const handleRegisterSuccess = (data) => {
     toast.success(data.message, { duration: 6000, icon: '🏰' });
-    // Navigate to game after successful registration
-    setTimeout(() => {
-      navigate('/game');
-    }, 1500);
+    // Navigation now handled directly in AuthModals for reliability
   };
 
   const handleOpenLogin = () => {

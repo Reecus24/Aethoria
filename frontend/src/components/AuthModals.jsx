@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
 import { Label } from './ui/label';
@@ -96,6 +97,7 @@ const PathCard = ({ path, selected, onSelect }) => (
 // ─── LOGIN MODAL ─────────────────────────────────
 export const LoginModal = ({ open, onClose, onSwitchToRegister, onSuccess }) => {
   const { loginWithData } = useAuth();
+  const navigate = useNavigate();
   const [form, setForm] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -108,8 +110,11 @@ export const LoginModal = ({ open, onClose, onSwitchToRegister, onSuccess }) => 
     try {
       const res = await axios.post(`${API}/auth/login`, form);
       loginWithData(res.data);
-      onSuccess(res.data);
       onClose();
+      // Call parent's onSuccess for toast
+      if (onSuccess) onSuccess(res.data);
+      // Navigate immediately and reliably
+      setTimeout(() => navigate('/game'), 100);
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to enter the gate');
     } finally {
@@ -164,6 +169,7 @@ export const LoginModal = ({ open, onClose, onSwitchToRegister, onSuccess }) => 
 // ─── REGISTER MODAL (2-step) ──────────────────────
 export const RegisterModal = ({ open, onClose, onSwitchToLogin, onSuccess }) => {
   const { loginWithData } = useAuth();
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({ username: '', email: '', password: '' });
   const [pathChoice, setPathChoice] = useState('knight');
@@ -184,10 +190,13 @@ export const RegisterModal = ({ open, onClose, onSwitchToLogin, onSuccess }) => 
     try {
       const res = await axios.post(`${API}/auth/register`, { ...form, path_choice: pathChoice });
       loginWithData(res.data);
-      onSuccess(res.data);
       onClose();
       setStep(1);
       setForm({ username: '', email: '', password: '' });
+      // Call parent's onSuccess for toast
+      if (onSuccess) onSuccess(res.data);
+      // Navigate immediately and reliably
+      setTimeout(() => navigate('/game'), 100);
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to register in the Realm');
     } finally {

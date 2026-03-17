@@ -44,15 +44,15 @@ security = HTTPBearer()
 # ============================================================================
 
 MAX_ENERGY = 100
-ENERGY_REGEN_PER_HOUR = 10
+ENERGY_REGEN_PER_HOUR = 25  # Increased from 10 → 25 (4x faster, full regen in 4 hours instead of 10)
 MAX_HP = 100
-HP_REGEN_PER_HOUR = 5
+HP_REGEN_PER_HOUR = 10  # Increased from 5 → 10 (2x faster)
 
 TRAINING_COSTS = {
-    'strength': {'energy': 10, 'duration_minutes': 5, 'xp': 2, 'gain': (1, 3)},
-    'dexterity': {'energy': 10, 'duration_minutes': 5, 'xp': 2, 'gain': (1, 3)},
-    'speed': {'energy': 10, 'duration_minutes': 5, 'xp': 2, 'gain': (1, 3)},
-    'defense': {'energy': 10, 'duration_minutes': 5, 'xp': 2, 'gain': (1, 3)},
+    'strength': {'energy': 6, 'duration_minutes': 3, 'xp': 3, 'gain': (1, 3)},  # Reduced energy 10→6, time 5→3, xp 2→3
+    'dexterity': {'energy': 6, 'duration_minutes': 3, 'xp': 3, 'gain': (1, 3)},
+    'speed': {'energy': 6, 'duration_minutes': 3, 'xp': 3, 'gain': (1, 3)},
+    'defense': {'energy': 6, 'duration_minutes': 3, 'xp': 3, 'gain': (1, 3)},
 }
 
 LEVEL_XP_REQUIREMENTS = [
@@ -134,25 +134,25 @@ MASTER_ITEMS = [
 # ============================================================================
 
 MASTER_CRIMES = [
-    # Level 1-3
-    {'id': 'steal_bread', 'name': 'Brot stehlen', 'description': 'Stehle Brot vom Marktstand', 'energy_cost': 5, 'min_level': 1, 'base_success': 80, 'rewards': {'gold': (5, 15), 'xp': 1}, 'failure': {'jail_minutes': 15}, 'category': 'petty'},
-    {'id': 'pickpocket', 'name': 'Taschendiebstahl', 'description': 'Stehle die Börse eines Bürgers', 'energy_cost': 8, 'min_level': 2, 'base_success': 65, 'rewards': {'gold': (20, 50), 'xp': 3}, 'failure': {'jail_minutes': 30}, 'category': 'theft'},
-    {'id': 'rob_drunk', 'name': 'Betrunkenen ausrauben', 'description': 'Raube einen Betrunkenen vor der Taverne aus', 'energy_cost': 7, 'min_level': 2, 'base_success': 70, 'rewards': {'gold': (15, 40), 'xp': 2}, 'failure': {'jail_minutes': 20}, 'category': 'theft'},
+    # Level 1-3 (Early crimes - reduced energy costs for better progression)
+    {'id': 'steal_bread', 'name': 'Brot stehlen', 'description': 'Stehle Brot vom Marktstand', 'energy_cost': 3, 'min_level': 1, 'base_success': 85, 'rewards': {'gold': (6, 18), 'xp': 2}, 'failure': {'jail_minutes': 10}, 'category': 'petty'},
+    {'id': 'pickpocket', 'name': 'Taschendiebstahl', 'description': 'Stehle die Börse eines Bürgers', 'energy_cost': 5, 'min_level': 2, 'base_success': 70, 'rewards': {'gold': (24, 60), 'xp': 4}, 'failure': {'jail_minutes': 20}, 'category': 'theft'},
+    {'id': 'rob_drunk', 'name': 'Betrunkenen ausrauben', 'description': 'Raube einen Betrunkenen vor der Taverne aus', 'energy_cost': 4, 'min_level': 2, 'base_success': 75, 'rewards': {'gold': (18, 48), 'xp': 3}, 'failure': {'jail_minutes': 15}, 'category': 'theft'},
     
-    # Level 4-7
-    {'id': 'burglary', 'name': 'Einbruch', 'description': 'Breche in ein Haus ein', 'energy_cost': 12, 'min_level': 4, 'base_success': 50, 'rewards': {'gold': (50, 150), 'xp': 8}, 'failure': {'jail_minutes': 60, 'gold_fine': 30}, 'category': 'burglary'},
-    {'id': 'steal_horse', 'name': 'Pferd stehlen', 'description': 'Stehle ein Pferd vom Stall', 'energy_cost': 15, 'min_level': 5, 'base_success': 45, 'rewards': {'gold': (100, 200), 'xp': 12}, 'failure': {'jail_minutes': 90, 'gold_fine': 50}, 'category': 'theft'},
-    {'id': 'rob_merchant', 'name': 'Händler überfallen', 'description': 'Überfalle einen reisenden Händler', 'energy_cost': 15, 'min_level': 6, 'base_success': 45, 'rewards': {'gold': (100, 300), 'xp': 15}, 'failure': {'jail_minutes': 120, 'gold_fine': 80}, 'category': 'robbery'},
-    {'id': 'blackmail', 'name': 'Erpressung', 'description': 'Erpresse einen wohlhabenden Bürger', 'energy_cost': 18, 'min_level': 7, 'base_success': 40, 'rewards': {'gold': (200, 400), 'xp': 18}, 'failure': {'jail_minutes': 150, 'gold_fine': 150}, 'category': 'extortion'},
+    # Level 4-7 (Mid-game - balanced energy/reward)
+    {'id': 'burglary', 'name': 'Einbruch', 'description': 'Breche in ein Haus ein', 'energy_cost': 8, 'min_level': 4, 'base_success': 55, 'rewards': {'gold': (60, 180), 'xp': 10}, 'failure': {'jail_minutes': 40, 'gold_fine': 30}, 'category': 'burglary'},
+    {'id': 'steal_horse', 'name': 'Pferd stehlen', 'description': 'Stehle ein Pferd vom Stall', 'energy_cost': 10, 'min_level': 5, 'base_success': 50, 'rewards': {'gold': (120, 240), 'xp': 15}, 'failure': {'jail_minutes': 60, 'gold_fine': 50}, 'category': 'theft'},
+    {'id': 'rob_merchant', 'name': 'Händler überfallen', 'description': 'Überfalle einen reisenden Händler', 'energy_cost': 10, 'min_level': 6, 'base_success': 50, 'rewards': {'gold': (120, 360), 'xp': 18}, 'failure': {'jail_minutes': 80, 'gold_fine': 80}, 'category': 'robbery'},
+    {'id': 'blackmail', 'name': 'Erpressung', 'description': 'Erpresse einen wohlhabenden Bürger', 'energy_cost': 12, 'min_level': 7, 'base_success': 45, 'rewards': {'gold': (240, 480), 'xp': 22}, 'failure': {'jail_minutes': 100, 'gold_fine': 150}, 'category': 'extortion'},
     
-    # Level 8-12
-    {'id': 'heist_shop', 'name': 'Laden ausrauben', 'description': 'Raube einen Waffenladen aus', 'energy_cost': 20, 'min_level': 8, 'base_success': 35, 'rewards': {'gold': (300, 600), 'xp': 25, 'item_chance': ('sword_steel', 10)}, 'failure': {'jail_minutes': 180, 'gold_fine': 200, 'injury': 15}, 'category': 'heist'},
-    {'id': 'kidnapping', 'name': 'Entführung', 'description': 'Entführe ein Familienmitglied eines Adeligen', 'energy_cost': 25, 'min_level': 10, 'base_success': 30, 'rewards': {'gold': (500, 1000), 'xp': 35}, 'failure': {'jail_minutes': 240, 'gold_fine': 400, 'injury': 25}, 'category': 'major'},
-    {'id': 'rob_treasury', 'name': 'Schatzkammer ausrauben', 'description': 'Wage einen Überfall auf die königliche Schatzkammer', 'energy_cost': 25, 'min_level': 10, 'base_success': 30, 'rewards': {'gold': (500, 1500), 'xp': 40}, 'failure': {'jail_minutes': 360, 'gold_fine': 300, 'injury': 20}, 'category': 'heist'},
+    # Level 8-12 (High risk/reward)
+    {'id': 'heist_shop', 'name': 'Laden ausrauben', 'description': 'Raube einen Waffenladen aus', 'energy_cost': 15, 'min_level': 8, 'base_success': 40, 'rewards': {'gold': (360, 720), 'xp': 30, 'item_chance': ('sword_steel', 15)}, 'failure': {'jail_minutes': 120, 'gold_fine': 200, 'injury': 15}, 'category': 'heist'},
+    {'id': 'kidnapping', 'name': 'Entführung', 'description': 'Entführe ein Familienmitglied eines Adeligen', 'energy_cost': 18, 'min_level': 10, 'base_success': 35, 'rewards': {'gold': (600, 1200), 'xp': 42}, 'failure': {'jail_minutes': 180, 'gold_fine': 400, 'injury': 25}, 'category': 'major'},
+    {'id': 'rob_treasury', 'name': 'Schatzkammer ausrauben', 'description': 'Wage einen Überfall auf die königliche Schatzkammer', 'energy_cost': 18, 'min_level': 10, 'base_success': 35, 'rewards': {'gold': (600, 1800), 'xp': 48}, 'failure': {'jail_minutes': 240, 'gold_fine': 300, 'injury': 20}, 'category': 'heist'},
     
-    # Level 13+
-    {'id': 'assassination', 'name': 'Attentat', 'description': 'Führe einen Auftragsmord aus', 'energy_cost': 30, 'min_level': 13, 'base_success': 25, 'rewards': {'gold': (1000, 2500), 'xp': 60}, 'failure': {'jail_minutes': 600, 'gold_fine': 800, 'injury': 40}, 'category': 'assassination'},
-    {'id': 'dragon_egg_theft', 'name': 'Drachenei stehlen', 'description': 'Stehle ein Drachenei aus einer Höhle', 'energy_cost': 40, 'min_level': 18, 'base_success': 15, 'rewards': {'gold': (3000, 8000), 'xp': 150, 'item_chance': ('relic_dragon_tooth', 30)}, 'failure': {'jail_minutes': 720, 'gold_fine': 2000, 'injury': 60}, 'category': 'legendary'},
+    # Level 13+ (Legendary - high energy, high reward)
+    {'id': 'assassination', 'name': 'Attentat', 'description': 'Führe einen Auftragsmord aus', 'energy_cost': 22, 'min_level': 13, 'base_success': 30, 'rewards': {'gold': (1200, 3000), 'xp': 72}, 'failure': {'jail_minutes': 360, 'gold_fine': 800, 'injury': 40}, 'category': 'assassination'},
+    {'id': 'dragon_egg_theft', 'name': 'Drachenei stehlen', 'description': 'Stehle ein Drachenei aus einer Höhle', 'energy_cost': 30, 'min_level': 18, 'base_success': 20, 'rewards': {'gold': (3600, 9600), 'xp': 180}, 'failure': {'jail_minutes': 480, 'gold_fine': 2000, 'injury': 60}, 'category': 'legendary'},
 ]
 
 # ============================================================================
@@ -160,13 +160,14 @@ MASTER_CRIMES = [
 # ============================================================================
 
 MASTER_QUESTS = [
-    {'id': 'quest_rats', 'name': 'Rattenplage', 'description': 'Töte 10 Ratten in den Stadtkanälen', 'min_level': 1, 'energy_cost': 15, 'duration_minutes': 20, 'rewards': {'gold': 50, 'xp': 10}, 'repeatable': True},
-    {'id': 'quest_escort', 'name': 'Händler-Eskorte', 'description': 'Eskortiere einen Händler sicher durch den Wald', 'min_level': 3, 'energy_cost': 20, 'duration_minutes': 30, 'rewards': {'gold': 100, 'xp': 25}, 'repeatable': True},
-    {'id': 'quest_wolves', 'name': 'Wolfsrudel', 'description': 'Eliminiere ein Wolfsrudel das Reisende bedroht', 'min_level': 5, 'energy_cost': 25, 'duration_minutes': 40, 'rewards': {'gold': 200, 'xp': 40}, 'repeatable': True},
-    {'id': 'quest_bandit_camp', 'name': 'Banditenlager', 'description': 'Zerstöre ein Banditenlager außerhalb der Stadt', 'min_level': 5, 'energy_cost': 30, 'duration_minutes': 60, 'rewards': {'gold': 250, 'xp': 50, 'item': 'sword_steel'}, 'repeatable': False},
-    {'id': 'quest_rescue', 'name': 'Rettungsmission', 'description': 'Rette einen verschleppten Bürger aus Feindeshand', 'min_level': 8, 'energy_cost': 35, 'duration_minutes': 90, 'rewards': {'gold': 500, 'xp': 80}, 'repeatable': True},
-    {'id': 'quest_artifact', 'name': 'Verlorenes Artefakt', 'description': 'Finde ein verlorenes Artefakt in den Ruinen', 'min_level': 10, 'energy_cost': 40, 'duration_minutes': 120, 'rewards': {'gold': 800, 'xp': 120, 'item': 'relic_ancient_coin'}, 'repeatable': False},
-    {'id': 'quest_dragon', 'name': 'Drachen-Bedrohung', 'description': 'Vertreibe einen jungen Drachen aus den Bergen', 'min_level': 15, 'energy_cost': 50, 'duration_minutes': 120, 'rewards': {'gold': 2000, 'xp': 200, 'item': 'relic_dragon_tooth'}, 'repeatable': False},
+    # Early game quests - reduced energy/time for faster progression
+    {'id': 'quest_rats', 'name': 'Rattenplage', 'description': 'Töte 10 Ratten in den Stadtkanälen', 'min_level': 1, 'energy_cost': 10, 'duration_minutes': 15, 'rewards': {'gold': 60, 'xp': 12}, 'repeatable': True},
+    {'id': 'quest_escort', 'name': 'Händler-Eskorte', 'description': 'Eskortiere einen Händler sicher durch den Wald', 'min_level': 3, 'energy_cost': 14, 'duration_minutes': 20, 'rewards': {'gold': 120, 'xp': 30}, 'repeatable': True},
+    {'id': 'quest_wolves', 'name': 'Wolfsrudel', 'description': 'Eliminiere ein Wolfsrudel das Reisende bedroht', 'min_level': 5, 'energy_cost': 18, 'duration_minutes': 30, 'rewards': {'gold': 240, 'xp': 48}, 'repeatable': True},
+    {'id': 'quest_bandit_camp', 'name': 'Banditenlager', 'description': 'Zerstöre ein Banditenlager außerhalb der Stadt', 'min_level': 5, 'energy_cost': 22, 'duration_minutes': 45, 'rewards': {'gold': 300, 'xp': 60, 'item': 'sword_steel'}, 'repeatable': False},
+    {'id': 'quest_rescue', 'name': 'Rettungsmission', 'description': 'Rette einen verschleppten Bürger aus Feindeshand', 'min_level': 8, 'energy_cost': 25, 'duration_minutes': 60, 'rewards': {'gold': 600, 'xp': 96}, 'repeatable': True},
+    {'id': 'quest_artifact', 'name': 'Verlorenes Artefakt', 'description': 'Finde ein verlorenes Artefakt in den Ruinen', 'min_level': 10, 'energy_cost': 30, 'duration_minutes': 90, 'rewards': {'gold': 960, 'xp': 144}, 'repeatable': False},
+    {'id': 'quest_dragon', 'name': 'Drachen-Bedrohung', 'description': 'Vertreibe einen jungen Drachen aus den Bergen', 'min_level': 15, 'energy_cost': 35, 'duration_minutes': 90, 'rewards': {'gold': 2400, 'xp': 240, 'item': 'relic_dragon_tooth'}, 'repeatable': False},
 ]
 
 # ============================================================================
@@ -174,10 +175,11 @@ MASTER_QUESTS = [
 # ============================================================================
 
 MASTER_CREATURES = [
-    {'id': 'wolf', 'name': 'Wolf', 'hp': 30, 'power': 15, 'min_level': 5, 'energy_cost': 20, 'rewards': {'gold': (30, 80), 'xp': 15}},
-    {'id': 'bear', 'name': 'Bär', 'hp': 60, 'power': 35, 'min_level': 10, 'energy_cost': 30, 'rewards': {'gold': (100, 200), 'xp': 40}},
-    {'id': 'troll', 'name': 'Troll', 'hp': 100, 'power': 50, 'min_level': 15, 'energy_cost': 40, 'rewards': {'gold': (300, 600), 'xp': 100}},
-    {'id': 'dragon_young', 'name': 'Junger Drache', 'hp': 200, 'power': 80, 'min_level': 20, 'energy_cost': 60, 'rewards': {'gold': (1000, 3000), 'xp': 300, 'item_chance': ('relic_dragon_tooth', 20)}},
+    # Balanced for new energy economy - reduced costs, increased rewards
+    {'id': 'wolf', 'name': 'Wolf', 'hp': 30, 'power': 15, 'min_level': 5, 'energy_cost': 12, 'rewards': {'gold': (40, 100), 'xp': 18}},
+    {'id': 'bear', 'name': 'Bär', 'hp': 60, 'power': 35, 'min_level': 10, 'energy_cost': 20, 'rewards': {'gold': (120, 240), 'xp': 48}},
+    {'id': 'troll', 'name': 'Troll', 'hp': 100, 'power': 50, 'min_level': 15, 'energy_cost': 28, 'rewards': {'gold': (360, 720), 'xp': 120}},
+    {'id': 'dragon_young', 'name': 'Junger Drache', 'hp': 200, 'power': 80, 'min_level': 20, 'energy_cost': 40, 'rewards': {'gold': (1200, 3600), 'xp': 360, 'item_chance': ('relic_dragon_tooth', 25)}},
 ]
 
 # ============================================================================
@@ -1270,10 +1272,10 @@ async def attack_player(req: CombatRequest, current_user: dict = Depends(get_cur
     if await check_hospital_status(current_user):
         raise HTTPException(status_code=400, detail="Du kannst nicht angreifen während du verletzt bist")
     
-    # Check energy (25 like torn.com)
+    # Check energy (reduced from 25 → 15 for better combat accessibility)
     current_energy = await regenerate_energy(current_user)
-    if current_energy < 25:
-        raise HTTPException(status_code=400, detail="Nicht genug Energie (benötigt: 25)")
+    if current_energy < 15:
+        raise HTTPException(status_code=400, detail="Nicht genug Energie (benötigt: 15)")
     
     # Find target
     target = await db.users.find_one({'username': req.target_username})
@@ -1291,7 +1293,7 @@ async def attack_player(req: CombatRequest, current_user: dict = Depends(get_cur
     # Deduct energy
     await db.users.update_one(
         {'id': user_id},
-        {'$inc': {'energy': -25}, '$set': {'last_energy_regen': datetime.now(timezone.utc)}}
+        {'$inc': {'energy': -15}, '$set': {'last_energy_regen': datetime.now(timezone.utc)}}
     )
     
     # Combat calculation with equipment bonuses
