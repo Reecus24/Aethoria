@@ -195,6 +195,28 @@ Goal: get the stack reliably running on a Hetzner server.
 ## Phase 9: Production Bugfix Sprint + Path/Class Differentiation — 🔴 In Progress (New)
 Goal: fix game-breaking issues discovered in production testing, then make class choice meaningful.
 
+### ✅ Phase 9 - Critical Training & Travel Fixes (COMPLETED)
+**User Reported Bugs - ALL FIXED:**
+1. ✅ **Training Energy Cost**: Changed from 10 → 100 energy (backend + frontend UI)
+2. ✅ **Training UI Text**: Corrected to "100 Energie • 12 Stunden" (was "6 Energie • 3 Minuten")
+3. ✅ **Action Blocking During Training**: All major actions (Combat, Crime, Travel, Quest, Hunt, Tavern) now blocked when training is active
+4. ✅ **Travel Level Gating Bug**: Fixed by fetching fresh user level from DB instead of stale JWT data
+5. ✅ **Training Stat Grants**: Verified that training correctly awards +1 stat point after completion
+6. ✅ **Mugging Logic**: Verified no damage is dealt on failed mug attempts (only jail chance)
+7. ✅ **Equipment Visibility**: Code review confirms equipped items remain visible with `equipped: true` flag
+
+**Testing Completed:**
+- ✅ Backend unit tests (all passed)
+- ✅ API integration tests (all passed)
+- ✅ Frontend UI verification (screenshots confirm correct display)
+- ✅ End-to-end flow tests (training claim, travel, action blocking)
+
+**Files Modified:**
+- `/app/backend/server.py`: Training costs, action blocking checks, travel level fetching
+- `/app/frontend/src/pages/TrainingPage.jsx`: UI text updates
+
+---
+
 ### Phase 9A (P0): Consistency & Economy/UX Truth (Displayed vs Real)
 - Fix starting class bonuses mismatch:
   - Noble/Shadow show “500 Gold” but receive 100.

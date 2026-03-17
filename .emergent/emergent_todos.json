@@ -1,18 +1,46 @@
 [
   {
-    "content": "Training: Energie-Kosten 6 → 100",
+    "content": "Backend: Training-Energie-Kosten 10 → 100 ändern",
     "status": "completed"
   },
   {
-    "content": "TrainingPage: Text korrigieren (zeigt noch 3 Min statt 12h)",
+    "content": "Frontend: Training-UI-Texte korrigieren (100 Energie, 12 Stunden)",
     "status": "completed"
   },
   {
-    "content": "Alle Actions blocken während Training (Combat, Crime, Travel, Quest, etc.)",
-    "status": "in_progress"
+    "content": "Backend: Training-Status-Check in allen Action-Endpoints hinzufügen (Combat, Crime, Travel, Quest, Hunt)",
+    "status": "completed"
   },
   {
-    "content": "Testing aller Änderungen",
-    "status": "pending"
+    "content": "Backend: Travel-Bug fixen (fresh user level aus DB holen)",
+    "status": "completed"
+  },
+  {
+    "content": "Test-Skript: Training end-to-end testen (verkürzte Dauer)",
+    "status": "completed"
+  },
+  {
+    "content": "Test-Skript: Travel mit Level-3 User testen",
+    "status": "completed"
+  },
+  {
+    "content": "Test-Skript: Action-Blocking während Training testen",
+    "status": "completed"
+  },
+  {
+    "content": "Frontend Screenshot: Training-UI verifizieren",
+    "status": "completed"
+  },
+  {
+    "content": "Integration-Test: Training starten und Action-Blocking im Browser testen",
+    "status": "completed"
+  },
+  {
+    "content": "P1-Bug: Equipment Visibility prüfen",
+    "status": "completed"
+  },
+  {
+    "content": "P1-Bug: Mugging Logic prüfen",
+    "status": "completed"
   }
 ]

@@ -19,8 +19,8 @@ export default function TrainingPage() {
   const [training, setTraining] = useState(false);
 
   const startTraining = async (stat) => {
-    if (gameState.resources.energy < 6) {
-      toast.error('Nicht genug Energie (benötigt: 6)', { icon: '⚡' });
+    if (gameState.resources.energy < 100) {
+      toast.error('Nicht genug Energie (benötigt: 100)', { icon: '⚡' });
       return;
     }
 
@@ -62,7 +62,7 @@ export default function TrainingPage() {
           Training Grounds
         </h1>
         <p style={{ color: 'var(--aeth-parchment-dim)', fontFamily: "'IBM Plex Sans', sans-serif" }}>
-          Trainiere deine Stats, um mächtiger zu werden • Kosten: 6 Energie • Dauer: 3 Minuten
+          Trainiere deine Stats, um mächtiger zu werden • Kosten: 100 Energie • Dauer: 12 Stunden
         </p>
       </div>
 
@@ -133,11 +133,11 @@ export default function TrainingPage() {
 
             <button
               onClick={() => startTraining(stat.id)}
-              disabled={training || activeTraining || gameState.resources.energy < 6 || !gameState.status.can_act}
+              disabled={training || activeTraining || gameState.resources.energy < 100 || !gameState.status.can_act}
               className="btn-gold w-full py-2.5 rounded-lg text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed"
               data-testid={`train-${stat.id}-btn`}
             >
-              {activeTraining ? 'Training läuft...' : 'Trainieren (6 Energie, 3 Min)'}
+              {activeTraining ? 'Training läuft...' : 'Trainieren (100 Energie, 12 Std)'}
             </button>
           </motion.div>
         ))}

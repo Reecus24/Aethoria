@@ -52,10 +52,10 @@ MAX_HP = 100
 HP_REGEN_PER_HOUR = 10  # Increased from 5 → 10 (2x faster)
 
 TRAINING_COSTS = {
-    'strength': {'energy': 10, 'duration_minutes': 720, 'xp': 5, 'gain': 1},  # 12 hours, always +1
-    'dexterity': {'energy': 10, 'duration_minutes': 720, 'xp': 5, 'gain': 1},
-    'speed': {'energy': 10, 'duration_minutes': 720, 'xp': 5, 'gain': 1},
-    'defense': {'energy': 10, 'duration_minutes': 720, 'xp': 5, 'gain': 1},
+    'strength': {'energy': 100, 'duration_minutes': 720, 'xp': 5, 'gain': 1},  # 12 hours, always +1
+    'dexterity': {'energy': 100, 'duration_minutes': 720, 'xp': 5, 'gain': 1},
+    'speed': {'energy': 100, 'duration_minutes': 720, 'xp': 5, 'gain': 1},
+    'defense': {'energy': 100, 'duration_minutes': 720, 'xp': 5, 'gain': 1},
 }
 
 LEVEL_XP_REQUIREMENTS = [
@@ -1178,6 +1178,11 @@ async def get_crimes(current_user: dict = Depends(get_current_user)):
 async def commit_crime(req: CrimeRequest, request: Request, current_user: dict = Depends(get_current_user)):
     user_id = current_user['id']
     
+    # Check training
+    training_session = await db.training_sessions.find_one({'user_id': user_id, 'completed': False})
+    if training_session:
+        raise HTTPException(status_code=400, detail="Du kannst keine Verbrechen begehen während du trainierst")
+    
     # Check dungeon
     if await check_dungeon_status(current_user):
         raise HTTPException(status_code=400, detail="Du kannst keine Verbrechen begehen während du im Kerker sitzt")
@@ -1393,6 +1398,10 @@ async def attack_player(req: CombatRequest, request: Request, current_user: dict
     user_id = current_user['id']
     
     # Check restrictions
+    training_session = await db.training_sessions.find_one({'user_id': user_id, 'completed': False})
+    if training_session:
+        raise HTTPException(status_code=400, detail="Du kannst nicht angreifen während du trainierst")
+    
     if await check_dungeon_status(current_user):
         raise HTTPException(status_code=400, detail="Du kannst nicht angreifen während du im Kerker bist")
     
@@ -1819,6 +1828,11 @@ async def get_available_quests(current_user: dict = Depends(get_current_user)):
 @app.post("/api/game/quests/accept")
 async def accept_quest(req: QuestRequest, current_user: dict = Depends(get_current_user)):
     user_id = current_user['id']
+    
+    # Check training
+    training_session = await db.training_sessions.find_one({'user_id': user_id, 'completed': False})
+    if training_session:
+        raise HTTPException(status_code=400, detail="Du kannst keine Quest annehmen während du trainierst")
     
     # Check if already on quest
     active = await db.user_quests.find_one({'user_id': user_id, 'status': 'active'})
@@ -2548,6 +2562,11 @@ async def play_dice(req: DiceGameRequest, current_user: dict = Depends(get_curre
     """Play dice game"""
     user_id = current_user['id']
     
+    # Check training
+    training_session = await db.training_sessions.find_one({'user_id': user_id, 'completed': False})
+    if training_session:
+        raise HTTPException(status_code=400, detail="Du kannst nicht spielen während du trainierst")
+    
     if current_user['gold'] < req.wager:
         raise HTTPException(status_code=400, detail="Nicht genug Gold für diesen Einsatz")
     
@@ -2593,6 +2612,11 @@ async def travel_to_kingdom(req: TravelRequest, current_user: dict = Depends(get
     """Travel to another kingdom"""
     user_id = current_user['id']
     
+    # Check training
+    training_session = await db.training_sessions.find_one({'user_id': user_id, 'completed': False})
+    if training_session:
+        raise HTTPException(status_code=400, detail="Du kannst nicht reisen während du trainierst")
+    
     # Check if already traveling
     existing = await db.travel_sessions.find_one({'user_id': user_id, 'completed': False})
     if existing:
@@ -2606,8 +2630,13 @@ async def travel_to_kingdom(req: TravelRequest, current_user: dict = Depends(get
     if current_user['location'] == req.kingdom_id:
         raise HTTPException(status_code=400, detail="Du bist bereits hier")
     
+    # CRITICAL: Fetch fresh user level from DB (JWT may be stale after level-ups!)
+    fresh_user = await db.users.find_one({'id': user_id})
+    if not fresh_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
     # Check level requirement
-    if current_user['level'] < kingdom.get('min_level', 1):
+    if fresh_user['level'] < kingdom.get('min_level', 1):
         raise HTTPException(status_code=400, detail=f"Level {kingdom['min_level']} erforderlich für {kingdom['name']}")
     
     # Travel cost and duration
@@ -2685,6 +2714,11 @@ async def get_creatures(current_user: dict = Depends(get_current_user)):
 async def hunt_creature(req: HuntRequest, current_user: dict = Depends(get_current_user)):
     """Hunt creature"""
     user_id = current_user['id']
+    
+    # Check training
+    training_session = await db.training_sessions.find_one({'user_id': user_id, 'completed': False})
+    if training_session:
+        raise HTTPException(status_code=400, detail="Du kannst nicht jagen während du trainierst")
     
     creature = next((c for c in MASTER_CREATURES if c['id'] == req.creature_id), None)
     if not creature:
