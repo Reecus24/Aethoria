@@ -1,14 +1,6 @@
 [
   {
-    "content": "Update frontend to use correct gameState structure for equipment",
+    "content": "Create deployment guide for user to update production server",
     "status": "completed"
-  },
-  {
-    "content": "Test all fixes locally before deploying to production",
-    "status": "in_progress"
-  },
-  {
-    "content": "Comprehensive 2-player testing (mutual attacks, gold transfer, XP calc)",
-    "status": "pending"
   }
 ]
