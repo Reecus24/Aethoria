@@ -52,10 +52,10 @@ MAX_HP = 100
 HP_REGEN_PER_HOUR = 10  # Increased from 5 → 10 (2x faster)
 
 TRAINING_COSTS = {
-    'strength': {'energy': 6, 'duration_minutes': 3, 'xp': 3, 'gain': (1, 3)},  # Reduced energy 10→6, time 5→3, xp 2→3
-    'dexterity': {'energy': 6, 'duration_minutes': 3, 'xp': 3, 'gain': (1, 3)},
-    'speed': {'energy': 6, 'duration_minutes': 3, 'xp': 3, 'gain': (1, 3)},
-    'defense': {'energy': 6, 'duration_minutes': 3, 'xp': 3, 'gain': (1, 3)},
+    'strength': {'energy': 10, 'duration_minutes': 720, 'xp': 5, 'gain': 1},  # 12 hours, always +1
+    'dexterity': {'energy': 10, 'duration_minutes': 720, 'xp': 5, 'gain': 1},
+    'speed': {'energy': 10, 'duration_minutes': 720, 'xp': 5, 'gain': 1},
+    'defense': {'energy': 10, 'duration_minutes': 720, 'xp': 5, 'gain': 1},
 }
 
 LEVEL_XP_REQUIREMENTS = [
@@ -898,9 +898,16 @@ async def get_game_state(current_user: dict = Depends(get_current_user)):
     """Get complete game state for HUD"""
     user_id = current_user['id']
     
-    # Regenerate resources
-    energy = await regenerate_energy(current_user)
-    hp = await regenerate_hp(current_user)
+    # CRITICAL: Fetch fresh user data from DB (token may be stale!)
+    fresh_user = await db.users.find_one({'id': user_id})
+    if not fresh_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    logger.info(f"DEBUG: Fresh user level from DB: {fresh_user['level']} (user_id: {user_id})")
+    
+    # Regenerate resources (use fresh user data)
+    energy = await regenerate_energy(fresh_user)
+    hp = await regenerate_hp(fresh_user)
     
     # Check timers
     timers = {}
@@ -966,7 +973,7 @@ async def get_game_state(current_user: dict = Depends(get_current_user)):
     total_speed_bonus = 0
     total_dexterity_bonus = 0
     
-    for slot, item_id in current_user.get('equipment', {}).items():
+    for slot, item_id in fresh_user.get('equipment', {}).items():
         if item_id:
             item_data = next((i for i in MASTER_ITEMS if i['id'] == item_id), None)
             if item_data:
@@ -983,35 +990,35 @@ async def get_game_state(current_user: dict = Depends(get_current_user)):
     return {
         'user': {
             'id': user_id,
-            'username': current_user['username'],
-            'level': current_user['level'],
-            'xp': current_user['xp'],
-            'xp_next': calculate_xp_for_next_level(current_user['xp'], current_user['level']),
-            'title': current_user['title'],
-            'path': current_user['path_choice'],
-            'path_label': current_user['path_label'],
+            'username': fresh_user['username'],
+            'level': fresh_user['level'],
+            'xp': fresh_user['xp'],
+            'xp_next': calculate_xp_for_next_level(fresh_user['xp'], fresh_user['level']),
+            'title': fresh_user['title'],
+            'path': fresh_user['path_choice'],
+            'path_label': fresh_user['path_label'],
         },
         'resources': {
-            'gold': current_user['gold'],
+            'gold': fresh_user['gold'],
             'energy': energy,
             'energy_max': MAX_ENERGY,
             'hp': hp,
             'hp_max': MAX_HP,
-            'xp': current_user['xp'],
-            'xp_required': calculate_xp_for_next_level(current_user['xp'], current_user['level']),
+            'xp': fresh_user['xp'],
+            'xp_required': calculate_xp_for_next_level(fresh_user['xp'], fresh_user['level']),
         },
         'stats': {
-            'strength': current_user['stats']['strength'],
-            'dexterity': current_user['stats']['dexterity'],
-            'speed': current_user['stats']['speed'],
-            'defense': current_user['stats']['defense'],
-            'total_strength': current_user['stats']['strength'] + total_strength_bonus,
-            'total_dexterity': current_user['stats']['dexterity'] + total_dexterity_bonus,
-            'total_speed': current_user['stats']['speed'] + total_speed_bonus,
-            'total_defense': current_user['stats']['defense'] + total_defense_bonus,
+            'strength': fresh_user['stats']['strength'],
+            'dexterity': fresh_user['stats']['dexterity'],
+            'speed': fresh_user['stats']['speed'],
+            'defense': fresh_user['stats']['defense'],
+            'total_strength': fresh_user['stats']['strength'] + total_strength_bonus,
+            'total_dexterity': fresh_user['stats']['dexterity'] + total_dexterity_bonus,
+            'total_speed': fresh_user['stats']['speed'] + total_speed_bonus,
+            'total_defense': fresh_user['stats']['defense'] + total_defense_bonus,
         },
         'location': {
-            'kingdom_id': current_user['location'],
+            'kingdom_id': fresh_user['location'],
             'kingdom_name': kingdom['name']
         },
         'equipment': equipped_items,
@@ -1042,10 +1049,10 @@ async def start_training(req: TrainRequest, request: Request, current_user: dict
     if await check_hospital_status(current_user):
         raise HTTPException(status_code=400, detail="Du kannst nicht trainieren während du verletzt bist")
     
-    # Check if already training THIS specific stat
-    existing = await db.training_sessions.find_one({'user_id': user_id, 'stat': req.stat, 'completed': False})
+    # Check if already training ANY stat (only one at a time!)
+    existing = await db.training_sessions.find_one({'user_id': user_id, 'completed': False})
     if existing:
-        raise HTTPException(status_code=400, detail=f"Du trainierst {req.stat} bereits")
+        raise HTTPException(status_code=400, detail=f"Du trainierst bereits {existing['stat'].upper()}")
     
     # Check energy
     cost = TRAINING_COSTS[req.stat]
@@ -1099,9 +1106,9 @@ async def claim_training(current_user: dict = Depends(get_current_user)):
         remaining = int((complete_time - datetime.now(timezone.utc)).total_seconds() / 60)
         raise HTTPException(status_code=400, detail=f"Training noch nicht abgeschlossen ({remaining} Minuten verbleibend)")
     
-    # Calculate gains
+    # Calculate gains - ALWAYS +1 stat
     stat = session['stat']
-    stat_gain = random.randint(*TRAINING_COSTS[stat]['gain'])
+    stat_gain = TRAINING_COSTS[stat]['gain']  # Now just an integer, not a range
     xp_gain = TRAINING_COSTS[stat]['xp']
     
     await db.users.update_one(

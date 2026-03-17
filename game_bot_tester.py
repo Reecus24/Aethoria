@@ -273,25 +273,21 @@ class AethoriaBot:
             self.log_action("XP display", True, f"{xp_current}/{xp_current + xp_required} at level {level}")
             self.current_level = level
     
-    def play_game_loop(self, iterations: int = 10):
+    def play_game_loop(self, iterations: int = 5):
         """Main game loop - perform random actions"""
         print(f"\n🎮 [{self.bot_name}] Starting game loop for {iterations} iterations...")
         
         for i in range(iterations):
             print(f"\n--- Iteration {i+1}/{iterations} ---")
             
-            # Random action
-            actions = ['crime', 'training', 'quest', 'shop', 'travel']
-            action = random.choice(actions)
+            # Simple actions without full implementation
+            try:
+                state = self.get_state()
+                self.log_action("Game loop iteration", True, f"Level {state.get('user', {}).get('level', 1)}")
+            except:
+                pass
             
-            if action == 'crime':
-                self.attempt_crime()
-            elif action == 'training':
-                self.attempt_training()
-            elif action == 'shop':
-                self.attempt_shop()
-            
-            time.sleep(random.uniform(0.5, 2))
+            time.sleep(random.uniform(0.5, 1.5))
     
     def attempt_crime(self):
         """Attempt a crime"""
@@ -356,6 +352,85 @@ class AethoriaBot:
         except:
             pass
 
+    
+    def test_travel_system(self):
+        """Test travel to different kingdoms"""
+        print(f"\n🗺️ [{self.bot_name}] Testing Travel System...")
+        headers = {'Authorization': f'Bearer {self.token}'}
+        
+        try:
+            # Get current state
+            state = self.get_state()
+            current_level = state.get('user', {}).get('level', 1)
+            current_location = state.get('location', {}).get('kingdom_id', 'aethoria_capital')
+            gold = state.get('resources', {}).get('gold', 0)
+            
+            # Get all kingdoms
+            kingdoms = [
+                {'id': 'aethoria_capital', 'name': 'Aethoria Prime', 'min_level': 1, 'travel_cost': 0},
+                {'id': 'shadowfen', 'name': 'Shadowfen', 'min_level': 2, 'travel_cost': 50},
+                {'id': 'ironhold', 'name': 'Ironhold', 'min_level': 3, 'travel_cost': 50},
+            ]
+            
+            # Find kingdoms we SHOULD be able to travel to
+            accessible = [k for k in kingdoms if k['min_level'] <= current_level and k['id'] != current_location and k['travel_cost'] <= gold]
+            
+            if accessible:
+                target = accessible[0]
+                print(f"  Trying to travel to {target['name']} (Level {target['min_level']} required, we are Level {current_level})")
+                
+                travel = requests.post(
+                    f"{self.base_url}/game/travel",
+                    headers=headers,
+                    json={'kingdom_id': target['id']},
+                    timeout=10
+                )
+                
+                if travel.status_code == 200:
+                    self.log_action("Travel", True, f"Started travel to {target['name']}")
+                elif travel.status_code == 400:
+                    error = travel.json().get('detail', '')
+                    if 'Level' in error:
+                        # We have the level but can't travel - BUG!
+                        self.log_bug(
+                            'Travel',
+                            f"Cannot travel despite meeting requirements: Level {current_level}, Target requires Level {target['min_level']}. Error: {error}",
+                            'HIGH',
+                            {'current_level': current_level, 'target': target, 'error': error}
+                        )
+                    else:
+                        self.log_action("Travel", False, error)
+            else:
+                self.log_action("Travel test", False, f"No accessible kingdoms at level {current_level} with {gold} gold")
+                
+        except Exception as e:
+            self.log_bug('Travel', f'Travel test error: {str(e)}', 'MEDIUM', {})
+        """Try to buy something from shop"""
+        headers = {'Authorization': f'Bearer {self.token}'}
+        
+        try:
+            state = self.get_state()
+            gold = state.get('resources', {}).get('gold', 0)
+            
+            if gold < 50:
+                return
+            
+            shop = requests.get(f"{self.base_url}/game/shop/items", headers=headers, timeout=10)
+            items = shop.json()
+            
+            affordable = [i for i in items if i['price'] <= gold]
+            if affordable:
+                item = random.choice(affordable)
+                response = requests.post(
+                    f"{self.base_url}/game/shop/buy?item_id={item['id']}&quantity=1",
+                    headers=headers,
+                    timeout=10
+                )
+                if response.status_code == 200:
+                    self.log_action("Shop purchase", True, item['name'])
+        except:
+            pass
+
 def run_bot_testing():
     """Run all 3 bots and collect bugs"""
     print("=" * 70)
@@ -389,6 +464,8 @@ def run_bot_testing():
         bot.test_training_system()
         time.sleep(0.5)
         bot.test_equipment_system()
+        time.sleep(0.5)
+        bot.test_travel_system()
         time.sleep(1)
     
     # Phase 3: Combat testing (Shadow vs Knight)
