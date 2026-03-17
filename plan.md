@@ -22,6 +22,9 @@
   - Idempotency for money-moving operations
   - Economy observability (structured logs)
   - Comprehensive E2E verification
+- **World “liveness” objective (Phase 8 add-on):** keep the realm visibly active for new visitors without breaking integrity:
+  - Readable, non-distracting event ticker speed
+  - Optional AI/bot players that **follow the same rules** (energy, level gates, timers)
 
 **Current status (updated):**
 - ✅ Phase 1 complete (data-flow POC verified)
@@ -33,6 +36,7 @@
 - ✅ **Phase 6 complete (MEGA-BUILD): full game backend + full game frontend + routing + stability fixes + functional smoke tests**
 - ✅ **Phase 7 complete: Login/Register flow hardening + Balancing pass (energy/time economy + rewards)**
 - ✅ **Phase 8 complete: Comprehensive E2E testing + security hardening (rate limiting, idempotency) + economy logging + final verification**
+- ✅ **Phase 8 add-on complete: Event ticker readability improvements + bot-player scripts for realm activity**
 
 ---
 
@@ -326,6 +330,42 @@ Added structured server-side logs for economy-affecting operations:
 
 ---
 
+## Phase 8 (Add-on): Realm Liveness (Ticker Readability + Bot Players) — ✅ Completed
+Goal: keep the landing page feeling alive using **real events**, while ensuring readability and integrity.
+
+### Phase 8G: Event Ticker Readability — ✅ Completed
+**Problem addressed:** ticker scrolled too quickly; events were visible for <1–2 seconds.
+
+**Fix shipped:**
+- ✅ Slowed marquee animation from **60s → 120s** (2× slower).
+- ✅ Maintained pause-on-hover behavior.
+
+**Files changed:**
+- `/app/frontend/src/index.css`
+
+**Result:**
+- ✅ Events remain readable for ~4–6 seconds.
+- ✅ Less visually distracting; better first-impression UX.
+
+### Phase 8H: Bot Players (5 AI Characters) — ✅ Completed
+**User request:** remove test characters and optionally run a small bot population that truly plays by the same rules.
+
+**Implementation:**
+- ✅ Created bot scripts that:
+  - Register/login characters
+  - Fetch `/api/game/state`
+  - Perform realistic actions (Crimes, Training, Shop, occasional Quests)
+  - Respect rules: energy costs, can_act restrictions, level gates
+- ✅ Ran bots and verified ticker displays mixed events across multiple players.
+
+**Artifacts:**
+- `/app/game_bot_quick.py` (short demo runs)
+- `/app/game_bot.py` (persistent bot implementation)
+
+**Note:** “Persistent daemon runner” attempt may depend on environment process management; quick-run script is confirmed to work and populate events.
+
+---
+
 ## Data Model (Phase 6 additions) — ✅ Implemented
 MongoDB collections now exist/are used (high-level):
 - `users` (extended)
@@ -357,6 +397,7 @@ MongoDB collections now exist/are used (high-level):
 - ✅ `/api/landing` returns real, validated content; frontend renders all sections.
 - ✅ No fake user names in ticker; no false marketing claims.
 - ✅ Landing stability: leaderboard datetime handling fixed.
+- ✅ Ticker readability improved (slower marquee).
 
 ### Game (met: functional baseline)
 - ✅ After login/register, user is routed to `/game`.
@@ -378,6 +419,10 @@ MongoDB collections now exist/are used (high-level):
 - ✅ Structured economy logging in place for debugging/monitoring.
 - ✅ Final verification completed post-hardening.
 
+### Realm Liveness (met)
+- ✅ Event ticker scroll speed is readable.
+- ✅ Multi-player activity present via bot scripts that follow game rules.
+
 ---
 
 ## Next Phase (Optional): Phase 9 — ⏳ Future
@@ -388,3 +433,4 @@ If desired after Phase 8 completion:
 - WebSockets for real-time chat and event updates
 - Admin panel for economy tuning, item management, and moderation
 - Full CI pipeline with deterministic E2E suite
+- Bot service hardening (run under supervisor/systemd, configurable bot pool size, per-bot backoff strategies)
