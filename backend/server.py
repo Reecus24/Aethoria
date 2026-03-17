@@ -278,17 +278,17 @@ PATHS = {
 }
 
 KINGDOMS = [
-    {"id": "aethoria_capital", "name": "Aethoria Prime", "desc": "The capital of the Realm. Trade, power, and intrigue converge.", "image": "https://images.unsplash.com/photo-1533154683836-84ea7a0bc310?w=400&q=50", "type": "Capital", "danger": "Medium"},
-    {"id": "ironhold", "name": "Ironhold", "desc": "A fortress city of steel and fire. Home to the greatest warriors.", "image": "https://images.unsplash.com/photo-1621947081720-86970823b77a?w=400&q=50", "type": "Military", "danger": "High"},
-    {"id": "shadowfen", "name": "Shadowfen", "desc": "A city of fog and secrets, where rogues and thieves hold court.", "image": "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?w=400&q=50", "type": "Underworld", "danger": "Very High"},
-    {"id": "goldenveil", "name": "Goldenveil", "desc": "The Realm's most prosperous trading city. Every merchant dreams of it.", "image": "https://images.unsplash.com/photo-1501183638710-841dd1904471?w=400&q=50", "type": "Commerce", "danger": "Low"},
-    {"id": "stonecrest", "name": "Stonecrest", "desc": "Ancient mountains hiding powerful arcane secrets in their caves.", "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&q=50", "type": "Arcane", "danger": "High"},
-    {"id": "crystalmere", "name": "Crystalmere", "desc": "A lakeside city of extraordinary beauty and political scheming.", "image": "https://images.unsplash.com/photo-1499678329028-101435549a4e?w=400&q=50", "type": "Noble", "danger": "Medium"},
-    {"id": "embervast", "name": "Embervast", "desc": "The volcanic borderlands, rich in dragon-forged materials.", "image": "https://images.unsplash.com/photo-1527482797697-8795b05a13fe?w=400&q=50", "type": "Wilds", "danger": "Extreme"},
-    {"id": "tidehaven", "name": "Tidehaven", "desc": "A port city where smugglers and merchants clash over sea routes.", "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=50", "type": "Maritime", "danger": "High"},
-    {"id": "duskwood", "name": "Duskwood", "desc": "An ancient forest kingdom where shapeshifters and druids dwell.", "image": "https://images.unsplash.com/photo-1448375240586-882707db888b?w=400&q=50", "type": "Forest", "danger": "Medium"},
-    {"id": "frostholm", "name": "Frostholm", "desc": "The frozen north: hard people, rare pelts, and glacier-locked tombs.", "image": "https://images.unsplash.com/photo-1491555103944-7c647fd857e6?w=400&q=50", "type": "Frozen", "danger": "Very High"},
-    {"id": "sunkeep", "name": "Sunkeep", "desc": "A desert kingdom where ruins of the First Empire still stand.", "image": "https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=400&q=50", "type": "Desert", "danger": "High"},
+    {"id": "aethoria_capital", "name": "Aethoria Prime", "desc": "The capital of the Realm. Trade, power, and intrigue converge.", "image": "https://images.unsplash.com/photo-1533154683836-84ea7a0bc310?w=400&q=50", "type": "Capital", "danger": "Medium", "min_level": 1, "travel_cost": 0},
+    {"id": "ironhold", "name": "Ironhold", "desc": "A fortress city of steel and fire. Home to the greatest warriors.", "image": "https://images.unsplash.com/photo-1621947081720-86970823b77a?w=400&q=50", "type": "Military", "danger": "High", "min_level": 3, "travel_cost": 50},
+    {"id": "shadowfen", "name": "Shadowfen", "desc": "A city of fog and secrets, where rogues and thieves hold court. Home of the Shadow Guild.", "image": "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?w=400&q=50", "type": "Underworld", "danger": "Very High", "min_level": 2, "travel_cost": 50},
+    {"id": "goldenveil", "name": "Goldenveil", "desc": "The Realm's most prosperous trading city. Every merchant dreams of it.", "image": "https://images.unsplash.com/photo-1501183638710-841dd1904471?w=400&q=50", "type": "Commerce", "danger": "Low", "min_level": 2, "travel_cost": 50},
+    {"id": "stonecrest", "name": "Stonecrest", "desc": "Ancient mountains hiding powerful arcane secrets in their caves.", "image": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&q=50", "type": "Arcane", "danger": "High", "min_level": 5, "travel_cost": 75},
+    {"id": "crystalmere", "name": "Crystalmere", "desc": "A lakeside city of extraordinary beauty and political scheming.", "image": "https://images.unsplash.com/photo-1499678329028-101435549a4e?w=400&q=50", "type": "Noble", "danger": "Medium", "min_level": 4, "travel_cost": 60},
+    {"id": "embervast", "name": "Embervast", "desc": "The volcanic borderlands, rich in dragon-forged materials.", "image": "https://images.unsplash.com/photo-1527482797697-8795b05a13fe?w=400&q=50", "type": "Wilds", "danger": "Extreme", "min_level": 10, "travel_cost": 100},
+    {"id": "tidehaven", "name": "Tidehaven", "desc": "A port city where smugglers and merchants clash over sea routes.", "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=50", "type": "Maritime", "danger": "High", "min_level": 6, "travel_cost": 70},
+    {"id": "duskwood", "name": "Duskwood", "desc": "An ancient forest kingdom where shapeshifters and druids dwell.", "image": "https://images.unsplash.com/photo-1448375240586-882707db888b?w=400&q=50", "type": "Forest", "danger": "Medium", "min_level": 4, "travel_cost": 55},
+    {"id": "frostholm", "name": "Frostholm", "desc": "The frozen north: hard people, rare pelts, and glacier-locked tombs.", "image": "https://images.unsplash.com/photo-1491555103944-7c647fd857e6?w=400&q=50", "type": "Frozen", "danger": "Very High", "min_level": 12, "travel_cost": 120},
+    {"id": "sunkeep", "name": "Sunkeep", "desc": "A desert kingdom where ruins of the First Empire still stand.", "image": "https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=400&q=50", "type": "Desert", "danger": "High", "min_level": 8, "travel_cost": 85},
 ]
 
 def make_initial_news():
@@ -366,8 +366,10 @@ def calculate_level(xp: int) -> int:
     return min(level, len(LEVEL_XP_REQUIREMENTS))
 
 def calculate_xp_for_next_level(current_xp: int, current_level: int) -> int:
+    """Calculate XP required for next level"""
     if current_level >= len(LEVEL_XP_REQUIREMENTS):
-        return 0
+        return 0  # Max level reached
+    return LEVEL_XP_REQUIREMENTS[current_level]  # Next level threshold
 
 def ensure_tz_aware(dt):
     """Ensure datetime is timezone-aware (UTC)"""
@@ -955,6 +957,8 @@ async def get_game_state(current_user: dict = Depends(get_current_user)):
             'energy_max': MAX_ENERGY,
             'hp': hp,
             'hp_max': MAX_HP,
+            'xp': current_user['xp'],
+            'xp_required': calculate_xp_for_next_level(current_user['xp'], current_user['level']),
         },
         'stats': {
             **current_user['stats'],
@@ -1402,52 +1406,145 @@ async def attack_player(req: CombatRequest, request: Request, current_user: dict
     attacker_wins = attacker_power > defender_power
     
     if attacker_wins:
-        # Calculate damage
-        base_damage = random.randint(20, 50)
-        damage = max(10, base_damage - defender_armor_bonus // 2)
-        new_target_hp = max(0, target_hp - damage)
-        
-        # Gold steal for mug
-        gold_stolen = 0
+        # For mug action: only steal gold, no damage
         if req.action == 'mug':
-            max_steal = target['gold'] // 2
-            gold_stolen = min(target['gold'], random.randint(10, max(50, max_steal)))
-            await db.users.update_one({'id': target['id']}, {'$inc': {'gold': -gold_stolen}})
-            await db.users.update_one({'id': user_id}, {'$inc': {'gold': gold_stolen}})
+            max_steal = target['gold'] // 3  # Max 33% of target's gold
+            gold_stolen = min(target['gold'], random.randint(20, max(100, max_steal)))
+            
+            if gold_stolen > 0:
+                await db.users.update_one({'id': target['id']}, {'$inc': {'gold': -gold_stolen}})
+                await db.users.update_one({'id': user_id}, {'$inc': {'gold': gold_stolen}})
+            
+            # Chance to get jailed (30% for successful mug)
+            if random.random() < 0.30:
+                jail_minutes = random.randint(15, 45)
+                await db.dungeon_sessions.insert_one({
+                    'id': str(uuid.uuid4()),
+                    'user_id': user_id,
+                    'crime_name': 'Ausrauben',
+                    'arrest_time': datetime.now(timezone.utc),
+                    'release_time': datetime.now(timezone.utc) + timedelta(minutes=jail_minutes),
+                    'released': False
+                })
+                
+                # Log combat (mug)
+                combat_log = {
+                    'id': str(uuid.uuid4()),
+                    'attacker_id': user_id,
+                    'attacker_name': current_user['username'],
+                    'defender_id': target['id'],
+                    'defender_name': target['username'],
+                    'action': 'mug',
+                    'winner': 'attacker',
+                    'damage': 0,
+                    'gold_stolen': gold_stolen,
+                    'hospital_minutes': 0,
+                    'timestamp': datetime.now(timezone.utc)
+                }
+                await db.combat_logs.insert_one(combat_log)
+                
+                # Update stats
+                await db.users.update_one({'id': user_id}, {'$inc': {'combat_wins': 1}})
+                await db.users.update_one({'id': target['id']}, {'$inc': {'combat_losses': 1}})
+                
+                # Ticker
+                await db.ticker_events.insert_one({
+                    'id': str(uuid.uuid4()),
+                    'event': f'{current_user["username"]} hat {target["username"]} ausgeraubt und wurde erwischt!',
+                    'type': 'crime',
+                    'user_id': user_id,
+                    'created_at': datetime.now(timezone.utc)
+                })
+                
+                return {
+                    'success': True,
+                    'won': True,
+                    'message': f'Du hast {gold_stolen} Gold gestohlen, wurdest aber erwischt und landest im Kerker für {jail_minutes} Minuten!',
+                    'gold_stolen': gold_stolen,
+                    'damage': 0,
+                    'jailed': True,
+                    'jail_minutes': jail_minutes
+                }
+            else:
+                # Successful mug without getting caught
+                combat_log = {
+                    'id': str(uuid.uuid4()),
+                    'attacker_id': user_id,
+                    'attacker_name': current_user['username'],
+                    'defender_id': target['id'],
+                    'defender_name': target['username'],
+                    'action': 'mug',
+                    'winner': 'attacker',
+                    'damage': 0,
+                    'gold_stolen': gold_stolen,
+                    'hospital_minutes': 0,
+                    'timestamp': datetime.now(timezone.utc)
+                }
+                await db.combat_logs.insert_one(combat_log)
+                
+                # Update stats
+                await db.users.update_one({'id': user_id}, {'$inc': {'combat_wins': 1}})
+                await db.users.update_one({'id': target['id']}, {'$inc': {'combat_losses': 1}})
+                
+                # Ticker
+                await db.ticker_events.insert_one({
+                    'id': str(uuid.uuid4()),
+                    'event': f'{current_user["username"]} hat {target["username"]} ausgeraubt!',
+                    'type': 'crime',
+                    'user_id': user_id,
+                    'created_at': datetime.now(timezone.utc)
+                })
+                
+                return {
+                    'success': True,
+                    'won': True,
+                    'message': f'Du hast {gold_stolen} Gold gestohlen!',
+                    'gold_stolen': gold_stolen,
+                    'damage': 0,
+                    'jailed': False
+                }
         
-        # Update target HP
-        await db.users.update_one(
-            {'id': target['id']},
-            {'$set': {'hp': new_target_hp, 'last_hp_regen': datetime.now(timezone.utc)}}
-        )
-        
-        # Hospital
-        hospital_minutes = 0
-        if req.action == 'hospitalize' or new_target_hp == 0:
-            hospital_minutes = 60 if req.action == 'hospitalize' else 30
-            await db.hospital_sessions.insert_one({
+        # For normal attack/hospitalize: deal damage
+        else:
+            # Calculate damage
+            base_damage = random.randint(20, 50)
+            damage = max(10, base_damage - defender_armor_bonus // 2)
+            new_target_hp = max(0, target_hp - damage)
+            
+            # Update target HP
+            await db.users.update_one(
+                {'id': target['id']},
+                {'$set': {'hp': new_target_hp, 'last_hp_regen': datetime.now(timezone.utc)}}
+            )
+            
+            # Hospital
+            hospital_minutes = 0
+            if req.action == 'hospitalize' or new_target_hp == 0:
+                hospital_minutes = 60 if req.action == 'hospitalize' else 30
+                await db.hospital_sessions.insert_one({
+                    'id': str(uuid.uuid4()),
+                    'user_id': target['id'],
+                    'reason': 'combat_loss',
+                    'attacker_id': user_id,
+                    'attacker_name': current_user['username'],
+                    'admit_time': datetime.now(timezone.utc),
+                    'release_time': datetime.now(timezone.utc) + timedelta(minutes=hospital_minutes),
+                    'released': False
+                })
+            
+            # Log
+            gold_stolen = 0
+            combat_log = {
                 'id': str(uuid.uuid4()),
-                'user_id': target['id'],
-                'reason': 'combat_loss',
                 'attacker_id': user_id,
                 'attacker_name': current_user['username'],
-                'admit_time': datetime.now(timezone.utc),
-                'release_time': datetime.now(timezone.utc) + timedelta(minutes=hospital_minutes),
-                'released': False
-            })
-        
-        # Log
-        combat_log = {
-            'id': str(uuid.uuid4()),
-            'attacker_id': user_id,
-            'attacker_name': current_user['username'],
-            'defender_id': target['id'],
-            'defender_name': target['username'],
-            'action': req.action,
-            'winner': 'attacker',
-            'damage': damage,
-            'gold_stolen': gold_stolen,
-            'hospital_minutes': hospital_minutes,
+                'defender_id': target['id'],
+                'defender_name': target['username'],
+                'action': req.action,
+                'winner': 'attacker',
+                'damage': damage,
+                'gold_stolen': gold_stolen,
+                'hospital_minutes': hospital_minutes,
             'timestamp': datetime.now(timezone.utc)
         }
         await db.combat_logs.insert_one(combat_log)
@@ -2394,8 +2491,12 @@ async def travel_to_kingdom(req: TravelRequest, current_user: dict = Depends(get
     if current_user['location'] == req.kingdom_id:
         raise HTTPException(status_code=400, detail="Du bist bereits hier")
     
+    # Check level requirement
+    if current_user['level'] < kingdom.get('min_level', 1):
+        raise HTTPException(status_code=400, detail=f"Level {kingdom['min_level']} erforderlich für {kingdom['name']}")
+    
     # Travel cost and duration
-    travel_cost = 50
+    travel_cost = kingdom.get('travel_cost', 50)
     travel_duration = 30  # minutes
     
     current_energy = await regenerate_energy(current_user)

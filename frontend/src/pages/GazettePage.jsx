@@ -151,7 +151,7 @@ export default function GazettePage() {
 
                 return (
                   <motion.div
-                    key={player.name}
+                    key={player.username || idx}
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: idx * 0.04 }}
@@ -180,11 +180,14 @@ export default function GazettePage() {
 
                           {/* Player Info */}
                           <div className="flex-1">
-                            <p className="font-bold font-cinzel text-lg mb-1" style={{ color: 'var(--aeth-parchment)' }}>
-                              {player.name}
-                            </p>
+                            <div className="flex items-center gap-2 mb-1">
+                              <p className="font-bold font-cinzel text-lg" style={{ color: 'var(--aeth-parchment)' }}>
+                                {player.username}
+                              </p>
+                              <span style={{ fontSize: '1.2rem' }}>{player.path_icon}</span>
+                            </div>
                             <p className="text-sm" style={{ color: 'var(--aeth-parchment-dim)' }}>
-                              {player.title || 'Abenteurer'}
+                              {player.title || player.path_label || 'Abenteurer'}
                             </p>
                           </div>
 
@@ -197,7 +200,7 @@ export default function GazettePage() {
                             <div>
                               <p className="text-xs mb-1" style={{ color: 'var(--aeth-parchment-dim)' }}>Total XP</p>
                               <p className="text-lg font-bold font-mono-az" style={{ color: 'var(--aeth-gold)' }}>
-                                {player.xp.toLocaleString()}
+                                {(player.xp || 0).toLocaleString()}
                               </p>
                             </div>
                           </div>

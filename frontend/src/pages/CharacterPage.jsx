@@ -18,7 +18,22 @@ export default function CharacterPage() {
 
   useEffect(() => {
     if (gameState) {
-      // gameState has no 'character' field - data is directly in gameState
+      // Fetch full item details for equipped items
+      const equippedItems = {};
+      const inv = gameState.inventory || {};
+      const equipped = inv.equipped || {};
+      
+      // Map equipped item IDs to full item data
+      for (const slot of ['weapon', 'armor', 'helmet', 'boots']) {
+        const itemId = equipped[slot];
+        if (itemId && inv.items) {
+          const itemData = inv.items.find(i => i.id === itemId);
+          if (itemData) {
+            equippedItems[slot] = itemData.item_details || itemData;
+          }
+        }
+      }
+      
       setCharData({
         name: gameState.user?.username,
         title: gameState.user?.path_label,
@@ -29,7 +44,7 @@ export default function CharacterPage() {
         dexterity: gameState.stats?.dexterity,
         speed: gameState.stats?.speed,
         defense: gameState.stats?.defense,
-        equipment: gameState.equipment,
+        equipment: equippedItems,
         location: gameState.location?.kingdom_name || 'Hauptstadt',
         days_in_realm: gameState.user?.days_in_realm,
         combat_wins: gameState.user?.combat_wins || 0,

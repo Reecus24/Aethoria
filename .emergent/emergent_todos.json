@@ -1,6 +1,18 @@
 [
   {
-    "content": "Create deployment guide for user to update production server",
-    "status": "completed"
+    "content": "Create comprehensive update package with ALL fixes",
+    "status": "in_progress"
+  },
+  {
+    "content": "Test locally with full 2-player scenario",
+    "status": "pending"
+  },
+  {
+    "content": "Deploy to user's production server",
+    "status": "pending"
+  },
+  {
+    "content": "Verify all 14+ bugs are fixed on production",
+    "status": "pending"
   }
 ]

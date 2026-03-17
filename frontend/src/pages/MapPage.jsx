@@ -12,17 +12,17 @@ import { toast } from 'sonner';
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const KINGDOMS = [
-  { id: 'hauptstadt', name: 'Hauptstadt Aethoria', desc: 'Zentrum des Reiches', color: '#D6A24D' },
-  { id: 'nordwacht', name: 'Nordwacht', desc: 'Eisige Berge', color: '#64B5F6' },
-  { id: 'suedhafen', name: 'Südhafen', desc: 'Handelsmetropole', color: '#FFB74D' },
-  { id: 'ostwald', name: 'Ostwald', desc: 'Geheimnisvoller Wald', color: '#81C784' },
-  { id: 'westfeste', name: 'Westfeste', desc: 'Militärfestung', color: '#E57373' },
-  { id: 'schattenland', name: 'Schattenland', desc: 'Dunkle Magie', color: '#9575CD' },
-  { id: 'goldtal', name: 'Goldtal', desc: 'Reiche Minen', color: '#FFD54F' },
-  { id: 'sturmkueste', name: 'Sturmküste', desc: 'Wilde See', color: '#4FC3F7' },
-  { id: 'drachenhoehen', name: 'Drachenhöhen', desc: 'Alte Ruinen', color: '#F06292' },
-  { id: 'kristallgebirge', name: 'Kristallgebirge', desc: 'Magische Kristalle', color: '#BA68C8' },
-  { id: 'totenmarsch', name: 'Totenmarsch', desc: 'Verfluchte Einöde', color: '#A1887F' },
+  { id: 'aethoria_capital', name: 'Aethoria Prime', desc: 'The capital of the Realm. Trade, power, and intrigue converge.', image: 'https://images.unsplash.com/photo-1533154683836-84ea7a0bc310?w=400&q=50', type: 'Capital', danger: 'Medium', min_level: 1, travel_cost: 0, color: '#D6A24D' },
+  { id: 'ironhold', name: 'Ironhold', desc: 'A fortress city of steel and fire. Home to the greatest warriors.', image: 'https://images.unsplash.com/photo-1621947081720-86970823b77a?w=400&q=50', type: 'Military', danger: 'High', min_level: 3, travel_cost: 50, color: '#E57373' },
+  { id: 'shadowfen', name: 'Shadowfen', desc: 'A city of fog and secrets, where rogues and thieves hold court. Home of the Shadow Guild.', image: 'https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?w=400&q=50', type: 'Underworld', danger: 'Very High', min_level: 2, travel_cost: 50, color: '#9575CD' },
+  { id: 'goldenveil', name: 'Goldenveil', desc: "The Realm's most prosperous trading city. Every merchant dreams of it.", image: 'https://images.unsplash.com/photo-1501183638710-841dd1904471?w=400&q=50', type: 'Commerce', danger: 'Low', min_level: 2, travel_cost: 50, color: '#FFD54F' },
+  { id: 'stonecrest', name: 'Stonecrest', desc: 'Ancient mountains hiding powerful arcane secrets in their caves.', image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&q=50', type: 'Arcane', danger: 'High', min_level: 5, travel_cost: 75, color: '#BA68C8' },
+  { id: 'crystalmere', name: 'Crystalmere', desc: 'A lakeside city of extraordinary beauty and political scheming.', image: 'https://images.unsplash.com/photo-1499678329028-101435549a4e?w=400&q=50', type: 'Noble', danger: 'Medium', min_level: 4, travel_cost: 60, color: '#64B5F6' },
+  { id: 'embervast', name: 'Embervast', desc: 'The volcanic borderlands, rich in dragon-forged materials.', image: 'https://images.unsplash.com/photo-1527482797697-8795b05a13fe?w=400&q=50', type: 'Wilds', danger: 'Extreme', min_level: 10, travel_cost: 100, color: '#F06292' },
+  { id: 'tidehaven', name: 'Tidehaven', desc: 'A port city where smugglers and merchants clash over sea routes.', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=50', type: 'Maritime', danger: 'High', min_level: 6, travel_cost: 70, color: '#4FC3F7' },
+  { id: 'duskwood', name: 'Duskwood', desc: 'An ancient forest kingdom where shapeshifters and druids dwell.', image: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=400&q=50', type: 'Forest', danger: 'Medium', min_level: 4, travel_cost: 55, color: '#81C784' },
+  { id: 'frostholm', name: 'Frostholm', desc: 'The frozen north: hard people, rare pelts, and glacier-locked tombs.', image: 'https://images.unsplash.com/photo-1491555103944-7c647fd857e6?w=400&q=50', type: 'Frozen', danger: 'Very High', min_level: 12, travel_cost: 120, color: '#A1887F' },
+  { id: 'sunkeep', name: 'Sunkeep', desc: 'A desert kingdom where ruins of the First Empire still stand.', image: 'https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=400&q=50', type: 'Desert', danger: 'High', min_level: 8, travel_cost: 85, color: '#FFB74D' },
 ];
 
 export default function MapPage() {
@@ -182,16 +182,36 @@ export default function MapPage() {
                       <div className="space-y-4">
                         <div className="space-y-2 text-sm" style={{ color: 'var(--aeth-parchment-dim)' }}>
                           <div className="flex justify-between">
+                            <span>Level erforderlich:</span>
+                            <span className="font-bold" style={{ color: kingdom.min_level > (gameState?.user?.level || 1) ? '#E57373' : 'var(--aeth-gold)' }}>
+                              Level {kingdom.min_level}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
                             <span>Kosten:</span>
-                            <span className="font-bold" style={{ color: 'var(--aeth-gold)' }}>50 Gold</span>
+                            <span className="font-bold" style={{ color: 'var(--aeth-gold)' }}>{kingdom.travel_cost} Gold</span>
                           </div>
                           <div className="flex justify-between">
                             <span>Dauer:</span>
                             <span className="font-bold" style={{ color: 'var(--aeth-parchment)' }}>10 Minuten</span>
                           </div>
+                          <div className="flex justify-between">
+                            <span>Gefahr:</span>
+                            <Badge variant="outline" style={{ 
+                              borderColor: kingdom.danger === 'Extreme' ? '#F44336' : kingdom.danger === 'Very High' ? '#FF9800' : kingdom.danger === 'High' ? '#FFB74D' : '#81C784',
+                              color: kingdom.danger === 'Extreme' ? '#F44336' : kingdom.danger === 'Very High' ? '#FF9800' : kingdom.danger === 'High' ? '#FFB74D' : '#81C784'
+                            }}>
+                              {kingdom.danger}
+                            </Badge>
+                          </div>
                         </div>
-                        <Button onClick={handleTravel} className="btn-gold w-full" data-testid="confirm-travel-button">
-                          Reise beginnen
+                        <Button 
+                          onClick={handleTravel} 
+                          disabled={kingdom.min_level > (gameState?.user?.level || 1) || (gameState?.resources?.gold || 0) < kingdom.travel_cost}
+                          className="btn-gold w-full" 
+                          data-testid="confirm-travel-button"
+                        >
+                          {kingdom.min_level > (gameState?.user?.level || 1) ? `Level ${kingdom.min_level} erforderlich` : 'Reise beginnen'}
                         </Button>
                       </div>
                     </DialogContent>
