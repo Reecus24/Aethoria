@@ -108,10 +108,20 @@ MASTER_ITEMS = [
     {'id': 'helmet_iron', 'name': 'Eisenhelm', 'type': 'armor', 'subtype': 'head', 'slot': 'helmet', 'price': 50, 'defense': 5, 'required_level': 1, 'description': 'Schützt deinen Kopf vor Hieben'},
     {'id': 'helmet_steel', 'name': 'Stahlhelm', 'type': 'armor', 'subtype': 'head', 'slot': 'helmet', 'price': 300, 'defense': 15, 'required_level': 6, 'description': 'Verstärkter Helm aus Stahl'},
     
-    # === ARMOR - SHIELD ===
-    {'id': 'shield_wooden', 'name': 'Holzschild', 'type': 'armor', 'subtype': 'shield', 'slot': 'shield', 'price': 60, 'defense': 8, 'required_level': 1, 'description': 'Ein einfacher Holzschild'},
-    {'id': 'shield_steel', 'name': 'Stahlschild', 'type': 'armor', 'subtype': 'shield', 'slot': 'shield', 'price': 600, 'defense': 30, 'required_level': 7, 'description': 'Massiver Schild aus reinem Stahl'},
-    {'id': 'shield_dragon', 'name': 'Drachenschuppenschild', 'type': 'armor', 'subtype': 'shield', 'slot': 'shield', 'price': 4000, 'defense': 70, 'required_level': 16, 'description': 'Aus echten Drachenschuppen gefertigt'},
+    # === ARMOR - SHIELD (OFFHAND) ===
+    {'id': 'shield_wooden', 'name': 'Holzschild', 'type': 'armor', 'subtype': 'offhand', 'slot': 'offhand', 'price': 60, 'defense': 8, 'required_level': 1, 'description': 'Ein einfacher Holzschild'},
+    {'id': 'shield_steel', 'name': 'Stahlschild', 'type': 'armor', 'subtype': 'offhand', 'slot': 'offhand', 'price': 600, 'defense': 30, 'required_level': 7, 'description': 'Massiver Schild aus reinem Stahl'},
+    {'id': 'shield_dragon', 'name': 'Drachenschuppenschild', 'type': 'armor', 'subtype': 'offhand', 'slot': 'offhand', 'price': 4000, 'defense': 70, 'required_level': 16, 'description': 'Aus echten Drachenschuppen gefertigt'},
+    
+    # === OFFHAND - DUAL WIELD ===
+    {'id': 'dagger_offhand', 'name': 'Zweitdolch', 'type': 'weapon', 'subtype': 'dual', 'slot': 'offhand', 'price': 200, 'damage': 12, 'strength': 2, 'dexterity': 3, 'required_level': 4, 'description': 'Für die freie Hand - perfekt für schnelle Angriffe'},
+    {'id': 'knife_throwing', 'name': 'Wurfmesser', 'type': 'weapon', 'subtype': 'dual', 'slot': 'offhand', 'price': 150, 'damage': 10, 'dexterity': 4, 'required_level': 3, 'description': 'Leicht und tödlich'},
+    
+    # === BOOTS ===
+    {'id': 'boots_leather', 'name': 'Lederstiefel', 'type': 'armor', 'subtype': 'boots', 'slot': 'boots', 'price': 40, 'speed': 2, 'required_level': 1, 'description': 'Leichte Stiefel für schnelle Bewegungen'},
+    {'id': 'boots_steel', 'name': 'Stahlstiefel', 'type': 'armor', 'subtype': 'boots', 'slot': 'boots', 'price': 300, 'defense': 8, 'speed': 3, 'required_level': 6, 'description': 'Gepanzerte Stiefel mit verstärkten Sohlen'},
+    {'id': 'boots_shadow', 'name': 'Schattenstiefel', 'type': 'armor', 'subtype': 'boots', 'slot': 'boots', 'price': 800, 'speed': 8, 'dexterity': 5, 'required_level': 10, 'description': 'Lautlos wie der Wind'},
+    {'id': 'boots_dragon', 'name': 'Drachenschuppenstiefel', 'type': 'armor', 'subtype': 'boots', 'slot': 'boots', 'price': 3500, 'defense': 15, 'speed': 12, 'required_level': 15, 'description': 'Unvergleichliche Beweglichkeit und Schutz'},
     
     # === POTIONS ===
     {'id': 'potion_health_small', 'name': 'Kleiner Heiltrank', 'type': 'consumable', 'subtype': 'potion', 'price': 20, 'effect': {'hp': 25}, 'required_level': 1, 'description': 'Stellt 25 HP wieder her'},
@@ -689,7 +699,7 @@ class UseItemRequest(BaseModel):
 
 class EquipItemRequest(BaseModel):
     item_id: str
-    slot: Literal['weapon', 'armor', 'helmet', 'shield']
+    slot: Literal['weapon', 'offhand', 'armor', 'helmet', 'boots']
 
 # ============================================================================
 # SEED DATABASE
@@ -759,6 +769,28 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 @app.on_event("startup")
 async def startup_event():
     await seed_database()
+    
+    # MIGRATION: Rename 'shield' to 'offhand' and add 'boots' slot for existing users
+    try:
+        users_with_old_equipment = await db.users.find({'equipment.shield': {'$exists': True}}).to_list(1000)
+        if users_with_old_equipment:
+            for user in users_with_old_equipment:
+                equipment = user.get('equipment', {})
+                # Move shield to offhand
+                if 'shield' in equipment:
+                    equipment['offhand'] = equipment.pop('shield')
+                # Add boots if missing
+                if 'boots' not in equipment:
+                    equipment['boots'] = None
+                
+                await db.users.update_one(
+                    {'id': user['id']},
+                    {'$set': {'equipment': equipment}}
+                )
+            logger.info(f"✓ Migrated {len(users_with_old_equipment)} users: shield→offhand, added boots slot")
+    except Exception as e:
+        logger.warning(f"Migration warning: {e}")
+    
     logger.info("✓ Realm of Aethoria backend started successfully")
 
 @app.on_event("shutdown")
@@ -802,7 +834,7 @@ async def register(req: RegisterRequest):
         'energy': MAX_ENERGY,
         'hp': MAX_HP,
         'stats': base_stats,
-        'equipment': {'weapon': None, 'armor': None, 'helmet': None, 'shield': None},
+        'equipment': {'weapon': None, 'offhand': None, 'armor': None, 'helmet': None, 'boots': None},
         'location': 'aethoria_capital',
         'title': PATH_LABELS[req.path_choice],
         'created_at': now,
@@ -948,6 +980,8 @@ async def get_game_state(current_user: dict = Depends(get_current_user)):
     equipped_items = []
     total_defense_bonus = 0
     total_strength_bonus = 0
+    total_speed_bonus = 0
+    total_dexterity_bonus = 0
     
     for slot, item_id in current_user.get('equipment', {}).items():
         if item_id:
@@ -958,6 +992,10 @@ async def get_game_state(current_user: dict = Depends(get_current_user)):
                     total_defense_bonus += item_data['defense']
                 if 'strength' in item_data:
                     total_strength_bonus += item_data['strength']
+                if 'speed' in item_data:
+                    total_speed_bonus += item_data['speed']
+                if 'dexterity' in item_data:
+                    total_dexterity_bonus += item_data['dexterity']
     
     return {
         'user': {
@@ -985,6 +1023,8 @@ async def get_game_state(current_user: dict = Depends(get_current_user)):
             'speed': current_user['stats']['speed'],
             'defense': current_user['stats']['defense'],
             'total_strength': current_user['stats']['strength'] + total_strength_bonus,
+            'total_dexterity': current_user['stats']['dexterity'] + total_dexterity_bonus,
+            'total_speed': current_user['stats']['speed'] + total_speed_bonus,
             'total_defense': current_user['stats']['defense'] + total_defense_bonus,
         },
         'location': {

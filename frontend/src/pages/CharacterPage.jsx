@@ -65,8 +65,8 @@ export default function CharacterPage() {
 
   const stats = [
     { id: 'strength', label: 'Stärke', value: charData?.strength || 0, total: gameState?.stats?.total_strength, icon: Sword, color: '#E57373' },
-    { id: 'dexterity', label: 'Geschicklichkeit', value: charData?.dexterity || 0, icon: Target, color: '#FFB74D' },
-    { id: 'speed', label: 'Geschwindigkeit', value: charData?.speed || 0, icon: Zap, color: '#64B5F6' },
+    { id: 'dexterity', label: 'Geschicklichkeit', value: charData?.dexterity || 0, total: gameState?.stats?.total_dexterity, icon: Target, color: '#FFB74D' },
+    { id: 'speed', label: 'Geschwindigkeit', value: charData?.speed || 0, total: gameState?.stats?.total_speed, icon: Zap, color: '#64B5F6' },
     { id: 'defense', label: 'Verteidigung', value: charData?.defense || 0, total: gameState?.stats?.total_defense, icon: Shield, color: '#81C784' },
   ];
 
@@ -228,8 +228,8 @@ export default function CharacterPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {['weapon', 'armor', 'helmet', 'shield'].map((slot) => (
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {['weapon', 'offhand', 'armor', 'helmet', 'boots'].map((slot) => (
               <div
                 key={slot}
                 className="border border-[color:var(--game-border-subtle)] rounded-lg p-4 text-center"
@@ -238,9 +238,10 @@ export default function CharacterPage() {
               >
                 <p className="text-xs mb-2" style={{ color: 'var(--aeth-parchment-dim)' }}>
                   {slot === 'weapon' && 'Waffe'}
+                  {slot === 'offhand' && 'Offhand'}
                   {slot === 'armor' && 'Rüstung'}
                   {slot === 'helmet' && 'Helm'}
-                  {slot === 'shield' && 'Schild'}
+                  {slot === 'boots' && 'Stiefel'}
                 </p>
                 {charData?.equipment?.[slot] ? (
                   <p className="text-sm font-semibold" style={{ color: 'var(--aeth-parchment)' }}>
