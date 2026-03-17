@@ -4,15 +4,31 @@
     "status": "completed"
   },
   {
-    "content": "Game Dashboard Architektur planen",
+    "content": "Design Guidelines für Game Interface vom design_agent holen",
     "status": "in_progress"
   },
   {
-    "content": "Design Guidelines für Game Interface holen",
+    "content": "Detaillierten Phase 6 Plan mit allen Features erstellen",
     "status": "pending"
   },
   {
-    "content": "Phase 6 Plan erstellen und mit User abstimmen",
+    "content": "Backend: Datenbank-Models für alle Features",
+    "status": "pending"
+  },
+  {
+    "content": "Backend: API Endpoints für alle Features",
+    "status": "pending"
+  },
+  {
+    "content": "Frontend: Game Dashboard Interface",
+    "status": "pending"
+  },
+  {
+    "content": "Frontend: Alle Feature-Seiten implementieren",
+    "status": "pending"
+  },
+  {
+    "content": "Testing: Alle neuen Features testen",
     "status": "pending"
   }
 ]
