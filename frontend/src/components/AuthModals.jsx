@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
 import { Label } from './ui/label';
 import { Input } from './ui/input';
 import { Separator } from './ui/separator';
@@ -68,12 +68,9 @@ export const LoginModal = ({ open, onClose, onSwitchToRegister, onSuccess }) => 
           >
             Enter the Gate
           </DialogTitle>
-          <p
-            className="text-sm text-center mt-1"
-            style={{ color: 'var(--aeth-parchment-dim)' }}
-          >
+          <DialogDescription className="text-sm text-center mt-1" style={{ color: 'var(--aeth-parchment-dim)' }}>
             Prove your identity to the dungeon guard
-          </p>
+          </DialogDescription>
         </DialogHeader>
 
         <Separator style={{ backgroundColor: 'var(--aeth-iron)', margin: '1rem 0' }} />
@@ -240,12 +237,9 @@ export const RegisterModal = ({ open, onClose, onSwitchToLogin, onSuccess }) => 
           >
             Begin Your Legend
           </DialogTitle>
-          <p
-            className="text-sm text-center mt-1"
-            style={{ color: 'var(--aeth-parchment-dim)' }}
-          >
+          <DialogDescription className="text-sm text-center mt-1" style={{ color: 'var(--aeth-parchment-dim)' }}>
             Register and forge your name in the annals of Aethoria
-          </p>
+          </DialogDescription>
         </DialogHeader>
 
         <Separator style={{ backgroundColor: 'var(--aeth-iron)', margin: '1rem 0' }} />
