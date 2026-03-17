@@ -1,26 +1,18 @@
 [
   {
-    "content": "Falsche Marketing-Zahlen aus About Section entfernen/anpassen",
+    "content": "42 Features in Kategorien gruppieren und priorisieren",
     "status": "completed"
   },
   {
-    "content": "Trust Markers im Hero Section korrigieren (50k, Free Forever entfernen)",
-    "status": "completed"
+    "content": "Game Dashboard Architektur planen",
+    "status": "in_progress"
   },
   {
-    "content": "PLACEHOLDER_TICKER Filler-Charaktere entfernen",
-    "status": "completed"
+    "content": "Design Guidelines für Game Interface holen",
+    "status": "pending"
   },
   {
-    "content": "App.js aktualisieren um stats an AboutSection zu übergeben",
-    "status": "completed"
-  },
-  {
-    "content": "Frontend-Code auf Fehler prüfen",
-    "status": "completed"
-  },
-  {
-    "content": "Screenshots zur Verifikation erstellen",
-    "status": "completed"
+    "content": "Phase 6 Plan erstellen und mit User abstimmen",
+    "status": "pending"
   }
 ]
