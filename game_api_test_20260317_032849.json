@@ -1,0 +1,74 @@
+{
+  "tests_run": 17,
+  "tests_passed": 9,
+  "tests_failed": 8,
+  "success_rate": 52.9,
+  "api_mismatches": [],
+  "failed_tests": [
+    {
+      "name": "Game State",
+      "method": "GET",
+      "endpoint": "/game/state",
+      "expected_status": 200,
+      "actual_status": 0,
+      "details": null
+    },
+    {
+      "name": "Commit Crime",
+      "method": "POST",
+      "endpoint": "/game/crimes/commit",
+      "expected_status": 200,
+      "actual_status": 0,
+      "details": null
+    },
+    {
+      "name": "Market buy",
+      "method": "GET",
+      "endpoint": "/game/market/buy",
+      "expected_status": 200,
+      "actual_status": 0,
+      "details": null
+    },
+    {
+      "name": "Market sell",
+      "method": "GET",
+      "endpoint": "/game/market/sell",
+      "expected_status": 200,
+      "actual_status": 0,
+      "details": null
+    },
+    {
+      "name": "Bank Deposit",
+      "method": "POST",
+      "endpoint": "/game/bank/deposit",
+      "expected_status": 200,
+      "actual_status": 0,
+      "details": null
+    },
+    {
+      "name": "Bank Withdraw",
+      "method": "POST",
+      "endpoint": "/game/bank/withdraw",
+      "expected_status": 200,
+      "actual_status": 0,
+      "details": null
+    },
+    {
+      "name": "Tavern Dice",
+      "method": "POST",
+      "endpoint": "/game/tavern/dice",
+      "expected_status": 200,
+      "actual_status": 0,
+      "details": null
+    },
+    {
+      "name": "Start Travel",
+      "method": "POST",
+      "endpoint": "/game/travel",
+      "expected_status": 200,
+      "actual_status": 0,
+      "details": null
+    }
+  ],
+  "duration": 4.18
+}

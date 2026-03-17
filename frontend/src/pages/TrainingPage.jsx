@@ -14,7 +14,7 @@ const STATS = [
   { id: 'defense', label: 'Verteidigung', icon: '🛡️', color: '#81C784', desc: 'Reduziert erhaltenen Schaden' },
 ];
 
-export const TrainingPage = () => {
+export default function TrainingPage() {
   const { gameState, refreshGameState } = useOutletContext();
   const [training, setTraining] = useState(false);
 

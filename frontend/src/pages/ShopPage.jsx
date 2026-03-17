@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-export const ShopPage = () => {
+export default function ShopPage() {
   const { gameState, refreshGameState } = useOutletContext();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);

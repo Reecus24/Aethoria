@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-export const QuestsPage = () => {
+export default function QuestsPage() {
   const { gameState, refreshGameState } = useOutletContext();
   const [quests, setQuests] = useState({ active_quest: null, available_quests: [] });
   const [loading, setLoading] = useState(true);

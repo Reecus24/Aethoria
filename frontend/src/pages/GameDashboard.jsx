@@ -7,7 +7,7 @@ import { TrendingUp, Swords, Skull, Scroll, Trophy, MessageSquare } from 'lucide
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-export const GameDashboard = () => {
+export default function GameDashboard() {
   const { user } = useAuth();
   const { gameState, refreshGameState } = useOutletContext();
   const [recentLogs, setRecentLogs] = useState({ combat: [], crimes: [] });

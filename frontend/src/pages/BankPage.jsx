@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-export const BankPage = () => {
+export default function BankPage() {
   const { gameState, refreshGameState } = useOutletContext();
   const [account, setAccount] = useState(null);
   const [depositAmount, setDepositAmount] = useState('');

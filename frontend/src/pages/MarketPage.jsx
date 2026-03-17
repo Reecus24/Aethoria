@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-export const MarketPage = () => {
+export default function MarketPage() {
   const { gameState, refreshGameState } = useOutletContext();
   const [listings, setListings] = useState([]);
   const [myListings, setMyListings] = useState([]);

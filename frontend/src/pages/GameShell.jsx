@@ -6,7 +6,7 @@ import {
   Home, Dumbbell, Skull, Swords, Scroll, Package, ShoppingCart, 
   Store, Landmark, Users, Dice6, Map, CircleDollarSign, Trophy,
   Hospital, LockKeyhole, Target, Castle, MessageSquare, Award,
-  Settings, LogOut, Menu, X, Crown, Heart, Zap
+  Settings, LogOut, Menu, X, Crown, Heart, Zap, User
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -43,6 +43,7 @@ export const GameShell = () => {
 
   const navItems = [
     { path: '/game', icon: Home, label: 'Dashboard', exact: true },
+    { path: '/game/character', icon: User, label: 'Character' },
     { path: '/game/training', icon: Dumbbell, label: 'Training Grounds' },
     { path: '/game/crimes', icon: Skull, label: 'Dark Deeds' },
     { path: '/game/combat', icon: Swords, label: 'Combat' },
@@ -57,10 +58,11 @@ export const GameShell = () => {
     { path: '/game/hunting', icon: Target, label: 'Creature Hunting' },
     { path: '/game/properties', icon: Castle, label: 'Strongholds' },
     { path: '/game/bounties', icon: CircleDollarSign, label: "Hunter's Contracts" },
-    { path: '/game/hospital', icon: Hospital, label: 'Healer's Sanctuary' },
+    { path: '/game/hospital', icon: Hospital, label: "Healer's Sanctuary" },
     { path: '/game/dungeon', icon: LockKeyhole, label: 'The Dungeon' },
     { path: '/game/achievements', icon: Award, label: 'Royal Honours' },
     { path: '/game/messages', icon: MessageSquare, label: 'Messages' },
+    { path: '/game/gazette', icon: Trophy, label: 'Royal Gazette' },
   ];
 
   if (loading) {

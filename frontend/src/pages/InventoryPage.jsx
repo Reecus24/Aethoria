@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-export const InventoryPage = () => {
+export default function InventoryPage() {
   const { gameState, refreshGameState } = useOutletContext();
   const [inventory, setInventory] = useState({ inventory: [], equipped: {} });
   const [loading, setLoading] = useState(true);
@@ -27,7 +27,7 @@ export const InventoryPage = () => {
     }
   };
 
-  const useItem = async (itemId) => {
+  const handleUseItem = async (itemId) => {
     try {
       const res = await axios.post(`${API}/game/inventory/use`, { item_id: itemId });
       toast.success(res.data.message, { icon: '✨' });
@@ -149,7 +149,7 @@ export const InventoryPage = () => {
                   </p>
                   {item.item_details.type === 'consumable' && (
                     <button
-                      onClick={() => useItem(item.item_id)}
+                      onClick={() => handleUseItem(item.item_id)}
                       className="btn-gold w-full py-2 rounded text-xs font-semibold"
                       data-testid={`use-item-${item.item_id}`}
                     >

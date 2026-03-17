@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-export const CombatPage = () => {
+export default function CombatPage() {
   const { gameState, refreshGameState } = useOutletContext();
   const [targets, setTargets] = useState([]);
   const [attacking, setAttacking] = useState(false);

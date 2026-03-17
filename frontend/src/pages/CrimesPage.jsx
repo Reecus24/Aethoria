@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-export const CrimesPage = () => {
+export default function CrimesPage() {
   const { gameState, refreshGameState } = useOutletContext();
   const [crimes, setCrimes] = useState([]);
   const [committing, setCommitting] = useState(false);
