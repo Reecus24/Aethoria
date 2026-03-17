@@ -1,18 +1,38 @@
 [
   {
-    "content": "Create comprehensive update package with ALL fixes",
+    "content": "CRITICAL: Fix training system (remove 'already training' restriction OR allow multiple stats)",
     "status": "in_progress"
   },
   {
-    "content": "Test locally with full 2-player scenario",
+    "content": "CRITICAL: Fix equipment unequip bug (re-equipping same item deletes it)",
     "status": "pending"
   },
   {
-    "content": "Deploy to user's production server",
+    "content": "CRITICAL: Add shields to equipment system (not shown anywhere)",
     "status": "pending"
   },
   {
-    "content": "Verify all 14+ bugs are fixed on production",
+    "content": "CRITICAL: Rename item attributes (damage→strength_bonus, defense→defense_bonus)",
+    "status": "pending"
+  },
+  {
+    "content": "CRITICAL: Sync equipment display (Inventory + Character MUST be identical)",
+    "status": "pending"
+  },
+  {
+    "content": "CRITICAL: Implement Shadow Guild/Hideout as dedicated location with features",
+    "status": "pending"
+  },
+  {
+    "content": "Fix XP display showing 0/100 and level progression",
+    "status": "pending"
+  },
+  {
+    "content": "Add stat bonuses from equipment to Character page display",
+    "status": "pending"
+  },
+  {
+    "content": "FINAL: Deploy + comprehensive test of ALL systems",
     "status": "pending"
   }
 ]
