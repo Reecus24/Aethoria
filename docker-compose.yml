@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: aethoria-mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-changeme}
+      MONGO_INITDB_DATABASE: aethoria
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - aethoria-network
+
+  # Backend (FastAPI)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: aethoria-backend
+    restart: always
+    environment:
+      MONGO_URL: mongodb://admin:${MONGO_ROOT_PASSWORD:-changeme}@mongodb:27017/aethoria?authSource=admin
+      JWT_SECRET: ${JWT_SECRET:-generate-a-secure-random-key-here}
+      JWT_ALGORITHM: HS256
+      JWT_EXPIRY_DAYS: 30
+    ports:
+      - "8001:8001"
+    depends_on:
+      - mongodb
+    networks:
+      - aethoria-network
+    volumes:
+      - ./backend:/app/backend
+    command: python server.py
+
+  # Frontend (React)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: aethoria-frontend
+    restart: always
+    environment:
+      REACT_APP_BACKEND_URL: ${FRONTEND_BACKEND_URL:-http://localhost:8001}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - aethoria-network
+    volumes:
+      - ./frontend:/app/frontend
+      - /app/frontend/node_modules
+    command: serve -s build -l 3000
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: aethoria-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro  # Für SSL-Zertifikate
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - aethoria-network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  aethoria-network:
+    driver: bridge
