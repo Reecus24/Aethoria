@@ -1,5 +1,5 @@
 {
-  "test_date": "2026-03-17T22:08:24.420665",
+  "test_date": "2026-03-17T22:49:24.179777",
   "bots_run": 3,
   "total_actions": 37,
   "bugs_found": 3,
@@ -7,7 +7,7 @@
     "CRITICAL": [],
     "HIGH": [
       {
-        "timestamp": "2026-03-17T22:07:51.511509",
+        "timestamp": "2026-03-17T22:48:49.813466",
         "bot": "KnightBot",
         "path": "knight",
         "category": "Training",
@@ -19,7 +19,7 @@
         "level_when_found": 1
       },
       {
-        "timestamp": "2026-03-17T22:07:56.180590",
+        "timestamp": "2026-03-17T22:48:54.457909",
         "bot": "ShadowBot",
         "path": "shadow",
         "category": "Training",
@@ -31,7 +31,7 @@
         "level_when_found": 1
       },
       {
-        "timestamp": "2026-03-17T22:08:00.829576",
+        "timestamp": "2026-03-17T22:48:59.081431",
         "bot": "NobleBot",
         "path": "noble",
         "category": "Training",
@@ -48,7 +48,7 @@
   },
   "all_bugs": [
     {
-      "timestamp": "2026-03-17T22:07:51.511509",
+      "timestamp": "2026-03-17T22:48:49.813466",
       "bot": "KnightBot",
       "path": "knight",
       "category": "Training",
@@ -60,7 +60,7 @@
       "level_when_found": 1
     },
     {
-      "timestamp": "2026-03-17T22:07:56.180590",
+      "timestamp": "2026-03-17T22:48:54.457909",
       "bot": "ShadowBot",
       "path": "shadow",
       "category": "Training",
@@ -72,7 +72,7 @@
       "level_when_found": 1
     },
     {
-      "timestamp": "2026-03-17T22:08:00.829576",
+      "timestamp": "2026-03-17T22:48:59.081431",
       "bot": "NobleBot",
       "path": "noble",
       "category": "Training",

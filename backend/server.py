@@ -3290,34 +3290,67 @@ async def run_bot_tests(current_user: dict = Depends(get_current_user)):
     import subprocess
     import json
     import os
+    import sys
+    
+    report_path = '/app/bot_test_report.json'
     
     try:
-        # Delete old report if exists
-        report_path = '/app/bot_test_report.json'
-        if os.path.exists(report_path):
-            os.remove(report_path)
+        # Run bot testing script with same Python interpreter and full environment
+        env = os.environ.copy()
+        env['MONGO_URL'] = os.getenv('MONGO_URL', 'mongodb://localhost:27017')
+        env['DB_NAME'] = os.getenv('DB_NAME', 'aethoria_db')
+        env['PYTHONPATH'] = '/app/backend'
         
-        # Run bot testing script with extended timeout
+        # Use sys.executable to ensure same Python interpreter with all packages
         process = subprocess.run(
-            ['python3', '/app/game_bot_tester.py'],
+            [sys.executable, '/app/game_bot_tester.py'],
             capture_output=True,
             text=True,
             timeout=120,  # 2 minutes
-            cwd='/app'
+            cwd='/app',
+            env=env
         )
         
-        logger.info(f"Bot script stdout: {process.stdout[-500:]}")
-        logger.info(f"Bot script stderr: {process.stderr[-500:]}")
+        logger.info(f"Bot script exit code: {process.returncode}")
+        if process.returncode != 0:
+            logger.warning(f"Bot script non-zero exit: {process.returncode}")
+            if process.stderr:
+                logger.error(f"Bot script stderr: {process.stderr[:1000]}")
+        
+        # Small delay to ensure file write is complete
+        import asyncio
+        await asyncio.sleep(0.5)
         
         # Check if report was created
         if not os.path.exists(report_path):
-            raise HTTPException(status_code=500, detail=f"Bot-Test Report wurde nicht erstellt. Exit code: {process.returncode}")
+            error_msg = f"Exit code: {process.returncode}"
+            if process.stderr:
+                error_msg += f". Error: {process.stderr[:500]}"
+            else:
+                error_msg += f". Stdout: {process.stdout[-500:]}"
+            raise HTTPException(
+                status_code=500, 
+                detail=f"Bot-Test Report wurde nicht erstellt. {error_msg}"
+            )
         
         # Load report
-        with open(report_path, 'r') as f:
-            report = json.load(f)
+        try:
+            with open(report_path, 'r') as f:
+                report = json.load(f)
+        except Exception as read_error:
+            logger.error(f"Failed to read report: {read_error}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"Report existiert aber konnte nicht gelesen werden: {str(read_error)}"
+            )
         
-        return report
+        # Return success
+        return {
+            'success': True,
+            'report': report,
+            'execution_time': 'completed',
+            'exit_code': process.returncode
+        }
         
     except subprocess.TimeoutExpired:
         raise HTTPException(status_code=408, detail="Bot-Tests haben zu lange gedauert (>2 Min)")

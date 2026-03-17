@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -20,9 +20,20 @@ export default function BotTestingPage() {
 
     try {
       const response = await axios.post(`${API}/admin/run-bot-tests`, {}, { timeout: 150000 });
-      setReport(response.data);
       
-      const bugsCount = response.data.bugs_found || 0;
+      // Handle new response format
+      const reportData = response.data.report || response.data;
+      
+      // Check if report is valid
+      if (!reportData || reportData === null) {
+        toast.error('Bot-Tests abgeschlossen, aber Report ist leer. Bitte manuell ausführen.');
+        setManualMode(true);
+        return;
+      }
+      
+      setReport(reportData);
+      
+      const bugsCount = reportData.bugs_found || 0;
       if (bugsCount === 0) {
         toast.success('🎉 Keine Bugs gefunden!');
       } else {
