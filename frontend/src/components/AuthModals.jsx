@@ -134,14 +134,16 @@ export const LoginModal = ({ open, onClose, onSwitchToRegister, onSuccess }) => 
 
           {error && (
             <p
-              className="text-sm p-3 rounded-lg"
+              data-testid="auth-error-message"
+              className="text-sm p-3 rounded-lg flex items-center gap-2"
               style={{
-                backgroundColor: 'rgba(142,29,44,0.15)',
-                color: '#E57373',
-                border: '1px solid rgba(142,29,44,0.4)',
+                backgroundColor: 'rgba(142,29,44,0.22)',
+                color: '#FF8A80',
+                border: '1px solid rgba(200,50,60,0.55)',
+                fontWeight: 500,
               }}
             >
-              {error}
+              <span>⚠️</span> {error}
             </p>
           )}
 
@@ -326,14 +328,16 @@ export const RegisterModal = ({ open, onClose, onSwitchToLogin, onSuccess }) => 
 
           {error && (
             <p
-              className="text-sm p-3 rounded-lg"
+              data-testid="auth-error-message"
+              className="text-sm p-3 rounded-lg flex items-center gap-2"
               style={{
-                backgroundColor: 'rgba(142,29,44,0.15)',
-                color: '#E57373',
-                border: '1px solid rgba(142,29,44,0.4)',
+                backgroundColor: 'rgba(142,29,44,0.22)',
+                color: '#FF8A80',
+                border: '1px solid rgba(200,50,60,0.55)',
+                fontWeight: 500,
               }}
             >
-              {error}
+              <span>⚠️</span> {error}
             </p>
           )}
 

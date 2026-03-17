@@ -3,9 +3,17 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const StarRating = ({ rating }) => (
-  <div className="flex gap-0.5">
+  <div className="flex gap-0.5" data-testid="star-rating" aria-label={`${rating} out of 5 stars`}>
     {[1, 2, 3, 4, 5].map((s) => (
-      <span key={s} className={s <= rating ? 'star-filled' : 'star-empty'} style={{ fontSize: '0.9rem' }}>
+      <span
+        key={s}
+        style={{
+          fontSize: '1rem',
+          color: s <= rating ? '#D6A24D' : '#3B3532',
+          textShadow: s <= rating ? '0 0 8px rgba(214,162,77,0.5)' : 'none',
+          lineHeight: 1,
+        }}
+      >
         ★
       </span>
     ))}
