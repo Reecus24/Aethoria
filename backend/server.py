@@ -1868,6 +1868,27 @@ async def accept_quest(req: QuestRequest, current_user: dict = Depends(get_curre
     active = await db.user_quests.find_one({'user_id': user_id, 'status': 'active'})
     if active:
         raise HTTPException(status_code=400, detail="Du hast bereits eine aktive Quest")
+
+@app.post("/api/game/quests/abandon")
+async def abandon_quest(current_user: dict = Depends(get_current_user)):
+    """Abandon active quest"""
+    user_id = current_user['id']
+    
+    active = await db.user_quests.find_one({'user_id': user_id, 'status': 'active'})
+    if not active:
+        raise HTTPException(status_code=404, detail="Keine aktive Quest gefunden")
+    
+    # Delete the active quest
+    await db.user_quests.delete_one({'_id': active['_id']})
+    
+    # Log event
+    await log_event('quest', f'{current_user["username"]} hat Quest {active.get("quest_id", "unknown")} abgebrochen', user_id)
+    
+    return {
+        'success': True,
+        'message': 'Quest abgebrochen'
+    }
+
     
     # Find quest
     quest = next((q for q in MASTER_QUESTS if q['id'] == req.quest_id), None)
