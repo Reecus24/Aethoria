@@ -1,38 +1,10 @@
 [
   {
-    "content": "CRITICAL: Fix training system (remove 'already training' restriction OR allow multiple stats)",
+    "content": "VISUAL TEST: Screenshots von Dungeon/Hospital/Map/Character Pages machen",
+    "status": "completed"
+  },
+  {
+    "content": "TESTING: Umfassende Tests aller Fixes mit testing_agent_v3",
     "status": "in_progress"
-  },
-  {
-    "content": "CRITICAL: Fix equipment unequip bug (re-equipping same item deletes it)",
-    "status": "pending"
-  },
-  {
-    "content": "CRITICAL: Add shields to equipment system (not shown anywhere)",
-    "status": "pending"
-  },
-  {
-    "content": "CRITICAL: Rename item attributes (damage→strength_bonus, defense→defense_bonus)",
-    "status": "pending"
-  },
-  {
-    "content": "CRITICAL: Sync equipment display (Inventory + Character MUST be identical)",
-    "status": "pending"
-  },
-  {
-    "content": "CRITICAL: Implement Shadow Guild/Hideout as dedicated location with features",
-    "status": "pending"
-  },
-  {
-    "content": "Fix XP display showing 0/100 and level progression",
-    "status": "pending"
-  },
-  {
-    "content": "Add stat bonuses from equipment to Character page display",
-    "status": "pending"
-  },
-  {
-    "content": "FINAL: Deploy + comprehensive test of ALL systems",
-    "status": "pending"
   }
 ]

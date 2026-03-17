@@ -31,8 +31,8 @@ export default function DungeonPage() {
     fetchDungeon();
   }, []);
 
-  const jailTimer = gameState?.timers?.jail;
-  const isInJail = jailTimer !== null;
+  const dungeonTimer = gameState?.timers?.dungeon;
+  const isInJail = dungeonTimer && dungeonTimer.seconds_remaining > 0;
 
   if (loading) {
     return (
@@ -85,7 +85,7 @@ export default function DungeonPage() {
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-sm" style={{ color: 'var(--aeth-parchment-dim)' }}>Haftstrafe endet in:</span>
                   <Badge className="bg-[color:var(--aeth-blood)] text-white text-base px-3 py-1" data-testid="jail-timer">
-                    {Math.floor((jailTimer?.seconds_remaining || 0) / 60)}:{String((jailTimer?.seconds_remaining || 0) % 60).padStart(2, '0')}
+                    {Math.floor((dungeonTimer?.seconds_remaining || 0) / 60)}:{String((dungeonTimer?.seconds_remaining || 0) % 60).padStart(2, '0')}
                   </Badge>
                 </div>
                 <div className="text-xs space-y-2" style={{ color: 'var(--aeth-parchment-dim)' }}>
@@ -95,7 +95,7 @@ export default function DungeonPage() {
                 </div>
               </div>
 
-              {(jailTimer?.seconds_remaining || 0) <= 0 && (
+              {(dungeonTimer?.seconds_remaining || 0) <= 0 && (
                 <div className="text-center">
                   <Badge className="bg-[color:var(--aeth-gold)] text-[color:var(--aeth-stone-0)] text-base px-4 py-2">
                     Freilassung ausstehend

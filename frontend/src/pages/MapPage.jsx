@@ -157,6 +157,27 @@ export default function MapPage() {
                   <p className="text-sm" style={{ color: 'var(--aeth-parchment-dim)' }}>
                     {kingdom.desc}
                   </p>
+                  
+                  {/* Level Requirement Badge */}
+                  <div className="flex items-center gap-2">
+                    <Badge 
+                      variant="outline" 
+                      className={`text-xs ${
+                        kingdom.min_level > (gameState?.user?.level || 1) 
+                          ? 'border-[#E57373] text-[#E57373]' 
+                          : 'border-[color:var(--aeth-gold)] text-[color:var(--aeth-gold)]'
+                      }`}
+                      data-testid={`kingdom-${kingdom.id}-level-req`}
+                    >
+                      Level {kingdom.min_level}+ erforderlich
+                    </Badge>
+                    {kingdom.travel_cost > 0 && (
+                      <Badge variant="outline" className="text-xs border-[color:var(--aeth-parchment-dim)] text-[color:var(--aeth-parchment-dim)]">
+                        {kingdom.travel_cost} Gold
+                      </Badge>
+                    )}
+                  </div>
+                  
                   <Dialog open={dialogOpen && travelTarget?.id === kingdom.id} onOpenChange={setDialogOpen}>
                     <DialogTrigger asChild>
                       <Button

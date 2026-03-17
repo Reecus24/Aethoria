@@ -18,19 +18,13 @@ export default function CharacterPage() {
 
   useEffect(() => {
     if (gameState) {
-      // Fetch full item details for equipped items
+      // Map equipped items from gameState.equipment array
       const equippedItems = {};
-      const inv = gameState.inventory || {};
-      const equipped = inv.equipped || {};
+      const equipmentArray = gameState.equipment || [];
       
-      // Map equipped item IDs to full item data
-      for (const slot of ['weapon', 'armor', 'helmet', 'boots']) {
-        const itemId = equipped[slot];
-        if (itemId && inv.items) {
-          const itemData = inv.items.find(i => i.id === itemId);
-          if (itemData) {
-            equippedItems[slot] = itemData.item_details || itemData;
-          }
+      for (const item of equipmentArray) {
+        if (item && item.slot) {
+          equippedItems[item.slot] = item;
         }
       }
       
@@ -70,10 +64,10 @@ export default function CharacterPage() {
   }
 
   const stats = [
-    { id: 'strength', label: 'Stärke', value: charData?.strength || 0, icon: Sword, color: '#E57373' },
+    { id: 'strength', label: 'Stärke', value: charData?.strength || 0, total: gameState?.stats?.total_strength, icon: Sword, color: '#E57373' },
     { id: 'dexterity', label: 'Geschicklichkeit', value: charData?.dexterity || 0, icon: Target, color: '#FFB74D' },
     { id: 'speed', label: 'Geschwindigkeit', value: charData?.speed || 0, icon: Zap, color: '#64B5F6' },
-    { id: 'defense', label: 'Verteidigung', value: charData?.defense || 0, icon: Shield, color: '#81C784' },
+    { id: 'defense', label: 'Verteidigung', value: charData?.defense || 0, total: gameState?.stats?.total_defense, icon: Shield, color: '#81C784' },
   ];
 
   const xpProgress = charData?.xp_current || 0;
@@ -209,7 +203,17 @@ export default function CharacterPage() {
                   data-testid={`character-stat-${stat.id}`}
                 >
                   {stat.value}
+                  {stat.total && stat.total !== stat.value && (
+                    <span className="text-lg ml-2" style={{ color: 'var(--aeth-parchment-dim)' }}>
+                      (+{stat.total - stat.value})
+                    </span>
+                  )}
                 </p>
+                {stat.total && stat.total !== stat.value && (
+                  <p className="text-xs mt-1" style={{ color: 'var(--aeth-parchment-dim)' }}>
+                    Gesamt: {stat.total}
+                  </p>
+                )}
               </CardContent>
             </Card>
           </motion.div>
@@ -225,7 +229,7 @@ export default function CharacterPage() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {['weapon', 'armor', 'helmet', 'boots'].map((slot) => (
+            {['weapon', 'armor', 'helmet', 'shield'].map((slot) => (
               <div
                 key={slot}
                 className="border border-[color:var(--game-border-subtle)] rounded-lg p-4 text-center"
@@ -236,7 +240,7 @@ export default function CharacterPage() {
                   {slot === 'weapon' && 'Waffe'}
                   {slot === 'armor' && 'Rüstung'}
                   {slot === 'helmet' && 'Helm'}
-                  {slot === 'boots' && 'Stiefel'}
+                  {slot === 'shield' && 'Schild'}
                 </p>
                 {charData?.equipment?.[slot] ? (
                   <p className="text-sm font-semibold" style={{ color: 'var(--aeth-parchment)' }}>

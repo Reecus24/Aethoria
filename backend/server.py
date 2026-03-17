@@ -87,17 +87,17 @@ PATH_ICONS = {
 
 MASTER_ITEMS = [
     # === WEAPONS - MELEE ===
-    {'id': 'sword_iron', 'name': 'Eisenschwert', 'type': 'weapon', 'subtype': 'melee', 'slot': 'weapon', 'price': 100, 'damage': 15, 'required_level': 1, 'description': 'Ein einfaches, aber zuverlässiges Schwert aus Eisen'},
-    {'id': 'sword_steel', 'name': 'Stahlschwert', 'type': 'weapon', 'subtype': 'melee', 'slot': 'weapon', 'price': 500, 'damage': 35, 'required_level': 5, 'description': 'Geschmiedet aus bestem Stahl, scharf und tödlich'},
-    {'id': 'sword_dragon', 'name': 'Drachenklingenschwert', 'type': 'weapon', 'subtype': 'melee', 'slot': 'weapon', 'price': 5000, 'damage': 80, 'required_level': 15, 'description': 'Geschmiedet im Drachenfeuer, eine legendäre Waffe'},
-    {'id': 'dagger_rusty', 'name': 'Rostiger Dolch', 'type': 'weapon', 'subtype': 'melee', 'slot': 'weapon', 'price': 50, 'damage': 10, 'required_level': 1, 'description': 'Alt und rostig, aber immer noch gefährlich'},
-    {'id': 'axe_battle', 'name': 'Streitaxt', 'type': 'weapon', 'subtype': 'melee', 'slot': 'weapon', 'price': 800, 'damage': 45, 'required_level': 8, 'description': 'Schwere Axt für vernichtende Schläge'},
-    {'id': 'mace_iron', 'name': 'Eisenstreitkolben', 'type': 'weapon', 'subtype': 'melee', 'slot': 'weapon', 'price': 300, 'damage': 25, 'required_level': 4, 'description': 'Zerschmettert Rüstungen mit roher Kraft'},
+    {'id': 'sword_iron', 'name': 'Eisenschwert', 'type': 'weapon', 'subtype': 'melee', 'slot': 'weapon', 'price': 100, 'damage': 15, 'strength': 3, 'required_level': 1, 'description': 'Ein einfaches, aber zuverlässiges Schwert aus Eisen'},
+    {'id': 'sword_steel', 'name': 'Stahlschwert', 'type': 'weapon', 'subtype': 'melee', 'slot': 'weapon', 'price': 500, 'damage': 35, 'strength': 7, 'required_level': 5, 'description': 'Geschmiedet aus bestem Stahl, scharf und tödlich'},
+    {'id': 'sword_dragon', 'name': 'Drachenklingenschwert', 'type': 'weapon', 'subtype': 'melee', 'slot': 'weapon', 'price': 5000, 'damage': 80, 'strength': 16, 'required_level': 15, 'description': 'Geschmiedet im Drachenfeuer, eine legendäre Waffe'},
+    {'id': 'dagger_rusty', 'name': 'Rostiger Dolch', 'type': 'weapon', 'subtype': 'melee', 'slot': 'weapon', 'price': 50, 'damage': 10, 'strength': 2, 'required_level': 1, 'description': 'Alt und rostig, aber immer noch gefährlich'},
+    {'id': 'axe_battle', 'name': 'Streitaxt', 'type': 'weapon', 'subtype': 'melee', 'slot': 'weapon', 'price': 800, 'damage': 45, 'strength': 9, 'required_level': 8, 'description': 'Schwere Axt für vernichtende Schläge'},
+    {'id': 'mace_iron', 'name': 'Eisenstreitkolben', 'type': 'weapon', 'subtype': 'melee', 'slot': 'weapon', 'price': 300, 'damage': 25, 'strength': 5, 'required_level': 4, 'description': 'Zerschmettert Rüstungen mit roher Kraft'},
     
     # === WEAPONS - RANGED ===
-    {'id': 'bow_short', 'name': 'Kurzbogen', 'type': 'weapon', 'subtype': 'ranged', 'slot': 'weapon', 'price': 150, 'damage': 20, 'required_level': 3, 'description': 'Schnell und wendig für schnelle Schüsse'},
-    {'id': 'bow_long', 'name': 'Langbogen', 'type': 'weapon', 'subtype': 'ranged', 'slot': 'weapon', 'price': 800, 'damage': 45, 'required_level': 8, 'description': 'Große Reichweite und tödliche Präzision'},
-    {'id': 'crossbow', 'name': 'Armbrust', 'type': 'weapon', 'subtype': 'ranged', 'slot': 'weapon', 'price': 1200, 'damage': 55, 'required_level': 10, 'description': 'Durchschlägt selbst schwere Rüstungen'},
+    {'id': 'bow_short', 'name': 'Kurzbogen', 'type': 'weapon', 'subtype': 'ranged', 'slot': 'weapon', 'price': 150, 'damage': 20, 'strength': 4, 'required_level': 3, 'description': 'Schnell und wendig für schnelle Schüsse'},
+    {'id': 'bow_long', 'name': 'Langbogen', 'type': 'weapon', 'subtype': 'ranged', 'slot': 'weapon', 'price': 800, 'damage': 45, 'strength': 9, 'required_level': 8, 'description': 'Große Reichweite und tödliche Präzision'},
+    {'id': 'crossbow', 'name': 'Armbrust', 'type': 'weapon', 'subtype': 'ranged', 'slot': 'weapon', 'price': 1200, 'damage': 55, 'strength': 11, 'required_level': 10, 'description': 'Durchschlägt selbst schwere Rüstungen'},
     
     # === ARMOR - BODY ===
     {'id': 'armor_leather', 'name': 'Lederrüstung', 'type': 'armor', 'subtype': 'body', 'slot': 'armor', 'price': 80, 'defense': 10, 'required_level': 1, 'description': 'Leichte Rüstung für Beweglichkeit'},
@@ -366,10 +366,12 @@ def calculate_level(xp: int) -> int:
     return min(level, len(LEVEL_XP_REQUIREMENTS))
 
 def calculate_xp_for_next_level(current_xp: int, current_level: int) -> int:
-    """Calculate XP required for next level"""
+    """Calculate XP required for next level (remaining XP needed)"""
     if current_level >= len(LEVEL_XP_REQUIREMENTS):
         return 0  # Max level reached
-    return LEVEL_XP_REQUIREMENTS[current_level]  # Next level threshold
+    
+    next_level_threshold = LEVEL_XP_REQUIREMENTS[current_level]
+    return next_level_threshold - current_xp  # How much XP is still needed
 
 def ensure_tz_aware(dt):
     """Ensure datetime is timezone-aware (UTC)"""
@@ -420,7 +422,7 @@ async def store_idempotency_result(idempotency_key: str, user_id: str, operation
     # Create TTL index for automatic cleanup (only once)
     try:
         await db.idempotency_keys.create_index('expires_at', expireAfterSeconds=0)
-    except:
+    except Exception:
         pass  # Index may already exist
 
 async def regenerate_energy(user: dict) -> int:
@@ -538,6 +540,23 @@ async def check_hospital_status(user: dict) -> Optional[dict]:
                 'seconds_remaining': max(0, seconds_remaining),
                 'reason': hospital_session.get('reason', 'Unknown')
             }
+    
+    # If not in active hospital session but injured, calculate estimated healing time
+    current_hp = user.get('hp', MAX_HP)
+    if current_hp < MAX_HP:
+        hp_missing = MAX_HP - current_hp
+        # Natural regen: 10 HP per hour = 1 HP per 6 minutes = 360 seconds per HP
+        seconds_to_heal = hp_missing * 360
+        estimated_release = datetime.now(timezone.utc) + timedelta(seconds=seconds_to_heal)
+        
+        return {
+            'in_hospital': False,
+            'injured': True,
+            'release_time': estimated_release.isoformat(),
+            'seconds_remaining': seconds_to_heal,
+            'reason': 'Natural regeneration'
+        }
+    
     return None
 
 async def log_event(event_type: str, message: str, user_id: Optional[str] = None):
@@ -928,7 +947,7 @@ async def get_game_state(current_user: dict = Depends(get_current_user)):
     # Calculate equipment bonuses
     equipped_items = []
     total_defense_bonus = 0
-    total_damage_bonus = 0
+    total_strength_bonus = 0
     
     for slot, item_id in current_user.get('equipment', {}).items():
         if item_id:
@@ -937,8 +956,8 @@ async def get_game_state(current_user: dict = Depends(get_current_user)):
                 equipped_items.append({**item_data, 'slot': slot})
                 if 'defense' in item_data:
                     total_defense_bonus += item_data['defense']
-                if 'damage' in item_data:
-                    total_damage_bonus += item_data['damage']
+                if 'strength' in item_data:
+                    total_strength_bonus += item_data['strength']
     
     return {
         'user': {
@@ -961,9 +980,12 @@ async def get_game_state(current_user: dict = Depends(get_current_user)):
             'xp_required': calculate_xp_for_next_level(current_user['xp'], current_user['level']),
         },
         'stats': {
-            **current_user['stats'],
+            'strength': current_user['stats']['strength'],
+            'dexterity': current_user['stats']['dexterity'],
+            'speed': current_user['stats']['speed'],
+            'defense': current_user['stats']['defense'],
+            'total_strength': current_user['stats']['strength'] + total_strength_bonus,
             'total_defense': current_user['stats']['defense'] + total_defense_bonus,
-            'total_damage': current_user['stats']['strength'] + total_damage_bonus,
         },
         'location': {
             'kingdom_id': current_user['location'],
@@ -997,10 +1019,10 @@ async def start_training(req: TrainRequest, request: Request, current_user: dict
     if await check_hospital_status(current_user):
         raise HTTPException(status_code=400, detail="Du kannst nicht trainieren während du verletzt bist")
     
-    # Check if already training
-    existing = await db.training_sessions.find_one({'user_id': user_id, 'completed': False})
+    # Check if already training THIS specific stat
+    existing = await db.training_sessions.find_one({'user_id': user_id, 'stat': req.stat, 'completed': False})
     if existing:
-        raise HTTPException(status_code=400, detail="Du trainierst bereits einen anderen Stat")
+        raise HTTPException(status_code=400, detail=f"Du trainierst {req.stat} bereits")
     
     # Check energy
     cost = TRAINING_COSTS[req.stat]
