@@ -6,7 +6,7 @@ import {
   Home, Dumbbell, Skull, Swords, Scroll, Package, ShoppingCart, 
   Store, Landmark, Users, Dice6, Map, CircleDollarSign, Trophy,
   Hospital, LockKeyhole, Target, Castle, MessageSquare, Award,
-  Settings, LogOut, Menu, X, Crown, Heart, Zap, User
+  Settings, LogOut, Menu, X, Crown, Heart, Zap, User, Bot
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -63,6 +63,7 @@ export const GameShell = () => {
     { path: '/game/achievements', icon: Award, label: 'Royal Honours', paths: ['knight', 'shadow', 'noble'] },
     { path: '/game/messages', icon: MessageSquare, label: 'Messages', paths: ['knight', 'shadow', 'noble'] },
     { path: '/game/gazette', icon: Trophy, label: 'Royal Gazette', paths: ['knight', 'shadow', 'noble'] },
+    { path: '/game/bot-testing', icon: Bot, label: '🤖 Bot-Tests', paths: ['knight', 'shadow', 'noble'] },
   ];
 
   // Filter navigation based on user's path

@@ -85,15 +85,19 @@ export default function InventoryPage() {
         <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--aeth-gold)', fontFamily: "'Cinzel', serif" }}>
           Ausrüstung
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {['weapon', 'armor', 'helmet', 'shield'].map(slot => {
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          {['weapon', 'offhand', 'armor', 'helmet', 'boots'].map(slot => {
             const equippedId = inventory.equipped[slot];
             const equippedItem = equippedId ? inventory.inventory.find(i => i.item_id === equippedId)?.item_details : null;
             
             return (
               <div key={slot} className="p-4 rounded-lg" style={{ backgroundColor: 'var(--aeth-stone-1)', border: '1px solid var(--aeth-iron)' }}>
                 <p className="text-xs uppercase mb-2" style={{ color: 'var(--aeth-parchment-dim)', fontFamily: "'Cinzel', serif" }}>
-                  {slot}
+                  {slot === 'weapon' && 'Waffe'}
+                  {slot === 'offhand' && 'Offhand'}
+                  {slot === 'armor' && 'Rüstung'}
+                  {slot === 'helmet' && 'Helm'}
+                  {slot === 'boots' && 'Stiefel'}
                 </p>
                 {equippedItem ? (
                   <div>
@@ -134,15 +138,25 @@ export default function InventoryPage() {
               {type === 'weapon' ? 'Waffen' : type === 'armor' ? 'Rüstungen' : type === 'consumable' ? 'Verbrauchsgüter' : type === 'relic' ? 'Reliquien' : type}
             </h2>
             <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {items.map(item => (
-                <div key={item.id} className="aeth-card p-4" data-testid={`inventory-item-${item.item_id}`}>
+              {items.map(item => {
+                const isEquipped = item.equipped === true;
+                
+                return (
+                <div key={item.id} className={`aeth-card p-4 ${isEquipped ? 'border-2 border-[color:var(--aeth-gold)]' : ''}`} data-testid={`inventory-item-${item.item_id}`}>
                   <div className="flex items-start justify-between mb-2">
                     <h3 className="text-sm font-semibold" style={{ color: 'var(--aeth-parchment)', fontFamily: "'IBM Plex Sans', sans-serif" }}>
                       {item.item_details.name}
                     </h3>
-                    <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: 'rgba(214,162,77,0.15)', color: 'var(--aeth-gold)' }}>
-                      x{item.quantity}
-                    </span>
+                    <div className="flex flex-col items-end gap-1">
+                      <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: 'rgba(214,162,77,0.15)', color: 'var(--aeth-gold)' }}>
+                        x{item.quantity}
+                      </span>
+                      {isEquipped && (
+                        <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: 'rgba(129,199,132,0.15)', color: '#81C784' }}>
+                          Ausgerüstet
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <p className="text-xs mb-3" style={{ color: 'var(--aeth-parchment-dim)' }}>
                     {item.item_details.description}
@@ -158,13 +172,17 @@ export default function InventoryPage() {
                       {item.item_details.effect.damage_boost && <p>+{item.item_details.effect.damage_boost} Schaden</p>}
                     </div>
                   )}
-                  {(item.item_details.damage || item.item_details.defense) && (
-                    <div className="text-xs mb-3 flex gap-2">
+                  {/* Show all stat bonuses */}
+                  {(item.item_details.damage || item.item_details.defense || item.item_details.strength || item.item_details.dexterity || item.item_details.speed) && (
+                    <div className="text-xs mb-3 flex flex-wrap gap-2">
                       {item.item_details.damage && <span style={{ color: '#E57373' }}>⚔️ {item.item_details.damage} DMG</span>}
+                      {item.item_details.strength && <span style={{ color: '#E57373' }}>💪 {item.item_details.strength} STR</span>}
                       {item.item_details.defense && <span style={{ color: '#81C784' }}>🛡️ {item.item_details.defense} DEF</span>}
+                      {item.item_details.dexterity && <span style={{ color: '#FFB74D' }}>🎯 {item.item_details.dexterity} DEX</span>}
+                      {item.item_details.speed && <span style={{ color: '#64B5F6' }}>⚡ {item.item_details.speed} SPD</span>}
                     </div>
                   )}
-                  {item.item_details.type === 'consumable' && (
+                  {item.item_details.type === 'consumable' && !isEquipped && (
                     <button
                       onClick={() => handleUseItem(item.item_id)}
                       className="btn-gold w-full py-2 rounded text-xs font-semibold"
@@ -173,7 +191,7 @@ export default function InventoryPage() {
                       Benutzen
                     </button>
                   )}
-                  {item.item_details.slot && (
+                  {item.item_details.slot && !isEquipped && (
                     <button
                       onClick={() => equipItem(item.item_id, item.item_details.slot)}
                       className="btn-gold w-full py-2 rounded text-xs font-semibold"
@@ -182,8 +200,18 @@ export default function InventoryPage() {
                       Ausrüsten
                     </button>
                   )}
+                  {isEquipped && (
+                    <button
+                      onClick={() => unequipItem(item.item_details.slot)}
+                      className="w-full py-2 rounded text-xs font-semibold"
+                      style={{ backgroundColor: 'rgba(229,115,115,0.2)', color: '#E57373' }}
+                      data-testid={`unequip-item-${item.item_id}`}
+                    >
+                      Ablegen
+                    </button>
+                  )}
                 </div>
-              ))}
+              )})}
             </div>
           </div>
         ))

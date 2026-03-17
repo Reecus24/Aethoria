@@ -28,7 +28,7 @@ import HospitalPage from './pages/HospitalPage';
 import DungeonPage from './pages/DungeonPage';
 import AchievementsPage from './pages/AchievementsPage';
 import GazettePage from './pages/GazettePage';
-import CharacterPage from './pages/CharacterPage';
+import BotTestingPage from './pages/BotTestingPage';
 
 // Protected Route wrapper
 function ProtectedRoute({ children }) {
@@ -107,6 +107,7 @@ function App() {
             <Route path="dungeon" element={<DungeonPage />} />
             <Route path="achievements" element={<AchievementsPage />} />
             <Route path="gazette" element={<GazettePage />} />
+            <Route path="bot-testing" element={<BotTestingPage />} />
           </Route>
 
           {/* Fallback */}

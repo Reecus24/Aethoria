@@ -104,9 +104,12 @@ export default function ShopPage() {
             <p className="text-xs mb-3" style={{ color: 'var(--aeth-parchment-dim)' }}>
               {item.description}
             </p>
-            <div className="flex items-center justify-between mb-3 text-xs">
+            <div className="flex flex-wrap items-center gap-2 mb-3 text-xs">
               {item.damage && <span style={{ color: '#E57373' }}>+{item.damage} DMG</span>}
+              {item.strength && <span style={{ color: '#E57373' }}>+{item.strength} STR</span>}
               {item.defense && <span style={{ color: '#81C784' }}>+{item.defense} DEF</span>}
+              {item.dexterity && <span style={{ color: '#FFB74D' }}>+{item.dexterity} DEX</span>}
+              {item.speed && <span style={{ color: '#64B5F6' }}>+{item.speed} SPD</span>}
               {item.effect && <span style={{ color: '#64B5F6' }}>Effekt</span>}
             </div>
             <button

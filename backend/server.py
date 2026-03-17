@@ -1631,56 +1631,128 @@ async def attack_player(req: CombatRequest, request: Request, current_user: dict
         }
     else:
         # Defender wins
-        base_damage = random.randint(15, 35)
-        damage = max(5, base_damage - current_user['stats']['defense'] // 2)
-        current_hp = await regenerate_hp(current_user)
-        new_attacker_hp = max(0, current_hp - damage)
         
-        await db.users.update_one(
-            {'id': user_id},
-            {'$set': {'hp': new_attacker_hp, 'last_hp_regen': datetime.now(timezone.utc)}}
-        )
-        
-        # Hospital
-        hospital_minutes = 0
-        if new_attacker_hp == 0:
-            hospital_minutes = 45
-            await db.hospital_sessions.insert_one({
+        # For MUG action that failed: NO damage, only jail chance based on dexterity
+        if req.action == 'mug':
+            # Calculate jail chance based on dexterity difference
+            attacker_dex = current_user['stats']['dexterity']
+            defender_dex = target['stats']['dexterity']
+            
+            # Base 20% chance, modified by dexterity difference
+            base_jail_chance = 0.20
+            dex_diff = defender_dex - attacker_dex
+            # +5% jail chance per 10 points defender dex advantage, -5% per 10 points attacker advantage
+            jail_modifier = (dex_diff / 10) * 0.05
+            final_jail_chance = max(0.05, min(0.50, base_jail_chance + jail_modifier))  # Between 5% and 50%
+            
+            jailed = random.random() < final_jail_chance
+            jail_minutes = 0
+            
+            if jailed:
+                jail_minutes = random.randint(20, 60)
+                await db.dungeon_sessions.insert_one({
+                    'id': str(uuid.uuid4()),
+                    'user_id': user_id,
+                    'crime_name': 'Ausrauben (gescheitert)',
+                    'arrest_time': datetime.now(timezone.utc),
+                    'release_time': datetime.now(timezone.utc) + timedelta(minutes=jail_minutes),
+                    'released': False
+                })
+            
+            # Log
+            combat_log = {
                 'id': str(uuid.uuid4()),
-                'user_id': user_id,
-                'reason': 'combat_loss',
+                'attacker_id': user_id,
+                'attacker_name': current_user['username'],
                 'defender_id': target['id'],
                 'defender_name': target['username'],
-                'admit_time': datetime.now(timezone.utc),
-                'release_time': datetime.now(timezone.utc) + timedelta(minutes=hospital_minutes),
-                'released': False
-            })
+                'action': 'mug',
+                'winner': 'defender',
+                'damage': 0,  # NO DAMAGE on failed mug
+                'gold_stolen': 0,
+                'hospital_minutes': 0,
+                'timestamp': datetime.now(timezone.utc)
+            }
+            await db.combat_logs.insert_one(combat_log)
+            
+            # Update stats
+            await db.users.update_one({'id': user_id}, {'$inc': {'combat_losses': 1}})
+            await db.users.update_one({'id': target['id']}, {'$inc': {'combat_wins': 1}})
+            
+            if jailed:
+                await log_event('crime', f'{current_user["username"]} wurde beim Versuch {target["username"]} auszurauben erwischt!', user_id)
+                return {
+                    'success': True,
+                    'victory': False,
+                    'message': f'Gescheitert und erwischt! Du landest für {jail_minutes} Minuten im Kerker.',
+                    'damage': 0,
+                    'gold_stolen': 0,
+                    'jailed': True,
+                    'jail_minutes': jail_minutes
+                }
+            else:
+                await log_event('combat', f'{target["username"]} hat einen Raubversuch von {current_user["username"]} abgewehrt!', target['id'])
+                return {
+                    'success': True,
+                    'victory': False,
+                    'message': 'Gescheitert! Das Opfer hat dich bemerkt und du musstest fliehen.',
+                    'damage': 0,
+                    'gold_stolen': 0,
+                    'jailed': False
+                }
         
-        # Log
-        combat_log = {
-            'id': str(uuid.uuid4()),
-            'attacker_id': user_id,
-            'attacker_name': current_user['username'],
-            'defender_id': target['id'],
-            'defender_name': target['username'],
-            'action': req.action,
-            'winner': 'defender',
-            'damage': damage,
-            'gold_stolen': 0,
-            'hospital_minutes': hospital_minutes,
-            'timestamp': datetime.now(timezone.utc)
-        }
-        await db.combat_logs.insert_one(combat_log)
-        
-        await log_event('combat', f'{target["username"]} hat {current_user["username"]} im Kampf besiegt!', target['id'])
-        
-        return {
-            'success': True,
-            'victory': False,
-            'message': f'Niederlage! Du hast {damage} Schaden erlitten',
-            'damage': damage,
-            'attacker_hospitalized': hospital_minutes > 0
-        }
+        # For normal attack/hospitalize that failed: attacker takes damage
+        else:
+            base_damage = random.randint(15, 35)
+            damage = max(5, base_damage - current_user['stats']['defense'] // 2)
+            current_hp = await regenerate_hp(current_user)
+            new_attacker_hp = max(0, current_hp - damage)
+            
+            await db.users.update_one(
+                {'id': user_id},
+                {'$set': {'hp': new_attacker_hp, 'last_hp_regen': datetime.now(timezone.utc)}}
+            )
+            
+            # Hospital
+            hospital_minutes = 0
+            if new_attacker_hp == 0:
+                hospital_minutes = 45
+                await db.hospital_sessions.insert_one({
+                    'id': str(uuid.uuid4()),
+                    'user_id': user_id,
+                    'reason': 'combat_loss',
+                    'defender_id': target['id'],
+                    'defender_name': target['username'],
+                    'admit_time': datetime.now(timezone.utc),
+                    'release_time': datetime.now(timezone.utc) + timedelta(minutes=hospital_minutes),
+                    'released': False
+                })
+            
+            # Log
+            combat_log = {
+                'id': str(uuid.uuid4()),
+                'attacker_id': user_id,
+                'attacker_name': current_user['username'],
+                'defender_id': target['id'],
+                'defender_name': target['username'],
+                'action': req.action,
+                'winner': 'defender',
+                'damage': damage,
+                'gold_stolen': 0,
+                'hospital_minutes': hospital_minutes,
+                'timestamp': datetime.now(timezone.utc)
+            }
+            await db.combat_logs.insert_one(combat_log)
+            
+            await log_event('combat', f'{target["username"]} hat {current_user["username"]} im Kampf besiegt!', target['id'])
+            
+            return {
+                'success': True,
+                'victory': False,
+                'message': f'Niederlage! Du hast {damage} Schaden erlitten',
+                'damage': damage,
+                'attacker_hospitalized': hospital_minutes > 0
+            }
 
 @app.get("/api/game/combat/logs")
 async def get_combat_logs(current_user: dict = Depends(get_current_user), limit: int = 30):
@@ -1872,7 +1944,11 @@ async def get_inventory(current_user: dict = Depends(get_current_user)):
     for inv_item in inv_items:
         item_data = next((i for i in MASTER_ITEMS if i['id'] == inv_item['item_id']), None)
         if item_data:
-            enriched.append({**inv_item, 'item_details': item_data})
+            enriched.append({
+                **inv_item, 
+                'item_details': item_data,
+                'equipped': inv_item.get('equipped', False)  # Include equipped flag
+            })
     
     return {
         'inventory': serialize_doc(enriched),
@@ -1942,30 +2018,24 @@ async def equip_item(req: EquipItemRequest, current_user: dict = Depends(get_cur
     if item_data.get('slot') != req.slot:
         raise HTTPException(status_code=400, detail=f"Dieser Gegenstand gehört in Slot: {item_data.get('slot', 'none')}")
     
-    # Unequip current item in slot (return to inventory)
+    # Unequip current item in slot (keep in inventory)
     current_equipment = current_user.get('equipment', {})
     old_item_id = current_equipment.get(req.slot)
     
     if old_item_id:
-        existing_inv = await db.inventories.find_one({'user_id': user_id, 'item_id': old_item_id})
-        if existing_inv:
-            await db.inventories.update_one({'user_id': user_id, 'item_id': old_item_id}, {'$inc': {'quantity': 1}})
-        else:
-            await db.inventories.insert_one({
-                'id': str(uuid.uuid4()),
-                'user_id': user_id,
-                'item_id': old_item_id,
-                'quantity': 1,
-                'acquired_at': datetime.now(timezone.utc)
-            })
+        # Mark old item as no longer equipped (keep in inventory)
+        await db.inventories.update_one(
+            {'user_id': user_id, 'item_id': old_item_id},
+            {'$set': {'equipped': False}}
+        )
     
-    # Remove new item from inventory
-    if inv_item['quantity'] == 1:
-        await db.inventories.delete_one({'id': inv_item['id']})
-    else:
-        await db.inventories.update_one({'id': inv_item['id']}, {'$inc': {'quantity': -1}})
+    # Mark new item as equipped (keep in inventory, don't delete!)
+    await db.inventories.update_one(
+        {'user_id': user_id, 'item_id': req.item_id},
+        {'$set': {'equipped': True}}
+    )
     
-    # Equip
+    # Equip in user document
     await db.users.update_one(
         {'id': user_id},
         {'$set': {f'equipment.{req.slot}': req.item_id}}
@@ -1997,20 +2067,13 @@ async def unequip_item(slot: str, current_user: dict = Depends(get_current_user)
     if not item_id:
         raise HTTPException(status_code=400, detail="Kein Gegenstand in diesem Slot")
     
-    # Return to inventory
-    existing = await db.inventories.find_one({'user_id': user_id, 'item_id': item_id})
-    if existing:
-        await db.inventories.update_one({'user_id': user_id, 'item_id': item_id}, {'$inc': {'quantity': 1}})
-    else:
-        await db.inventories.insert_one({
-            'id': str(uuid.uuid4()),
-            'user_id': user_id,
-            'item_id': item_id,
-            'quantity': 1,
-            'acquired_at': datetime.now(timezone.utc)
-        })
+    # Mark as unequipped in inventory
+    await db.inventories.update_one(
+        {'user_id': user_id, 'item_id': item_id},
+        {'$set': {'equipped': False}}
+    )
     
-    # Unequip
+    # Remove from equipment slot
     await db.users.update_one({'id': user_id}, {'$set': {f'equipment.{slot}': None}})
     
     return {'success': True, 'message': 'Gegenstand abgelegt'}
@@ -3145,6 +3208,38 @@ async def get_reviews_only():
         })
     
     return enriched
+
+# ============================================================================
+# ADMIN / BOT TESTING ENDPOINTS
+# ============================================================================
+
+@app.post("/api/admin/run-bot-tests")
+async def run_bot_tests(current_user: dict = Depends(get_current_user)):
+    """Run automated bot tests"""
+    import subprocess
+    import json
+    
+    try:
+        # Run bot testing script
+        subprocess.run(
+            ['python3', '/app/game_bot_tester.py'],
+            capture_output=True,
+            text=True,
+            timeout=60
+        )
+        
+        # Load report
+        with open('/app/bot_test_report.json', 'r') as f:
+            report = json.load(f)
+        
+        return report
+        
+    except subprocess.TimeoutExpired:
+        raise HTTPException(status_code=408, detail="Bot-Tests haben zu lange gedauert")
+    except FileNotFoundError:
+        raise HTTPException(status_code=500, detail="Bot-Test Report nicht gefunden")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Bot-Tests fehlgeschlagen: {str(e)}")
 
 @app.post("/api/reviews")
 async def create_review(req: ReviewRequest, current_user: dict = Depends(get_current_user)):

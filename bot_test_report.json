@@ -1,0 +1,33 @@
+{
+  "test_date": "2026-03-17T21:37:38.810671",
+  "bots_run": 3,
+  "total_actions": 24,
+  "bugs_found": 0,
+  "bugs_by_severity": {
+    "CRITICAL": [],
+    "HIGH": [],
+    "MEDIUM": [],
+    "LOW": []
+  },
+  "all_bugs": [],
+  "bot_summaries": [
+    {
+      "bot": "KnightBot",
+      "path": "knight",
+      "actions": 7,
+      "bugs": 0
+    },
+    {
+      "bot": "ShadowBot",
+      "path": "shadow",
+      "actions": 10,
+      "bugs": 0
+    },
+    {
+      "bot": "NobleBot",
+      "path": "noble",
+      "actions": 7,
+      "bugs": 0
+    }
+  ]
+}
